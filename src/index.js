@@ -1,9 +1,9 @@
 import N3 from 'n3';
 import fs from "fs";
-import { RdfStore } from 'rdf-stores';
-import { QueryEngine } from '@comunica/query-sparql';
+//import { RdfStore } from 'rdf-stores';
+//import { QueryEngine } from '@comunica/query-sparql';
 import rdfDataset from "@rdfjs/dataset";
-import validate from './utils/shacl_validation.js';
+//import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
 import request from "request";
 import {
