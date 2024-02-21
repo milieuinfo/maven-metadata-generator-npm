@@ -134,6 +134,10 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-get_version_urls()
+export { get_version_urls };
+
+
+
+//get_version_urls()
 
 
