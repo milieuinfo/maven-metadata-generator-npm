@@ -7,7 +7,15 @@
   "scripts": {
     "release": "echo \"joepie de poepie\""
   },
-  "keywords": [],
+  "publishConfig": {
+    "registry": "https://repo.omgeving.vlaanderen.be/artifactory/api/npm/local-npm/"
+  },
+  "keywords": [
+    "milieuinfo",
+    "metadata",
+    "generator",
+    "maven"
+  ],
   "author": "Vlaamse Overheid, Departement omgeving",
   "license": "MIT",
   "dependencies": {
