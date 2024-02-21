@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-
+    "release": "echo \"joepie de poepie\""
   },
   "keywords": [],
   "author": "Vlaamse Overheid, Departement omgeving",
@@ -18,5 +18,8 @@
     "js-yaml": "^4.1.0",
     "xml-js": "^1.6.11",
     "jsonpath": "^1.1.1"
+  },
+  "volta": {
+    "node": "18.19.1"
   }
 }
