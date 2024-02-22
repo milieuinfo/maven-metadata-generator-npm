@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "build": "rm -rf build && npm install && rollup -c rollup.config.mjs",
-    "release": "npm run build && npm version $release_version && git push && npm publish"
+    "release": "npm run build && npm version $release_version && git push --all && npm publish"
   },
   "publishConfig": {
     "registry": "https://repo.omgeving.vlaanderen.be/artifactory/api/npm/local-npm/"
