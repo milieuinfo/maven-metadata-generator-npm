@@ -69,6 +69,7 @@ const frame_catalog = {
 export {
     artifactId,
     config,
+    context,
     dcat_catalog_jsonld,
     dcat_catalog_turtle,
     dcat_dataset_jsonld,
