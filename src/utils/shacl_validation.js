@@ -1,6 +1,7 @@
 import rdf from '@zazuko/env-node'
 import SHACLValidator from 'rdf-validate-shacl'
 
+
 async function validate(shapes, data) {
     console.log("Validation");
     const validator = new SHACLValidator(shapes, { factory: rdf })

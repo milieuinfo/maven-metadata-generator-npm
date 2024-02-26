@@ -1,22 +1,10 @@
 'use strict';
-import yaml from 'js-yaml';
-import fs, {readFileSync} from "fs";
-import convert from "xml-js";
-import jp from "jsonpath";
+import {
+    groupId,
+    artifactId,
+    config
+} from './variables.js';
 
-
-
-//const config = yaml.load(fs.readFileSync('./source/config.yml', 'utf8'));
-
-const config_dcat = yaml.load(fs.readFileSync('./config/config.yml', 'utf8'));
-
-var result = JSON.parse(convert.xml2json(readFileSync('../pom.xml', 'utf8'), {compact: true, spaces: 4}));
-
-const groupId = jp.query(result, '$.project.groupId._text').toString();
-
-const artifactId = jp.query(result, '$.project.artifactId._text').toString();
-
-const context = Object.assign({},JSON.parse(readFileSync(config.source.path + config.source.context)), config.prefixes)
 
 
 function construct_metadata(versions) {

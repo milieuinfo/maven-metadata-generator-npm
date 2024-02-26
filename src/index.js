@@ -1,11 +1,11 @@
 import N3 from 'n3';
 import fs from "fs";
 import rdfDataset from "@rdfjs/dataset";
-//import validate from './utils/shacl_validation.js';
+import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
 import request from "request";
+
 import {
-    sortLines,
     spdx_rules,
     spdx_extra_rules,
     rdf_rules,
@@ -30,6 +30,7 @@ import {
 } from './utils/metadata.js';
 import {RoxiReasoner} from "roxi-js";
 
+const sortLines = str => str.split(/\r?\n/).sort().join('\n'); // To sort the dump of the reasoner for turtle pretty printing. Easier than using the Sink or Store.
 
 async function get_version_urls() {
     console.log('1. get previous versions');
@@ -109,10 +110,10 @@ function output(rdf, turtle, json_ld) {
                     dataset.add(quad);
             else
                 (async () => {
-                    //if (await validate(shapes_dcat, dataset)) {
+                    if (await validate(shapes_dcat, dataset)) {
                     ttl_writer.end((error, result) => fs.writeFileSync(turtle, result));
                     rdf_to_jsonld(dataset, json_ld);
-                    //}
+                    }
                 })()
         });
 }
