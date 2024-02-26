@@ -48,7 +48,7 @@ function construct_metadata(versions) {
                     "isVersionOf": config.prefixes.omg_dataset + artifactId,
                     "issued": date_time,
                     "title": artifactId.split("-").join(' ') + ' Versie ' + version,
-                    "rootResource": config.prefixes.omg_conceptscheme + artifactId.split("-")[1],
+                    "rootResource": config.prefixes.conceptscheme + artifactId.split("-")[1],
                     "version": version,
                     "page": config.prefixes.omg_dataset_doc + artifactId + '_' + version + '.html',
                     "distribution": distributions
@@ -64,7 +64,7 @@ function construct_metadata(versions) {
             "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen het beleidsdomein omgeving.",
             "identifier": config.prefixes.omg_dataset + artifactId,
             "title": artifactId.split("-").join(' '),
-            "rootResource": config.prefixes.omg_conceptscheme + artifactId.split("-")[1],
+            "rootResource": config.prefixes.conceptscheme + artifactId.split("-")[1],
             "page": config.prefixes.omg_dataset_doc + artifactId + '.html',
             "hasVersion": dataset_versions
         }, config.metadata.all, config.metadata.dataset)
