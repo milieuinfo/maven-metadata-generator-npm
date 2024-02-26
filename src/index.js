@@ -4,6 +4,7 @@ import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
 import request from "request";
+import path from "path";
 
 import {
     spdx_rules,
@@ -111,8 +112,11 @@ function output(rdf, turtle, json_ld) {
             else
                 (async () => {
                     if (await validate(shapes_dcat, dataset)) {
-                    ttl_writer.end((error, result) => fs.writeFileSync(turtle, result));
-                    rdf_to_jsonld(dataset, json_ld);
+                        if (!fs.existsSync(path.dirname(turtle))){
+                            fs.mkdirSync(path.dirname(turtle), { recursive: true });
+                        }
+                        ttl_writer.end((error, result) => fs.writeFileSync(turtle, result));
+                        rdf_to_jsonld(dataset, json_ld);
                     }
                 })()
         });

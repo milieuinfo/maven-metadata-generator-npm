@@ -36,13 +36,17 @@ const spdx_rules = fs.readFileSync(config.n3.spdx_rules, 'utf8');
 
 const spdx_extra_rules = fs.readFileSync(config.n3.spdx_extra_rules, 'utf8');
 
-const dcat_dataset_jsonld = config.dcat.path_dataset + config.dcat.name + '/' + config.dcat.dataset_jsonld
+const dcat_catalog_path = config.dcat.path_catalog + config.dcat.name + '/'
 
-const dcat_dataset_turtle = config.dcat.path_dataset + config.dcat.name + '/' + config.dcat.dataset_turtle
+const dcat_dataset_path = config.dcat.path_dataset + config.dcat.name + '/'
 
-const dcat_catalog_jsonld = config.dcat.path_catalog + config.dcat.name + '/' + config.dcat.catalog_jsonld
+const dcat_dataset_jsonld = dcat_dataset_path + config.dcat.dataset_jsonld
 
-const dcat_catalog_turtle = config.dcat.path_catalog + config.dcat.name + '/' + config.dcat.catalog_turtle
+const dcat_dataset_turtle = dcat_dataset_path + config.dcat.dataset_turtle
+
+const dcat_catalog_jsonld = dcat_catalog_path + config.dcat.catalog_jsonld
+
+const dcat_catalog_turtle = dcat_catalog_path + config.dcat.catalog_turtle
 
 
 const frame_catalog = {
@@ -71,8 +75,10 @@ export {
     config,
     context,
     dcat_catalog_jsonld,
+    dcat_catalog_path,
     dcat_catalog_turtle,
     dcat_dataset_jsonld,
+    dcat_dataset_path,
     dcat_dataset_turtle,
     dcat_rules,
     dcterms_rules,
