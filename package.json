@@ -16,6 +16,8 @@
     "milieuinfo",
     "metadata",
     "generator",
+    "rdfjs",
+    "dcat",
     "maven"
   ],
   "author": "Vlaamse Overheid, Departement omgeving",
