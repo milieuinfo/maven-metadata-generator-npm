@@ -3,12 +3,14 @@ import yaml from 'js-yaml';
 import fs, {readFileSync} from "fs";
 import convert from "xml-js";
 import jp from "jsonpath";
-//import {context_skos_prefixes} from "./variables";
 
 
-const config = yaml.load(fs.readFileSync('../resources/source/config.yml', 'utf8'));
 
-var result = JSON.parse(convert.xml2json(readFileSync('../../../pom.xml', 'utf8'), {compact: true, spaces: 4}));
+//const config = yaml.load(fs.readFileSync('./source/config.yml', 'utf8'));
+
+const config_dcat = yaml.load(fs.readFileSync('./config/config.yml', 'utf8'));
+
+var result = JSON.parse(convert.xml2json(readFileSync('../pom.xml', 'utf8'), {compact: true, spaces: 4}));
 
 const groupId = jp.query(result, '$.project.groupId._text').toString();
 
@@ -34,7 +36,7 @@ function construct_metadata(versions) {
                     "version": version,
                     "title": artifactId.split("-").join(' ') + ', geserialiseerd als ' + extension + '-formaat. Versie ' + version,
                     "page": config.prefixes.omg_distribution_doc + artifactId + '_' + version + '_' + extension + '.html'
-                } //be/vlaanderen/omgeving/data/id/graph/codelijst-matrix/2.0.1/codelijst-matrix-2.0.1.jar
+                }
                 if (extension === 'jar'){
                     distribution_object = Object.assign({},{
                         "downloadURL": config.prefixes.repo + groupId.replace("/", '.') + '/' + version + '/' + artifactId + '-' + version + '.' + extension,
@@ -67,16 +69,16 @@ function construct_metadata(versions) {
     }
     let dataset_object = Object.assign({},
         {
-        "id": config.prefixes.omg_dataset + artifactId,
-        "dc.identifier": groupId.replace("graph", 'dataset') + '.' + artifactId, // "be.vlaanderen.omgeving.data.id.dataset.codelijst-matrix",
-        "alternative": "Dataset " + artifactId,
-        "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen het beleidsdomein omgeving.",
-        "identifier": config.prefixes.omg_dataset + artifactId,
-        "title": artifactId.split("-").join(' '),
-        "rootResource": config.prefixes.omg_conceptscheme + artifactId.split("-")[1],
-        "page": config.prefixes.omg_dataset_doc + artifactId + '.html',
-        "hasVersion": dataset_versions
-    }, config.metadata.all, config.metadata.dataset)
+            "id": config.prefixes.omg_dataset + artifactId,
+            "dc.identifier": groupId.replace("graph", 'dataset') + '.' + artifactId, // "be.vlaanderen.omgeving.data.id.dataset.codelijst-matrix",
+            "alternative": "Dataset " + artifactId,
+            "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen het beleidsdomein omgeving.",
+            "identifier": config.prefixes.omg_dataset + artifactId,
+            "title": artifactId.split("-").join(' '),
+            "rootResource": config.prefixes.omg_conceptscheme + artifactId.split("-")[1],
+            "page": config.prefixes.omg_dataset_doc + artifactId + '.html',
+            "hasVersion": dataset_versions
+        }, config.metadata.all, config.metadata.dataset)
 
     return {
         "@context": context,

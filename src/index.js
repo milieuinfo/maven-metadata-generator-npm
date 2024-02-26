@@ -1,7 +1,5 @@
 import N3 from 'n3';
 import fs from "fs";
-//import { RdfStore } from 'rdf-stores';
-//import { QueryEngine } from '@comunica/query-sparql';
 import rdfDataset from "@rdfjs/dataset";
 //import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
@@ -20,12 +18,9 @@ import {
     dcat_dataset_turtle,
     dcat_catalog_jsonld,
     dcat_catalog_turtle,
-    context_catalog,
     groupId,
     artifactId,
     next_release_version,
-    name,
-    dcat_prefixes,
     frame_catalog,
     shapes_dcat,
     config
@@ -101,7 +96,7 @@ async function n3_reasoning(json, turtle, json_ld) {
 
 function output(rdf, turtle, json_ld) {
     console.log("5: output");
-    const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: dcat_prefixes });
+    const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: config.prefixes });
     //const nt_writer = new N3.Writer({ format: 'N-Triples' });
     const dataset = rdfDataset.dataset()
     const parser = new N3.Parser();
