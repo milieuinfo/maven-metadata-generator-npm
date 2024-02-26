@@ -23,7 +23,4 @@ services:
       - ${HOME:-.}/.npmrc:/root/.npmrc:ro
       - ${HOME:-.}/.gitconfig:/root/.gitconfig:ro
       - ${HOME:-.}/.git-credentials:/root/.git-credentials:ro
-      - ${HOME:-.}/.ssh:/root/.ssh:ro
-      - ${HOME:-.}/.ssh/key:/${HOME:-.}/.ssh/key:ro
-      - ../.git:/data/.git
       - ..:/data

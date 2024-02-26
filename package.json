@@ -1,13 +1,13 @@
 {
   "type": "module",
   "name": "maven-metadata-generator-npm",
-  "version": "0.1.6",
+  "version": "0.1.13",
   "description": "",
   "main": "src/index.js",
   "scripts": {
     "build": "rm -rf build && npm install && rollup -c rollup.config.mjs",
-    "release": "npm run build && npm version $release_version && git push && npm publish",
-    "postpublish": "git tag v$release_version && git push --tags"
+    "release": "npm run build && npm version $release_version && npm publish",
+    "postversion": "git push && git push --tags"
   },
   "publishConfig": {
     "registry": "https://repo.omgeving.vlaanderen.be/artifactory/api/npm/local-npm/"
