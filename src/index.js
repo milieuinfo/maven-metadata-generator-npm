@@ -88,6 +88,7 @@ async function n3_reasoning(json, turtle, json_ld) {
     reasoner.add_rules(skos_rules);
     reasoner.add_rules(foaf_rules);
     reasoner.add_rules(void_rules);
+    reasoner.add_rules(rdf_rules);
     reasoner.add_rules(spdx_rules);
     reasoner.add_rules(spdx_extra_rules);
     reasoner.materialize();
