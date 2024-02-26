@@ -36,7 +36,7 @@ const spdx_rules = fs.readFileSync(config.n3.spdx_rules, 'utf8');
 
 const spdx_extra_rules = fs.readFileSync(config.n3.spdx_extra_rules, 'utf8');
 
-const dcat_dataset_jsonld = config.dcat.path_dataset + name + '/' + config.dcat.dataset_jsonld
+const dcat_dataset_jsonld = config.dcat.path_dataset + artifactId + '/' + config.dcat.dataset_jsonld
 
 const dcat_dataset_turtle = config.dcat.path_dataset + config.dcat.name + '/' + config.dcat.dataset_turtle
 
