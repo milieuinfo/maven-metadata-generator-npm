@@ -5,6 +5,7 @@ import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
 import request from "request";
 import path from "path";
+import {RoxiReasoner} from "roxi-js";
 
 import {
     spdx_rules,
@@ -29,9 +30,12 @@ import {
 import {
     construct_metadata
 } from './utils/metadata.js';
-import {RoxiReasoner} from "roxi-js";
+import {
+    separateString,
+    joinArray,
+    sortLines
+} from './utils/functions.js';
 
-const sortLines = str => str.split(/\r?\n/).sort().join('\n'); // To sort the dump of the reasoner for turtle pretty printing. Easier than using the Sink or Store.
 
 async function get_version_urls() {
     console.log('1. get previous versions');
@@ -134,7 +138,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { get_version_urls };
+export { get_version_urls, separateString, joinArray, sortLines };
 
 
 
