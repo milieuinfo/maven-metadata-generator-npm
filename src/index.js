@@ -8,28 +8,29 @@ import path from "path";
 import {RoxiReasoner} from "roxi-js";
 
 import {
-    dcat_rules,
-    dcat_dataset_jsonld,
-    dcat_dataset_turtle,
+    artifactId,
+    config,
     dcat_catalog_jsonld,
     dcat_catalog_turtle,
-    groupId,
-    artifactId,
-    next_release_version,
+    dcat_dataset_jsonld,
+    dcat_dataset_turtle,
+    dcat_rules,
     frame_catalog,
-    shapes_dcat,
-    config
+    groupId,
+    next_release_version,
+    shapes_dcat
 } from './utils/variables.js';
-import {
-    construct_metadata
-} from './utils/metadata.js';
-import {
-    separateString,
-    joinArray,
-    sortLines
-} from './utils/functions.js';
+import {construct_metadata} from './utils/metadata.js';
+import {joinArray, separateString, sortLines} from './utils/functions.js';
 
-
+async function create_metadata() {
+    const urls = await get_version_urls()
+    const versions = await get_versions(urls)
+    const version_nt = await n3_reasoning(construct_metadata(versions[0]), dcat_rules)
+    const versions_nt = await n3_reasoning(construct_metadata(versions[1]), dcat_rules)
+    output(version_nt, dcat_dataset_turtle, dcat_dataset_jsonld)
+    output(versions_nt, dcat_catalog_turtle, dcat_catalog_jsonld)
+}
 async function get_version_urls() {
     console.log('1. get previous versions');
     let url = 'https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=' +
@@ -50,7 +51,8 @@ async function get_version_urls() {
                     my_uris.push(result.uri);
                 }
             }
-            get_versions(my_uris)
+            return my_uris;
+            //get_versions(my_uris)
         };
     });
 }
@@ -68,17 +70,10 @@ async function get_versions(uris) {
     let version = {}
     version[next_release_version] = date_time.toISOString()
     my_versions.push(version)
-    //construct_metadata2([version])
-    //output(n3_reasoning(construct_metadata([version]), dcat_rules), dcat_dataset_turtle, dcat_dataset_jsonld)
-    //output(n3_reasoning(construct_metadata(my_versions), dcat_rules), dcat_catalog_turtle, dcat_catalog_jsonld)
-        (async () => {
-            const version_nt = await n3_reasoning(construct_metadata([version]), dcat_rules)
-            const versions_nt = await n3_reasoning(construct_metadata(my_versions), dcat_rules)
-            output(version_nt, dcat_dataset_turtle, dcat_dataset_jsonld)
-            output(versions_nt, dcat_catalog_turtle, dcat_catalog_jsonld)
-        })()
-
+    return [ [version], my_versions ];
 }
+
+
 async function n3_reasoning(json_ld, rules) {
     console.log("2: n3 reasoning ");
     let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
@@ -88,9 +83,9 @@ async function n3_reasoning(json_ld, rules) {
         reasoner.add_rules(fs.readFileSync(rules[rule], 'utf8'));
     }
     reasoner.materialize();
-    const result = await sortLines(reasoner.get_abox_dump())
-    return result;
+    return await sortLines(reasoner.get_abox_dump());
 }
+
 //
 //
 // async function n3_reasoning(json, turtle, json_ld) {
@@ -149,7 +144,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { n3_reasoning, get_version_urls, separateString, joinArray, sortLines , validate };
+export { n3_reasoning, create_metadata, separateString, joinArray, sortLines , validate };
 
 
 
