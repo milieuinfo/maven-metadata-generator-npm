@@ -88,7 +88,8 @@ async function n3_reasoning(json_ld, rules) {
         reasoner.add_rules(fs.readFileSync(rules[rule], 'utf8'));
     }
     reasoner.materialize();
-    return sortLines(reasoner.get_abox_dump());
+    const result = await sortLines(reasoner.get_abox_dump())
+    return result;
 }
 //
 //
