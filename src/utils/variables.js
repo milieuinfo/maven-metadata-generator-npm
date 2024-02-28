@@ -20,21 +20,7 @@ const artifactId = jp.query(pom, '$.project.artifactId._text').toString();
 
 const next_release_version = jp.query(pom, '$.project.version._text').toString().split('-')[0];
 
-const skos_rules = fs.readFileSync(config.n3.skos_rules, 'utf8');
-
 const dcat_rules = config.dcat.rules ;
-
-const dcterms_rules = fs.readFileSync(config.n3.dcterms_rules, 'utf8');
-
-const foaf_rules = fs.readFileSync(config.n3.foaf_rules, 'utf8');
-
-const void_rules = fs.readFileSync(config.n3.void_rules, 'utf8');
-
-const rdf_rules = fs.readFileSync(config.n3.rdf_rules, 'utf8');
-
-const spdx_rules = fs.readFileSync(config.n3.spdx_rules, 'utf8');
-
-const spdx_extra_rules = fs.readFileSync(config.n3.spdx_extra_rules, 'utf8');
 
 const dcat_catalog_path = config.dcat.path_catalog + artifactId + '/'
 
