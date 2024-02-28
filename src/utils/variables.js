@@ -81,17 +81,10 @@ export {
     dcat_dataset_path,
     dcat_dataset_turtle,
     dcat_rules,
-    dcterms_rules,
-    foaf_rules,
     frame_catalog,
     groupId,
     next_release_version,
-    rdf_rules,
-    shapes_dcat,
-    skos_rules,
-    spdx_extra_rules,
-    spdx_rules,
-    void_rules
+    shapes_dcat
 };
 
 
