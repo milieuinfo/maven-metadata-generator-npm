@@ -62,8 +62,8 @@ async function get_versions(uris) {
     let version = {}
     version[next_release_version] = date_time.toISOString()
     my_versions.push(version)
-    const version_nt = await n3_reasoning(construct_metadata([version]), dcat_rules)
-    const versions_nt = await n3_reasoning(construct_metadata(my_versions), dcat_rules)
+    const version_nt = await n3_reasoning(construct_dcat([version]), dcat_rules)
+    const versions_nt = await n3_reasoning(construct_dcat(my_versions), dcat_rules)
     output(version_nt, dcat_dataset_turtle, dcat_dataset_jsonld)
     output(versions_nt, dcat_catalog_turtle, dcat_catalog_jsonld)
 }
