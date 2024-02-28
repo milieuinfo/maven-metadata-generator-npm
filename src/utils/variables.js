@@ -22,7 +22,7 @@ const next_release_version = jp.query(pom, '$.project.version._text').toString()
 
 const skos_rules = fs.readFileSync(config.n3.skos_rules, 'utf8');
 
-const dcat_rules = fs.readFileSync(config.n3.dcat_rules, 'utf8');
+const dcat_rules = config.dcat.rules ;
 
 const dcterms_rules = fs.readFileSync(config.n3.dcterms_rules, 'utf8');
 

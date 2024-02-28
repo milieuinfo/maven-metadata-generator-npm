@@ -8,14 +8,7 @@ import path from "path";
 import {RoxiReasoner} from "roxi-js";
 
 import {
-    spdx_rules,
-    spdx_extra_rules,
-    rdf_rules,
-    void_rules,
-    foaf_rules,
-    dcterms_rules,
     dcat_rules,
-    skos_rules,
     dcat_dataset_jsonld,
     dcat_dataset_turtle,
     dcat_catalog_jsonld,
@@ -76,28 +69,39 @@ async function get_versions(uris) {
     version[next_release_version] = date_time.toISOString()
     my_versions.push(version)
     //construct_metadata2([version])
-    n3_reasoning(construct_metadata([version]), dcat_dataset_turtle, dcat_dataset_jsonld)
-    n3_reasoning(construct_metadata(my_versions), dcat_catalog_turtle, dcat_catalog_jsonld)
+    output(n3_reasoning(construct_metadata([version]), dcat_rules), dcat_dataset_turtle, dcat_dataset_jsonld)
+    output(n3_reasoning(construct_metadata(my_versions), dcat_rules), dcat_catalog_turtle, dcat_catalog_jsonld)
 
 }
-
-
-async function n3_reasoning(json, turtle, json_ld) {
-    console.log("4: n3 reasoning ");
-    let rdf = await jsonld.toRDF(json, { format: "application/n-quads" })
+async function n3_reasoning(json_ld, rules) {
+    console.log("2: n3 reasoning ");
+    let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
     const reasoner = RoxiReasoner.new();
     reasoner.add_abox(rdf);
-    reasoner.add_rules(dcat_rules);
-    reasoner.add_rules(dcterms_rules);
-    reasoner.add_rules(skos_rules);
-    reasoner.add_rules(foaf_rules);
-    reasoner.add_rules(void_rules);
-    reasoner.add_rules(rdf_rules);
-    reasoner.add_rules(spdx_rules);
-    reasoner.add_rules(spdx_extra_rules);
+    for (let rule in rules) {
+        reasoner.add_rules(fs.readFileSync(rules[rule], 'utf8'));
+    }
     reasoner.materialize();
-    output(sortLines(reasoner.get_abox_dump()), turtle, json_ld);
+    return sortLines(reasoner.get_abox_dump());
 }
+//
+//
+// async function n3_reasoning(json, turtle, json_ld) {
+//     console.log("4: n3 reasoning ");
+//     let rdf = await jsonld.toRDF(json, { format: "application/n-quads" })
+//     const reasoner = RoxiReasoner.new();
+//     reasoner.add_abox(rdf);
+//     reasoner.add_rules(dcat_rules);
+//     reasoner.add_rules(dcterms_rules);
+//     reasoner.add_rules(skos_rules);
+//     reasoner.add_rules(foaf_rules);
+//     reasoner.add_rules(void_rules);
+//     reasoner.add_rules(rdf_rules);
+//     reasoner.add_rules(spdx_rules);
+//     reasoner.add_rules(spdx_extra_rules);
+//     reasoner.materialize();
+//     output(sortLines(reasoner.get_abox_dump()), turtle, json_ld);
+// }
 
 
 function output(rdf, turtle, json_ld) {
@@ -138,7 +142,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { get_version_urls, separateString, joinArray, sortLines , validate };
+export { n3_reasoning, get_version_urls, separateString, joinArray, sortLines , validate };
 
 
 
