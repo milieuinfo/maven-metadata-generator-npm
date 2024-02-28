@@ -8,7 +8,7 @@ import {
 
 
 
-function construct_metadata(versions) {
+function construct_dcat(versions) {
     let dataset_versions = new Array()
     for (const v of versions) {
         for (const [version, date_time] of Object.entries(v)) {
@@ -77,5 +77,5 @@ function construct_metadata(versions) {
     } ;
 }
 
-export { construct_metadata};
+export { construct_dcat };
 

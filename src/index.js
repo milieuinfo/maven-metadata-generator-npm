@@ -20,15 +20,11 @@ import {
     next_release_version,
     shapes_dcat
 } from './utils/variables.js';
-import {construct_metadata} from './utils/metadata.js';
+import {construct_dcat} from './utils/metadata.js';
 import {joinArray, separateString, sortLines} from './utils/functions.js';
 
-async function create_metadata() {
-    const urls = await get_version_urls()
-    const versions = await get_versions(urls)
 
-}
-async function get_version_urls() {
+async function create_metadata() {
     console.log('1. get previous versions');
     let url = 'https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=' +
         groupId +
@@ -105,10 +101,10 @@ async function n3_reasoning(json_ld, rules) {
 // }
 
 
-function output(rdf, turtle, json_ld) {
+function output(rdf, turtle = false, json_ld = false, n_triples = false , csv = false) {
     console.log("5: output");
     const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: config.prefixes });
-    //const nt_writer = new N3.Writer({ format: 'N-Triples' });
+    const nt_writer = new N3.Writer({ format: 'N-Triples' });
     const dataset = rdfDataset.dataset()
     const parser = new N3.Parser();
     parser.parse(
@@ -116,20 +112,31 @@ function output(rdf, turtle, json_ld) {
         (error, quad) => {
             if (quad)
                 ttl_writer.addQuad(quad),
-                    //nt_writer.addQuad(quad),
+                    nt_writer.addQuad(quad),
                     dataset.add(quad);
             else
                 (async () => {
                     if (await validate(shapes_dcat, dataset)) {
-                        if (!fs.existsSync(path.dirname(turtle))){
-                            fs.mkdirSync(path.dirname(turtle), { recursive: true });
+                        if (turtle){
+                            if (!fs.existsSync(path.dirname(turtle))){
+                                fs.mkdirSync(path.dirname(turtle), { recursive: true });
+                            }
+                            ttl_writer.end((error, result) => fs.writeFileSync(turtle, result));
                         }
-                        ttl_writer.end((error, result) => fs.writeFileSync(turtle, result));
-                        rdf_to_jsonld(dataset, json_ld);
+                        if (n_triples){
+                            if (!fs.existsSync(path.dirname(n_triples))){
+                                fs.mkdirSync(path.dirname(n_triples), { recursive: true });
+                            }
+                            nt_writer.end((error, result) => fs.writeFileSync(n_triples, result))
+                        }
+                        if (json_ld){
+                            rdf_to_jsonld(dataset, json_ld);
+                        }
                     }
                 })()
         });
 }
+
 
 async function rdf_to_jsonld(rdf_dataset, filename) {
     console.log("6 rdf to jsonld");
@@ -143,7 +150,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { n3_reasoning, get_version_urls, separateString, joinArray, sortLines , validate };
+export { n3_reasoning, create_metadata, separateString, joinArray, sortLines , validate };
 
 
 
