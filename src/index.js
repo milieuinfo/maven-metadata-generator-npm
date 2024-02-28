@@ -69,8 +69,14 @@ async function get_versions(uris) {
     version[next_release_version] = date_time.toISOString()
     my_versions.push(version)
     //construct_metadata2([version])
-    output(n3_reasoning(construct_metadata([version]), dcat_rules), dcat_dataset_turtle, dcat_dataset_jsonld)
-    output(n3_reasoning(construct_metadata(my_versions), dcat_rules), dcat_catalog_turtle, dcat_catalog_jsonld)
+    //output(n3_reasoning(construct_metadata([version]), dcat_rules), dcat_dataset_turtle, dcat_dataset_jsonld)
+    //output(n3_reasoning(construct_metadata(my_versions), dcat_rules), dcat_catalog_turtle, dcat_catalog_jsonld)
+        (async () => {
+            const version_nt = await n3_reasoning(construct_metadata([version]), dcat_rules)
+            const versions_nt = await n3_reasoning(construct_metadata(my_versions), dcat_rules)
+            output(version_nt, dcat_dataset_turtle, dcat_dataset_jsonld)
+            output(versions_nt, dcat_catalog_turtle, dcat_catalog_jsonld)
+        })()
 
 }
 async function n3_reasoning(json_ld, rules) {
