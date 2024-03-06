@@ -9,12 +9,6 @@
     "release": "npm run build && npm version $release_version && npm publish",
     "postversion": "git push && git push --tags"
   },
-  "files": [
-    "./src/n3/"
-  ],
-  "directories": {
-    "n3:": "./src/n3"
-  },
   "publishConfig": {
     "registry": "https://repo.omgeving.vlaanderen.be/artifactory/api/npm/local-npm/"
   },
