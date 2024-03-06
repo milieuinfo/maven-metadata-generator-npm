@@ -6,6 +6,10 @@ import jsonld from "jsonld";
 import request from "request";
 import path from "path";
 import {RoxiReasoner} from "roxi-js";
+//import * as file from './skos-rules.txt' assert { type: 'text' };
+
+
+
 
 import {
     artifactId,
@@ -71,6 +75,7 @@ async function get_versions(uris) {
 
 async function n3_reasoning(json_ld, rules) {
     console.log("2: n3 reasoning ");
+    console.log(module.path);
     let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
     const reasoner = RoxiReasoner.new();
     reasoner.add_abox(rdf);
@@ -148,8 +153,9 @@ async function rdf_to_jsonld(rdf_dataset, frame) {
 }
 
 async function jsonld_writer(data, filename) {
-    if(typeof data === "string") {fs.writeFileSync(filename, JSON.stringify(await rdf_to_jsonld(data, frame_catalog), null, 4));}
-    if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
+    if(typeof data === "string") {fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));}
+    if(typeof data === "object") {fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));}
+    //if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
 }
 
 async function table_writer(data, filename) {
@@ -157,16 +163,16 @@ async function table_writer(data, filename) {
     if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
 }
 
-async function rdf_to_jsonld(dataset) {
-    console.log("4: rdf to jsonld");
-    console.log("Extract a conceptscheme as a tree using a frame.");
-    let json_from_rdf = await jsonld.fromRDF(dataset);
-    let framed_without_prefix = await jsonld.frame(json_from_rdf, frame_skos_no_prefixes);
-    fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld, JSON.stringify(framed_without_prefix, null, 4));
-    let framed_with_prefix = await jsonld.frame(json_from_rdf, frame_skos_prefixes);
-    fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld_framed, JSON.stringify(framed_with_prefix, null, 4));
-    jsonld_to_csv(framed_without_prefix);
-}
+// async function rdf_to_jsonld(dataset) {
+//     console.log("4: rdf to jsonld");
+//     console.log("Extract a conceptscheme as a tree using a frame.");
+//     let json_from_rdf = await jsonld.fromRDF(dataset);
+//     let framed_without_prefix = await jsonld.frame(json_from_rdf, frame_skos_no_prefixes);
+//     fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld, JSON.stringify(framed_without_prefix, null, 4));
+//     let framed_with_prefix = await jsonld.frame(json_from_rdf, frame_skos_prefixes);
+//     fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld_framed, JSON.stringify(framed_with_prefix, null, 4));
+//     jsonld_to_csv(framed_without_prefix);
+// }
 
 async function jsonld_to_csv(my_json){
     console.log("5: jsonld to csv");
@@ -198,7 +204,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { n3_reasoning, create_metadata, separateString, joinArray, sortLines , validate };
+export { n3_reasoning, create_metadata, separateString, joinArray, output , validate };
 
 
 
