@@ -1,0 +1,64 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dctype: <http://purl.org/dc/dcmitype/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdo: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+{ ?x a dcat:Catalog } => { ?x a dcat:Dataset } .
+{ ?x a dcat:DataService } => { ?x a dctype:Service } .
+{ ?x a dcat:DataService } => { ?x a dcat:Resource } .
+{ ?x a dcat:Dataset } => { ?x a dcat:Resource } .
+{ ?x a dcat:Role } => { ?x a skos:Concept } .
+
+
+{ ?x dcat:catalog ?y } => { ?x dcterms:hasPart ?y } .
+{ ?x dcat:catalog ?y } => { ?x rdfs:member ?y } .
+{ ?x dcat:catalog ?y } => { ?y a dcat:Catalog } .
+{ ?x dcat:catalog ?y } => { ?x a dcat:Catalog } .
+
+{ ?x dcat:centroid ?y } => { ?x a dcterms:Location } .
+{ ?x dcat:compressFormat ?y } => { ?x dcterms:format ?y } .
+{ ?x dcat:compressFormat ?y } => { ?y a dcterms:MediaType } .
+{ ?x dcat:contactPoint ?y } => { ?y a vcard:Kind } .
+{ ?x dcat:dataset ?y } => { ?y a dcat:Dataset } .
+{ ?x dcat:dataset ?y } => { ?x dcterms:hasPart ?y } .
+{ ?x dcat:dataset ?y } => { ?x rdfs:member ?y } .
+
+{ ?x dcat:distribution ?y } => { ?y a dcat:Distribution } .
+{ ?x dcat:distribution ?y } => { ?x dcterms:relation ?y } .
+
+{ ?x dcat:downloadURL ?y } => { ?y a rdfs:Resource } .
+{ ?x dcat:accessURL ?y } => { ?y a rdfs:Resource } .
+
+{ ?x dcat:keyword ?y } => { ?x dcterms:subject ?y } .
+{ ?x dcat:landingPage ?y } => { ?x foaf:page ?y } .
+{ ?x dcat:mediaType ?y } => { ?x dcterms:format ?y } .
+{ ?x dcat:packageFormat ?y } => { ?x dcterms:format ?y } .
+
+{ ?x dcat:service ?y } => { ?x dcterms:hasPart ?y } .
+{ ?x dcat:service ?y } => { ?x rdfs:member ?y } .
+
+{ ?x dcat:theme ?y } => { ?x dcterms:subject ?y } .
+
+{ ?x dcat:endpointURL ?y } => { ?y a rdfs:Resource } .
+{ ?x dcat:hadRole ?y } => { ?y a dcat:Role } .
+{ ?x dcat:landingPage ?y } => { ?y a foaf:Document } .
+{ ?x dcat:mediaType ?y } => { ?y a dcterms:MediaType } .
+{ ?x dcat:packageFormat ?y } => { ?y a dcterms:MediaType } .
+
+{ ?x dcat:qualifiedRelation ?y } => { ?y a dcat:Relationship } .
+{ ?x dcat:record ?y } => { ?y a dcat:CatalogRecord } .
+{ ?x dcat:servesDataset ?y } => { ?y a dcat:Dataset } .
+
+{ ?x dcat:service ?y } => { ?y a dcat:DataService } .
+{ ?x dcat:theme ?y } => { ?y a skos:Concept } .
+{ ?x dcat:servesDataset ?y } => { ?y a dcat:Dataset } .
+{ ?x dcat:servesDataset ?y } => { ?y a dcat:Dataset } .

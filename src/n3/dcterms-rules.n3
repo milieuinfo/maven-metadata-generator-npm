@@ -1,0 +1,79 @@
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix foaf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dcam:  <http://purl.org/dc/dcam/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+
+        { ?x dcterms:hasFormat ?y . } => { ?y dcterms:isFormatOf ?x . } .
+        { ?y dcterms:isFormatOf ?x . } => { ?x dcterms:hasFormat ?y . } .
+        { ?x dcterms:hasPart ?y . } => { ?y dcterms:isPartOf ?x . } .
+        { ?y dcterms:isPartOf ?x . } => { ?x dcterms:hasPart ?y . } .
+        { ?x dcterms:isReferencedBy ?y . } => { ?y dcterms:references ?x . } .
+        { ?y dcterms:references ?x . } => { ?x dcterms:isReferencedBy ?y . } .
+        { ?x dcterms:isReplacedBy ?y . } => { ?y dcterms:replaces ?x . } .
+        { ?y dcterms:replaces ?x . } => { ?x dcterms:isReplacedBy ?y . } .
+        { ?x dcterms:isRequiredBy ?y . } => { ?y dcterms:requires ?x . } .
+        { ?y dcterms:requires ?x . } => { ?x dcterms:isRequiredBy ?y . } .
+        { ?x dcterms:creator ?y . } => { ?x foaf:maker ?y . } .
+        { ?x dcterms:publisher ?y . } => { ?y a dcterms:Agent . } .
+        { ?x dcterms:contributor ?y . } => { ?y a dcterms:Agent . } .
+
+        { ?x dcterms:format ?y . } => { ?y a dcterms:MediaTypeOrExtent . } .
+        { ?x dcterms:language ?y . } => { ?y a dcterms:LinguisticSystem . } .
+
+        { ?x dcterms:coverage ?y . } => { ?y a dcterms:LocationPeriodOrJurisdiction . } .
+
+        { ?x dcterms:rights ?y . } => { ?y a dcterms:RightsStatement . } .
+
+        { ?x dcterms:audience ?y . } => { ?y a dcterms:AgentClass . } .
+        { ?x dcterms:extent ?y . } => { ?y a dcterms:SizeOrDuration . } .
+        { ?x dcterms:medium ?y . } => { ?y a dcterms:PhysicalMedium . } .
+        { ?x dcterms:medium ?y . } => { ?x a dcterms:PhysicalResource . } .
+
+        { ?x dcterms:conformsTo ?y . } => { ?y a dcterms:Standard . } .
+        { ?x dcterms:accessRights ?y . } => { ?y a dcterms:RightsStatement . } .
+        { ?x dcterms:spatial ?y . } => { ?y a dcterms:Location . } .
+        { ?x dcterms:accrualPeriodicity ?y . } => { ?y a dcterms:Frequency . } .
+        { ?x dcterms:temporal ?y . } => { ?y a dcterms:PeriodOfTime . } .
+        { ?x dcterms:mediator ?y . } => { ?y a dcterms:AgentClass . } .
+        { ?x dcterms:educationLevel ?y . } => { ?y a dcterms:AgentClass . } .
+
+        { ?x dcterms:license ?y . } => { ?y a dcterms:LicenseDocument . } .
+        { ?x dcterms:rightsHolder ?y . } => { ?y a dcterms:Agent . } .
+        { ?x dcterms:provenance ?y . } => { ?y a dcterms:ProvenanceStatement . } .
+        { ?x dcterms:instructionalMethod ?y . } => { ?y a dcterms:MethodOfInstruction . } .
+        { ?x dcterms:accrualMethod ?y . } => { ?y a dcterms:MethodOfAccrual . } .
+
+        { ?x dcterms:accrualPolicy ?y . } => { ?y a dcterms:Policy . } .
+
+        { ?x dcterms:hasVersion ?y . } => { ?y dcterms:isVersionOf ?x . } .
+        { ?y dcterms:isVersionOf ?x . } => { ?x dcterms:hasVersion ?y . } .
+        { ?x dcterms:hasVersion ?y . } => { ?y a rdfs:Resource . } .
+        { ?x dcterms:isVersionOf ?y . } => { ?y a rdfs:Resource . } .
+        { ?x dcterms:relation ?y . } => { ?y a rdfs:Resource . } .
+        { ?x dcterms:subject ?y . } => { ?y a rdfs:Resource . } .
+
+
+        { ?x dcterms:title ?y . } => { ?x rdfs:label ?y . } .
+
+        { ?x dcterms:references ?y . } => { ?x dcterms:relation ?y . } .
+
+        { ?x dcterms:isReferencedBy ?y . } => { ?x dcterms:relation ?y . }  .
+
+
+
+# dit laatste is geen onderdeel van het dcterms vocabularium
+
+#{ ?x dcterms:type ?y . } => { ?y a rdfs:Class . } .
+
+
+
+
+
+
+
+
+

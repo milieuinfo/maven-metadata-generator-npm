@@ -130,20 +130,68 @@ function output(rdf, turtle = false, json_ld = false, n_triples = false , csv = 
                             nt_writer.end((error, result) => fs.writeFileSync(n_triples, result))
                         }
                         if (json_ld){
-                            rdf_to_jsonld(dataset, json_ld);
+                            jsonld_writer(dataset, json_ld);
+                        }
+                        if (csv){
+                            table_writer(dataset, json_ld);
                         }
                     }
                 })()
         });
 }
 
-
-async function rdf_to_jsonld(rdf_dataset, filename) {
-    console.log("6 rdf to jsonld");
+async function rdf_to_jsonld(rdf_dataset, frame) {
+    console.log("rdf to jsonld");
     let my_json = await jsonld.fromRDF(rdf_dataset);
-    console.log("Extract Catalog as a tree using a frame.");
-    let framed = await jsonld.frame(my_json, frame_catalog);
-    fs.writeFileSync(filename, JSON.stringify(framed, null, 4));
+    console.log("Extract ... as a tree using a frame.");
+    return await jsonld.frame(my_json, frame);
+}
+
+async function jsonld_writer(data, filename) {
+    if(typeof data === "string") {fs.writeFileSync(filename, JSON.stringify(await rdf_to_jsonld(data, frame_catalog), null, 4));}
+    if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
+}
+
+async function table_writer(data, filename) {
+    if(typeof data === "string") {fs.writeFileSync(filename, JSON.stringify(await rdf_to_jsonld(data, frame_catalog), null, 4));}
+    if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
+}
+
+async function rdf_to_jsonld(dataset) {
+    console.log("4: rdf to jsonld");
+    console.log("Extract a conceptscheme as a tree using a frame.");
+    let json_from_rdf = await jsonld.fromRDF(dataset);
+    let framed_without_prefix = await jsonld.frame(json_from_rdf, frame_skos_no_prefixes);
+    fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld, JSON.stringify(framed_without_prefix, null, 4));
+    let framed_with_prefix = await jsonld.frame(json_from_rdf, frame_skos_prefixes);
+    fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld_framed, JSON.stringify(framed_with_prefix, null, 4));
+    jsonld_to_csv(framed_without_prefix);
+}
+
+async function jsonld_to_csv(my_json){
+    console.log("5: jsonld to csv");
+    var array = jp.query(my_json, '$.graph[*]');
+    let temp = {};
+    const results = [];
+    for (const row of array){
+        temp = {};
+        for (const [key] of Object.entries(row)) {
+            temp[key] = joinArray(row[key])
+        }
+        results.push(temp)
+    }
+    const csv = await json2csv(results,
+        {emptyFieldValue: null,
+            expandArrayObjects: false});
+    const csv_path = config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.csv
+    fs.writeFileSync(csv_path, csv, 'utf8' );
+    if (config.metadata.distribution.xlsx){
+        try {
+            convertCsvToXlsx(csv_path, config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.xlsx, { sheetName : config.types , overwrite : true });
+        } catch (e) {
+            console.error(e.toString());
+        }
+    }
 }
 
 function version_from_uri(uri) {

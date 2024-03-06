@@ -1,0 +1,29 @@
+@prefix dce: <http://purl.org/dc/elements/1.1/>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix skos-ex: <http://eulersharp.sourceforge.net/2003/03swap/skos-mapping-extension#>.
+
+
+<http://eulersharp.sourceforge.net/2003/03swap/skos-mapping-extension-rules>
+    dce:title "SKOS Mapping Extension Rules"@en;
+    dce:creator "Hong Sun"@en;
+    dce:contributor "Jos De Roo"@en;
+    dce:publisher "Agfa Healthcare/Belgium"@en;
+    dce:description "Rules to extend SKOS in defining mapping relation"@en;
+    skos:note "The mapping relations in SKOS, e.g. skos:exactMatch can not be merged with hierarchical relations inside a vocabulary, e.g. skos:broader. This rule set defines a new property to link the SKOS mapping relations and SKOS hierchical relations."@en.
+
+
+#Mapping relations entailed from SKOS hierarchical relation
+{ ?x skos:broader ?y. } => {  ?x skos-ex:implies ?y. }.
+{ ?x skos:narrower ?y. } => {  ?y skos-ex:implies ?x. }.
+
+
+#Mapping relations entailed from SKOS mapping relation
+{ ?x skos:broadMatch ?y. } => {  ?x skos-ex:implies ?y. }.
+{ ?x skos:narrowMatch ?y. } => {  ?y skos-ex:implies ?x. }.
+
+
+#Mapping relations entailed from SKOS mapping relation (exact match)
+{ ?x skos:exactMatch ?y. } => {  ?x skos-ex:implies ?y. ?y skos-ex:implies ?x. }.
+
+#Define the mapping relation as transitive
+{ ?x skos-ex:implies ?y. ?y skos-ex:implies ?z. } => {  ?x skos-ex:implies ?z. }.
