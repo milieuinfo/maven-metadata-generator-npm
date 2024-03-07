@@ -5,12 +5,9 @@ import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
 import request from "request";
 import path from "path";
+import jp from 'jsonpath';
+import  { json2csv }  from 'json-2-csv';
 import {RoxiReasoner} from "roxi-js";
-//import * as file from './skos-rules.txt' assert { type: 'text' };
-
-
-
-
 import {
     artifactId,
     config,
@@ -86,24 +83,6 @@ async function n3_reasoning(json_ld, rules) {
     return await sortLines(reasoner.get_abox_dump());
 }
 
-//
-//
-// async function n3_reasoning(json, turtle, json_ld) {
-//     console.log("4: n3 reasoning ");
-//     let rdf = await jsonld.toRDF(json, { format: "application/n-quads" })
-//     const reasoner = RoxiReasoner.new();
-//     reasoner.add_abox(rdf);
-//     reasoner.add_rules(dcat_rules);
-//     reasoner.add_rules(dcterms_rules);
-//     reasoner.add_rules(skos_rules);
-//     reasoner.add_rules(foaf_rules);
-//     reasoner.add_rules(void_rules);
-//     reasoner.add_rules(rdf_rules);
-//     reasoner.add_rules(spdx_rules);
-//     reasoner.add_rules(spdx_extra_rules);
-//     reasoner.materialize();
-//     output(sortLines(reasoner.get_abox_dump()), turtle, json_ld);
-// }
 
 
 function output(rdf, turtle = false, json_ld = false, n_triples = false , csv = false) {
@@ -138,7 +117,7 @@ function output(rdf, turtle = false, json_ld = false, n_triples = false , csv = 
                             jsonld_writer(dataset, json_ld);
                         }
                         if (csv){
-                            table_writer(dataset, json_ld);
+                            table_writer(dataset, csv);
                         }
                     }
                 })()
@@ -159,22 +138,12 @@ async function jsonld_writer(data, filename) {
 }
 
 async function table_writer(data, filename) {
-    if(typeof data === "string") {fs.writeFileSync(filename, JSON.stringify(await rdf_to_jsonld(data, frame_catalog), null, 4));}
-    if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
+    if(typeof filename === "string") {jsonld_to_csv(filename, await rdf_to_jsonld(data, frame_catalog));}
+    if(typeof filename === "object") {jsonld_to_csv(filename[0], await rdf_to_jsonld(data, filename[1]));}
 }
 
-// async function rdf_to_jsonld(dataset) {
-//     console.log("4: rdf to jsonld");
-//     console.log("Extract a conceptscheme as a tree using a frame.");
-//     let json_from_rdf = await jsonld.fromRDF(dataset);
-//     let framed_without_prefix = await jsonld.frame(json_from_rdf, frame_skos_no_prefixes);
-//     fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld, JSON.stringify(framed_without_prefix, null, 4));
-//     let framed_with_prefix = await jsonld.frame(json_from_rdf, frame_skos_prefixes);
-//     fs.writeFileSync(config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.jsonld_framed, JSON.stringify(framed_with_prefix, null, 4));
-//     jsonld_to_csv(framed_without_prefix);
-// }
 
-async function jsonld_to_csv(my_json){
+async function jsonld_to_csv(csv_path, my_json){
     console.log("5: jsonld to csv");
     var array = jp.query(my_json, '$.graph[*]');
     let temp = {};
@@ -189,7 +158,6 @@ async function jsonld_to_csv(my_json){
     const csv = await json2csv(results,
         {emptyFieldValue: null,
             expandArrayObjects: false});
-    const csv_path = config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.csv
     fs.writeFileSync(csv_path, csv, 'utf8' );
     if (config.metadata.distribution.xlsx){
         try {
