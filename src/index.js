@@ -80,7 +80,8 @@ async function n3_reasoning(json_ld, rules) {
     const reasoner = RoxiReasoner.new();
     reasoner.add_abox(rdf);
     for (let rule in rules) {
-        reasoner.add_rules(fs.readFileSync(rules[rule], 'utf8'));
+        reasoner.add_rules(fs.readFileSync(process.cwd() + rules[rule], 'utf8'));
+        //reasoner.add_rules(fs.readFileSync(rules[rule], 'utf8'));
     }
     reasoner.materialize();
     return await sortLines(reasoner.get_abox_dump());
