@@ -23,6 +23,7 @@
   "author": "Vlaamse Overheid, Departement omgeving",
   "license": "MIT",
   "dependencies": {
+    "@aternus/csv-to-xlsx": "^2.1.2",
     "@zazuko/env-node": "1.0.2",
     "js-yaml": "4.1.0",
     "jsonld": "8.3.1",

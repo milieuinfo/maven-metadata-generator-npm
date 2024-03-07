@@ -7,6 +7,7 @@ import request from "request";
 import path from "path";
 import jp from 'jsonpath';
 import  { json2csv }  from 'json-2-csv';
+import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import {RoxiReasoner} from "roxi-js";
 import {
     artifactId,
