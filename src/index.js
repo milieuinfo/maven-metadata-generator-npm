@@ -9,9 +9,12 @@ import jp from 'jsonpath';
 import  { json2csv }  from 'json-2-csv';
 import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import {RoxiReasoner} from "roxi-js";
+import csv from 'csvtojson';
 import {
     artifactId,
     config,
+    context,
+    skos_context_prefixes,
     dcat_catalog_jsonld,
     dcat_catalog_turtle,
     dcat_dataset_jsonld,
@@ -20,11 +23,38 @@ import {
     frame_catalog,
     groupId,
     next_release_version,
-    shapes_dcat
+    shapes_dcat,
+    shapes_skos,
+    skos_rules
 } from './utils/variables.js';
 import {construct_dcat} from './utils/metadata.js';
 import {joinArray, separateString, sortLines} from './utils/functions.js';
 
+
+async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file) {
+    console.log("1: csv to jsonld ");
+    await csv({
+        ignoreEmpty:true,
+        flatKeys:true
+    })
+        .fromFile(config.source.path + config.source.codelijst_csv)
+        .then((jsonObj)=>{
+            var new_json = new Array();
+            for(var i = 0; i < jsonObj.length; i++){
+                const object = {};
+                Object.keys(jsonObj[i]).forEach(function(key) {
+                    object[key] = separateString(jsonObj[i][key]);
+                })
+                new_json.push(object)
+            }
+            let jsonld = {"@graph": new_json, "@context": skos_context_prefixes};
+            console.log("1: Csv to Jsonld");
+            (async () => {
+                const nt = await n3_reasoning(jsonld, skos_rules)
+                output(shapes_skos, nt, ttl_file, jsonld_file, nt_file, csv_file)
+            })()
+        })
+}
 
 async function create_metadata() {
     console.log('1. get previous versions');
@@ -66,8 +96,8 @@ async function get_versions(uris) {
     my_versions.push(version)
     const version_nt = await n3_reasoning(construct_dcat([version]), dcat_rules)
     const versions_nt = await n3_reasoning(construct_dcat(my_versions), dcat_rules)
-    output(version_nt, dcat_dataset_turtle, dcat_dataset_jsonld)
-    output(versions_nt, dcat_catalog_turtle, dcat_catalog_jsonld)
+    output(shapes_dcat, version_nt, dcat_dataset_turtle, dcat_dataset_jsonld)
+    output(shapes_dcat, versions_nt, dcat_catalog_turtle, dcat_catalog_jsonld)
 }
 
 
@@ -86,7 +116,7 @@ async function n3_reasoning(json_ld, rules) {
 
 
 
-function output(rdf, turtle = false, json_ld = false, n_triples = false , csv = false) {
+function output(shapes, rdf, turtle = false, json_ld = false, n_triples = false , csv = false) {
     console.log("5: output");
     const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: config.prefixes });
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
@@ -101,7 +131,7 @@ function output(rdf, turtle = false, json_ld = false, n_triples = false , csv = 
                     dataset.add(quad);
             else
                 (async () => {
-                    if (await validate(shapes_dcat, dataset)) {
+                    if (await validate(shapes, dataset)) {
                         if (turtle){
                             if (!fs.existsSync(path.dirname(turtle))){
                                 fs.mkdirSync(path.dirname(turtle), { recursive: true });
@@ -135,7 +165,6 @@ async function rdf_to_jsonld(rdf_dataset, frame) {
 async function jsonld_writer(data, filename) {
     if(typeof filename === "string") {fs.writeFileSync(filename, JSON.stringify(await rdf_to_jsonld(data, frame_catalog), null, 4));}
     if(typeof filename === "object") {fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));}
-    //if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
 }
 
 async function table_writer(data, filename) {
@@ -173,10 +202,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { n3_reasoning, create_metadata, separateString, joinArray, output , validate };
+export { generate_skos, create_metadata };
 
-
-
-//get_version_urls()
 
 

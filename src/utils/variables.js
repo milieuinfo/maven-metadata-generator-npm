@@ -35,6 +35,7 @@ const dcat_catalog_jsonld = dcat_catalog_path + config.dcat.catalog_jsonld
 
 const dcat_catalog_turtle = dcat_catalog_path + config.dcat.catalog_turtle
 
+const skos_rules = config.skos.rules ;
 
 const frame_catalog = {
     "@context": context,
@@ -57,10 +58,19 @@ const frame_catalog = {
     }
 }
 
+const skos_prefixes = Object.assign( {}, config.skos.prefixes, config.prefixes, { '@base' : config.skos.prefixes.concept })
+
+const skos_context = JSON.parse(readFileSync(config.source.path + config.source.context));
+
+const skos_context_prefixes = Object.assign({},skos_context , skos_prefixes)
+
+const shapes_skos = await rdf.dataset().import(rdf.fromFile(config.ap.path + config.ap.name + '-' + config.ap.type + '/' + config.ap.name + '-' + config.ap.type + config.ap.turtle))
+
 export {
     artifactId,
     config,
     context,
+    skos_context_prefixes,
     dcat_catalog_jsonld,
     dcat_catalog_path,
     dcat_catalog_turtle,
@@ -71,7 +81,9 @@ export {
     frame_catalog,
     groupId,
     next_release_version,
-    shapes_dcat
+    shapes_dcat,
+    shapes_skos,
+    skos_rules
 };
 
 
