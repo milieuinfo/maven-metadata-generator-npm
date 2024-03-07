@@ -75,7 +75,6 @@ async function get_versions(uris) {
 
 async function n3_reasoning(json_ld, rules) {
     console.log("2: n3 reasoning ");
-    console.log(module.path);
     let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
     const reasoner = RoxiReasoner.new();
     reasoner.add_abox(rdf);
@@ -154,8 +153,8 @@ async function rdf_to_jsonld(rdf_dataset, frame) {
 }
 
 async function jsonld_writer(data, filename) {
-    if(typeof data === "string") {fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));}
-    if(typeof data === "object") {fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));}
+    if(typeof filename === "string") {fs.writeFileSync(filename, JSON.stringify(await rdf_to_jsonld(data, frame_catalog), null, 4));}
+    if(typeof filename === "object") {fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));}
     //if(typeof data === "object") {fs.writeFileSync(filename, JSON.stringify(data, null, 4));}
 }
 
