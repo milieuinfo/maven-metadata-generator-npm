@@ -13,7 +13,6 @@ import csv from 'csvtojson';
 import {
     artifactId,
     config,
-    context,
     skos_context_prefixes,
     dcat_catalog_jsonld,
     dcat_catalog_turtle,
@@ -32,7 +31,7 @@ import {joinArray, separateString, sortLines} from './utils/functions.js';
 
 
 async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file) {
-    console.log("1: csv to jsonld ");
+    console.log("skos generation: csv to jsonld ");
     await csv({
         ignoreEmpty:true,
         flatKeys:true
@@ -57,7 +56,7 @@ async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file) {
 }
 
 async function create_metadata() {
-    console.log('1. get previous versions');
+    console.log('metadata generation: get previous versions');
     let url = 'https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=' +
         groupId +
         '&a=' +
@@ -96,13 +95,13 @@ async function get_versions(uris) {
     my_versions.push(version)
     const version_nt = await n3_reasoning(construct_dcat([version]), dcat_rules)
     const versions_nt = await n3_reasoning(construct_dcat(my_versions), dcat_rules)
-    output(shapes_dcat, version_nt, dcat_dataset_turtle, dcat_dataset_jsonld)
-    output(shapes_dcat, versions_nt, dcat_catalog_turtle, dcat_catalog_jsonld)
+    output(shapes_dcat, version_nt, dcat_dataset_turtle, [dcat_dataset_jsonld, frame_catalog])
+    output(shapes_dcat, versions_nt, dcat_catalog_turtle, [dcat_catalog_jsonld, frame_catalog])
 }
 
 
 async function n3_reasoning(json_ld, rules) {
-    console.log("2: n3 reasoning ");
+    console.log("n3 reasoning ");
     let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
     const reasoner = RoxiReasoner.new();
     reasoner.add_abox(rdf);
@@ -117,7 +116,7 @@ async function n3_reasoning(json_ld, rules) {
 
 
 function output(shapes, rdf, turtle = false, json_ld = false, n_triples = false , csv = false) {
-    console.log("5: output");
+    console.log("output");
     const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: config.prefixes });
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
     const dataset = rdfDataset.dataset()
@@ -163,18 +162,16 @@ async function rdf_to_jsonld(rdf_dataset, frame) {
 }
 
 async function jsonld_writer(data, filename) {
-    if(typeof filename === "string") {fs.writeFileSync(filename, JSON.stringify(await rdf_to_jsonld(data, frame_catalog), null, 4));}
-    if(typeof filename === "object") {fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));}
+    fs.writeFileSync(filename[0], JSON.stringify(await rdf_to_jsonld(data, filename[1]), null, 4));
 }
 
 async function table_writer(data, filename) {
-    if(typeof filename === "string") {jsonld_to_csv(filename, await rdf_to_jsonld(data, frame_catalog));}
-    if(typeof filename === "object") {jsonld_to_csv(filename[0], await rdf_to_jsonld(data, filename[1]));}
+    jsonld_to_csv(filename[0], await rdf_to_jsonld(data, filename[1]));
 }
 
 
 async function jsonld_to_csv(csv_path, my_json){
-    console.log("5: jsonld to csv");
+    console.log("jsonld to csv");
     var array = jp.query(my_json, '$.graph[*]');
     let temp = {};
     const results = [];
