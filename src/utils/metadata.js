@@ -28,12 +28,12 @@ function construct_dcat(versions) {
                 }
                 if (extension === 'jar'){
                     distribution_object = Object.assign({},{
-                        "downloadURL": config.prefixes.repo + groupId.replace("/", '.') + '/' + version + '/' + artifactId + '-' + version + '.' + extension,
+                        "downloadURL": config.prefixes.repo + groupId.replace(".", '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version + '.' + extension,
                         "packageName" : groupId + '.' + artifactId
                     }, dist, config.metadata.all, distribution_metadata)
                 } else {
                     distribution_object = Object.assign({},{
-                        "downloadURL": config.prefixes.datasets + groupId.replace("graph", 'distribution') + '.' + artifactId + '.' + version + '_' + extension,
+                        "downloadURL": config.prefixes.datasets + groupId.replace("graph", 'distribution') + '.' + artifactId + '.' + version + '.'  + artifactId.replace('codelijst-', '') + '.' + extension,
                     }, dist, config.metadata.all, distribution_metadata)
                 }
                 distributions.push(distribution_object)
