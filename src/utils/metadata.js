@@ -28,7 +28,7 @@ function construct_dcat(versions) {
                 }
                 if (extension === 'jar'){
                     distribution_object = Object.assign({},{
-                        "downloadURL": config.prefixes.repo + groupId.replace(".", '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version + '.' + extension,
+                        "downloadURL": config.prefixes.repo + groupId.replaceAll(".", '/') + '/' + artifactId + '/' + version + '/' + artifactId + '-' + version + '.' + extension,
                         "packageName" : groupId + '.' + artifactId
                     }, dist, config.metadata.all, distribution_metadata)
                 } else {
