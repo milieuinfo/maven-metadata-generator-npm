@@ -1,0 +1,9 @@
+@prefix dbo:	<http://dbpedia.org/ontology/> .
+
+
+{ ?x dbo:smiles ?y } => { ?x a dbo:ChemicalCompound }
+{ ?x dbo:inchi ?y } => { ?x a dbo:ChemicalCompound }
+{ ?x dbo:iupacName ?y } => { ?x a dbo:Drug }
+{ ?x dbo:formula ?y } => { ?x a dbo:ChemicalSubstance }
+{ ?x dbo:pubchem ?y } => { ?x a dbo:ChemicalSubstance }
+

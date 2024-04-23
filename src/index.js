@@ -119,7 +119,7 @@ async function n3_reasoning(json_ld, rules) {
 
 function output(shapes, rdf, turtle = false, json_ld = false, n_triples = false , csv = false) {
     console.log("output");
-    const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: config.prefixes });
+    const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: Object.assign({},config.skos.prefixes, config.prefixes ) });
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
     const dataset = rdfDataset.dataset()
     const parser = new N3.Parser();
