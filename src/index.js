@@ -97,6 +97,11 @@ async function get_versions(uris) {
     const versions_nt = await n3_reasoning(construct_dcat(my_versions), dcat_rules)
     fs.rmSync(config.dcat.path_catalog, { recursive: true, force: true });
     fs.rmSync(config.dcat.path_dataset, { recursive: true, force: true });
+    // TODO: find solution for packaging from /tmp/dcat
+    // in case a different subdomain was packaged, previous filepath was not deleted
+    if (fs.existsSync('/tmp/dcat')){
+        fs.rmSync('/tmp/dcat', { recursive: true, force: true });
+    }
     output(shapes_dcat, version_nt, dcat_dataset_turtle, [dcat_dataset_jsonld, frame_catalog])
     output(shapes_dcat, versions_nt, dcat_catalog_turtle, [dcat_catalog_jsonld, frame_catalog])
 }
