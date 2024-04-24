@@ -23,9 +23,9 @@ const next_release_version = jp.query(pom, '$.project.version._text').toString()
 
 const dcat_rules = this_config.dcat.rules ;
 
-const dcat_catalog_path = config.dcat.path_catalog + artifactId + '/'
+const dcat_catalog_path = '../temp/' + config.dcat.path_catalog + artifactId + '/'
 
-const dcat_dataset_path = config.dcat.path_dataset + artifactId + '/'
+const dcat_dataset_path = '../temp/' + config.dcat.path_dataset + artifactId + '/'
 
 const dcat_dataset_jsonld = dcat_dataset_path + config.dcat.dataset_jsonld
 
