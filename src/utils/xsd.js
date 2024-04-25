@@ -7,7 +7,7 @@ import jp from 'jsonpath';
 
 async function xsd_writer(rdf_dataset, xsd_file) {
     let my_json = await jsonld.fromRDF(rdf_dataset);
-    let schema = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#ConceptScheme")]["@id"]')[0];
+    let schema = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#ConceptScheme")]["http://purl.org/dc/elements/1.1/identifier"]')[0][0]['@value'];
     let concepts = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#Concept")]["@id"]');
     var xw = new XMLWriter;
 
