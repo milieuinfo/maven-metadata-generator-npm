@@ -2,6 +2,7 @@ import fs from "fs";
 import XMLWriter from 'xml-writer';
 import XmlBeautify from 'xml-beautify';
 import { DOMParser } from 'xmldom';
+import jsonld from "jsonld";
 
 
 async function xsd_writer(rdf_dataset, xsd_file) {
