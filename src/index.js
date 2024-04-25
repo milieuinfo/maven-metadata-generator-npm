@@ -27,10 +27,11 @@ import {
     skos_rules
 } from './utils/variables.js';
 import {construct_dcat} from './utils/metadata.js';
+import {xsd_writer} from './utils/xsd.js';
 import {joinArray, separateString, sortLines} from './utils/functions.js';
 
 
-async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file) {
+async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file, xsd_file) {
     console.log("skos generation: csv to jsonld ");
     await csv({
         ignoreEmpty:true,
@@ -50,7 +51,7 @@ async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file) {
             console.log("1: Csv to Jsonld");
             (async () => {
                 const nt = await n3_reasoning(jsonld, skos_rules)
-                output(shapes_skos, nt, ttl_file, jsonld_file, nt_file, csv_file)
+                output(shapes_skos, nt, ttl_file, jsonld_file, nt_file, csv_file, xsd_file)
             })()
         })
 }
@@ -118,7 +119,7 @@ async function n3_reasoning(json_ld, rules) {
 
 
 
-function output(shapes, rdf, turtle = false, json_ld = false, n_triples = false , csv = false) {
+function output(shapes, rdf, turtle = false, json_ld = false, n_triples = false , csv = false, xsd = false) {
     console.log("output");
     const ttl_writer = new N3.Writer({ format: 'text/turtle' , prefixes: Object.assign({},config.skos.prefixes, config.prefixes ) });
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
@@ -151,6 +152,9 @@ function output(shapes, rdf, turtle = false, json_ld = false, n_triples = false 
                         }
                         if (csv){
                             table_writer(dataset, csv);
+                        }
+                        if (xsd){
+                            xsd_writer(dataset, xsd);
                         }
                     }
                 })()
