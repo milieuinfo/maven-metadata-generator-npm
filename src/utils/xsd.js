@@ -3,7 +3,7 @@ import XMLWriter from 'xml-writer';
 import XmlBeautify from 'xml-beautify';
 import { DOMParser } from 'xmldom';
 import jsonld from "jsonld";
-
+import jp from 'jsonpath';
 
 async function xsd_writer(rdf_dataset, xsd_file) {
     let my_json = await jsonld.fromRDF(rdf_dataset);
