@@ -37,6 +37,8 @@ const dcat_catalog_turtle = dcat_catalog_path + config.dcat.catalog_turtle
 
 const skos_rules = config.skos.rules ;
 
+const urn = ('urn:' + groupId + ':' + artifactId);
+
 const frame_catalog = {
     "@context": context,
     "@type": ["dcat:Catalog"],
@@ -83,7 +85,8 @@ export {
     next_release_version,
     shapes_dcat,
     shapes_skos,
-    skos_rules
+    skos_rules,
+    urn
 };
 
 
