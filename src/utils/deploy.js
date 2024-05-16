@@ -5,8 +5,7 @@ import jp from 'jsonpath';
 import path from "path";
 import AdmZip from "adm-zip";
 import {sortLines} from './functions.js';
-import pkg from 'glob';
-const { glob } = pkg;
+import { glob } from 'glob';
 import {RoxiReasoner} from "roxi-js";
 import fetch, { fileFromSync } from 'node-fetch';
 
@@ -73,19 +72,14 @@ async function merge(dir, omgeving) {
     console.log('Merge turtle files to one n-triple file')
     const reasoner = RoxiReasoner.new();
     const nt_file = path.join(dir, artifactId + '.nt')
-    glob('**/*.ttl', {
+    const ttl_files = await glob('**/*.ttl', {
         cwd: dir
-    },(err, files) => {
-        if (err) {
-            console.log(err);
-        } else {
-            files.forEach(file => {
-                reasoner.add_abox(fs.readFileSync(path.join(dir, file), 'utf8').toString());
-            } )
-            fs.writeFileSync(nt_file,sortLines(reasoner.get_abox_dump()), 'utf8');
-            put(nt_file, omgeving)
-        }
-    });
+    })
+    ttl_files.forEach(file => {
+        reasoner.add_abox(fs.readFileSync(path.join(dir, file), 'utf8').toString());
+    })
+    fs.writeFileSync(nt_file,sortLines(reasoner.get_abox_dump()), 'utf8');
+    put(nt_file, omgeving)
 }
 
 async function put(nt_file, omgeving) {
