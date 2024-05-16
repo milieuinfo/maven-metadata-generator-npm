@@ -29,6 +29,7 @@ import {
 import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
 import {joinArray, separateString, sortLines} from './utils/functions.js';
+import {deploy_latest} from './utils/deploy.js';
 
 
 async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file, xsd_file) {
@@ -206,7 +207,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { generate_skos, create_metadata };
+export { generate_skos, create_metadata, deploy_latest };
 
 
 
