@@ -83,6 +83,18 @@ async function merge(dir, omgeving) {
 }
 
 async function put(nt_file, omgeving) {
+    const response_drop = await fetch('http://' + config.deploy.virtuoso + '-' + omgeving + '-1.vm.cumuli.be:8080/sparql-auth?default-graph-uri=&query=drop+silent+graph+<' + graph + '>', {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Basic ' + btoa(process.env.virtuoso_rw_username + ':' + process.env.virtuoso_rw_password)
+        }
+    });
+    if (response_drop.status === 200) {
+        console.log('Dropped ' + graph)
+    }
+    else { console.log('Failed Drop')}
+    console.log('Status: ' + response_drop.status )
+    console.log('statusText: ' + response_drop.statusText)
     console.log('Put n-triple file to named graph ' + graph)
     const response = await fetch('http://' + config.deploy.virtuoso + '-' + omgeving + '-1.vm.cumuli.be:8080/sparql-graph-crud-auth?graph-uri=' + graph, {
         method: 'PUT',
