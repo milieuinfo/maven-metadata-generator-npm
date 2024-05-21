@@ -43,7 +43,7 @@ function construct_dcat(versions) {
                     "id": config.prefixes.omg_dataset + artifactId + '_' + version,
                     "dc.identifier": groupId.replace("graph", 'dataset') + '.' + artifactId + '.' + version,
                     "alternative": "Dataset " + artifactId,
-                    "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen het beleidsdomein omgeving van de Vlaamse Overheid.",
+                    "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen " + groupId.split('.id')[0].split('.').reverse().join('.') + ".",
                     "identifier": config.prefixes.omg_dataset + artifactId + '_' + version,
                     "isVersionOf": config.prefixes.omg_dataset + artifactId,
                     "issued": date_time,
@@ -56,26 +56,76 @@ function construct_dcat(versions) {
             dataset_versions.push(dataset_version_object)
         }
     }
+    let named_graph_object = Object.assign({},
+        {
+            "id": config.prefixes.omg_named_graph + artifactId,
+            "dc.identifier": groupId.replace("graph", 'namedgraph') + '.' + artifactId, // "be.vlaanderen.omgeving.data.id.namedgraph.codelijst-matrix",
+            "identifier": config.prefixes.omg_named_graph + artifactId,
+            "title": "Graph " + artifactId.split("-").join(' '),
+            "rootResource": config.prefixes.conceptscheme + artifactId.split("-")[1],
+            "source": config.prefixes.omg_distribution + artifactId + '_' + Object.keys(versions[versions.length - 1])[0] + '_jar',
+            "sparql-service-description-name": config.prefixes.omg_graph + artifactId,
+            "sparql-service-description-graph": config.prefixes.omg_graph + artifactId
+
+        })
+
+    let graphcollection_object = Object.assign({},
+        {
+            "id": config.prefixes.omg_graphcollection + "sparqlservice",
+            "dc.identifier": groupId.replace("graph", 'graphcollection') + '.' + "sparqlservice", // "be.vlaanderen.omgeving.data.id.graphcollection.sparqlservice",
+            "identifier": config.prefixes.omg_graphcollection + "sparqlservice",
+            "label": "De graphen die gebruikt kunnen worden in de constructie van een dataset via SPARQL Protocol.",
+            "namedGraph": named_graph_object,
+        })
+
+    let service_object = Object.assign({},
+        {
+            "id": config.prefixes.omg_service + "sparqlservice",
+            "dc.identifier": groupId.replace("graph", 'service') + '.' + "sparqlservice",
+            "identifier": config.prefixes.omg_service + "sparqlservice",
+            "label": "Sparql service conform SPARQL 1.1 Protocol.",
+            "comment": "Een beschrijving, met de verschillende kenmerken, van de sparql service.",
+            "namedGraph": named_graph_object,
+            "availableGraphs": graphcollection_object,
+            "defaultDataset": graphcollection_object
+        }, config.metadata.sparqlservice)
+
+
+
+
     let dataset_object = Object.assign({},
         {
             "id": config.prefixes.omg_dataset + artifactId,
             "dc.identifier": groupId.replace("graph", 'dataset') + '.' + artifactId, // "be.vlaanderen.omgeving.data.id.dataset.codelijst-matrix",
             "alternative": "Dataset " + artifactId,
-            "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen het beleidsdomein omgeving.",
+            "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen " + groupId.split('.id')[0].split('.').reverse().join('.') ,
             "identifier": config.prefixes.omg_dataset + artifactId,
             "title": artifactId.split("-").join(' '),
             "rootResource": config.prefixes.conceptscheme + artifactId.split("-")[1],
             "page": config.prefixes.omg_dataset_doc + artifactId + '.html',
-            "hasVersion": dataset_versions
+            "hasVersion": dataset_versions,
+            "defaultGraph": config.prefixes.omg_graph + artifactId
         }, config.metadata.all, config.metadata.dataset)
+
+    let dataservice_object = Object.assign({},
+        {
+            "id": config.prefixes.omg_dataservice + "sparqlendpoint",
+            "dc.identifier": groupId.replace("graph", 'dataservice') + '.' + "sparqlendpoint",
+            "identifier": config.prefixes.omg_dataservice + "sparqlendpoint",
+            "title": "Sparql endpoint op de datasets binnen " + groupId.split('.id')[0].split('.').reverse().join('.'),
+            "description": "Sparql endpoint api op de datasets gepubliceerd onder het domein " + groupId,
+            "servesDataset": dataset_object,
+            "endpointDescription": service_object
+        })
 
     return {
         "@context": context,
         "id": config.metadata.catalog.uri,
         "type": config.metadata.catalog.type,
-        "dataset": dataset_object
+        "dataset": dataset_object,
+        "namedGraph": named_graph_object,
+        "service": dataservice_object
     } ;
 }
 
 export { construct_dcat };
-

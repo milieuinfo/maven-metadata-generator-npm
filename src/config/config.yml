@@ -8,6 +8,7 @@ dcat:
     rdf_rules: /../node_modules/maven-metadata-generator-npm/src/n3/rdf-rules.n3
     spdx_rules: /../node_modules/maven-metadata-generator-npm/src/n3/spdx-rules.n3
     spdx_extra_rules: /../node_modules/maven-metadata-generator-npm/src/n3/spdx-extra-rules.n3
+    ssd_rules: /../node_modules/maven-metadata-generator-npm/src/n3/ssd-rules.n3
 
 ap :
   path: /../node_modules/maven-metadata-generator-npm/src/dcat-ap-constraints/dcat-ap-constraints.ttl

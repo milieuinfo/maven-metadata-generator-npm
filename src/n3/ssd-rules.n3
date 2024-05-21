@@ -1,0 +1,68 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix sd: <http://www.w3.org/ns/sparql-service-description#> .
+
+
+{ ?x sd:endpoint ?y } => { ?x a sd:Service } .
+
+{ ?x sd:defaultEntailmentRegime ?y } => { ?x sd:feature ?y } .
+{ ?x sd:defaultEntailmentRegime ?y } => { ?x a sd:Service } .
+{ ?x sd:defaultEntailmentRegime ?y } => { ?y a sd:EntailmentRegime } .
+
+{ ?x sd:entailmentRegime ?y } => { ?x a sd:NamedGraph } .
+{ ?x sd:entailmentRegime ?y } => { ?y a sd:EntailmentRegime } .
+
+{ ?x sd:defaultSupportedEntailmentProfile ?y } => { ?x sd:feature ?y } .
+{ ?x sd:defaultSupportedEntailmentProfile ?y } => { ?x a sd:Service } .
+{ ?x sd:defaultSupportedEntailmentProfile ?y } => { ?y a sd:EntailmentProfile } .
+
+{ ?x sd:supportedEntailmentProfile ?y } => { ?x a sd:NamedGraph } .
+{ ?x sd:supportedEntailmentProfile ?y } => { ?y a sd:EntailmentProfile } .
+
+{ ?x sd:extensionFunction ?y } => { ?x sd:feature ?y } .
+{ ?x sd:extensionFunction ?y } => { ?x a sd:Service } .
+{ ?x sd:extensionFunction ?y } => { ?y a sd:Function } .
+
+{ ?x sd:extensionAggregate ?y } => { ?x sd:feature ?y } .
+{ ?x sd:extensionAggregate ?y } => { ?x a sd:Service } .
+{ ?x sd:extensionAggregate ?y } => { ?y a sd:Aggregate } .
+
+{ ?x sd:languageExtension ?y } => { ?x sd:feature ?y } .
+{ ?x sd:languageExtension ?y } => { ?x a sd:Service } .
+{ ?x sd:languageExtension ?y } => { ?y a sd:Feature } .
+
+{ ?x sd:supportedLanguage ?y } => { ?x sd:feature ?y } .
+{ ?x sd:supportedLanguage ?y } => { ?x a sd:Service } .
+{ ?x sd:supportedLanguage ?y } => { ?y a sd:Language } .
+
+{ ?x sd:propertyFeature ?y } => { ?x sd:feature ?y } .
+{ ?x sd:propertyFeature ?y } => { ?x a sd:Service } .
+{ ?x sd:propertyFeature ?y } => { ?y a sd:Feature } .
+
+{ ?x sd:feature ?y } => { ?x a sd:Service } .
+{ ?x sd:feature ?y } => { ?y a sd:Feature } .
+
+{ ?x sd:defaultDataset ?y } => { ?x a sd:Service } .
+{ ?x sd:defaultDataset ?y } => { ?y a sd:Dataset } .
+
+{ ?x sd:availableGraphs ?y } => { ?x a sd:Service } .
+{ ?x sd:availableGraphs ?y } => { ?y a sd:GraphCollection } .
+
+{ ?x sd:resultFormat ?y } => { ?x a sd:Service } .
+{ ?x sd:resultFormat ?y } => { ?y a <http://www.w3.org/ns/formats/Format> } .
+
+{ ?x sd:inputFormat ?y } => { ?x a sd:Service } .
+{ ?x sd:inputFormat ?y } => { ?y a <http://www.w3.org/ns/formats/Format> } .
+
+{ ?x sd:defaultGraph ?y } => { ?x a sd:Dataset } .
+{ ?x sd:defaultGraph ?y } => { ?y a sd:Graph } .
+
+{ ?x sd:namedGraph ?y } => { ?x a sd:GraphCollection } .
+{ ?x sd:namedGraph ?y } => { ?y a sd:NamedGraph } .
+
+{ ?x sd:name ?y } => { ?x a sd:NamedGraph } .
+
+{ ?x sd:graph ?y } => { ?x a sd:NamedGraph } .
+{ ?x sd:graph ?y } => { ?y a sd:Graph } .
+
