@@ -91,8 +91,6 @@ function construct_dcat(versions) {
         }, config.metadata.sparqlservice)
 
 
-
-
     let dataset_object = Object.assign({},
         {
             "id": config.prefixes.omg_dataset + artifactId,
@@ -114,7 +112,7 @@ function construct_dcat(versions) {
             "identifier": config.prefixes.omg_dataservice + "sparqlendpoint",
             "title": "Sparql endpoint op de datasets binnen " + groupId.split('.id')[0].split('.').reverse().join('.'),
             "description": "Sparql endpoint api op de datasets gepubliceerd onder het domein " + groupId,
-            "servesDataset": dataset_object,
+            "servesDataset": config.prefixes.omg_dataset + artifactId + '_' + Object.keys(versions[versions.length - 1])[0],
             "endpointDescription": service_object
         })
 
@@ -124,7 +122,8 @@ function construct_dcat(versions) {
         "type": config.metadata.catalog.type,
         "dataset": dataset_object,
         "namedGraph": named_graph_object,
-        "service": dataservice_object
+        "service": dataservice_object,
+        "label": "Catalog " + groupId.split('.id')[0].split('.').reverse().join('.'),
     } ;
 }
 
