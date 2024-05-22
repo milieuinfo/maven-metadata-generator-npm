@@ -28,6 +28,7 @@
 @prefix void: <http://rdfs.org/ns/void#>.
 @prefix spdx: <http://spdx.org/rdf/terms#>.
 @prefix vcard: <http://www.w3.org/2006/vcard/ns#>.
+@prefix ssd: <http://www.w3.org/ns/sparql-service-description#>.
 
 omg_ont:dcat-ap-constraints
     a               owl:Ontology ;
@@ -67,66 +68,319 @@ ons:catalog a                sh:NodeShape ;
             sh:name          "vormvereisten voor de catalogus van codelijsten"@en ;
             sh:description   "De shacl/ontologie die de vormvereisten voor een catalogus beschrijft"@en ;
             rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-            sh:property      omg_ps:dcterms_hasPart, omg_ps:rdfs_member, omg_ps:dcat_dataset, omg_ps:rdf_type;
+            sh:property      omg_ps:dcterms_hasPart, omg_ps:rdfs_member, omg_ps:dcat_dataset, omg_ps:rdf_type, omg_ps:rdfs_label,
+                             omg_ps:dcat_service ;
             sh:closed true ;
             sh:targetClass   dcat:Catalog .
 
 ons:dataset a                sh:NodeShape ;
-            rdfs:label       ""@en ;
-            sh:name          ""@en ;
-            sh:description   ""@en ;
+            rdfs:label       "dataset"@en ;
+            sh:name          "dataset"@en ;
+            sh:description   "A collection of data, published or curated by a single source, and available for access or download in one or more representations."@en ;
             rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-            sh:property     omg_ps:dcat_accessURL, omg_ps:dcterms_isPartOf, omg_ps:dcterms_subject, omg_ps:rdf_type,omg_ps:dcat_contactPoint,omg_ps:dcat_landingPage,omg_ps:dcat_theme,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,omg_ps:dcterms_accrualPeriodicity,omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_hasVersion,omg_ps:dcterms_identifier,omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page,omg_ps:rdfs_label,omg_ps:void_rootResource ;
+            sh:property     omg_ps:dcat_accessURL, omg_ps:dcterms_isPartOf, omg_ps:dcterms_subject,
+                             omg_ps:rdf_type,omg_ps:dcat_contactPoint,omg_ps:dcat_landingPage,omg_ps:dcat_theme,
+                             omg_ps:dc_identifier,omg_ps:dcterms_accessRights,omg_ps:dcterms_accrualPeriodicity,
+                             omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_hasVersion,omg_ps:dcterms_identifier,
+                             omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,omg_ps:dcterms_rightsHolder,
+                             omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page,
+                             omg_ps:rdfs_label,omg_ps:void_rootResource, omg_ps:ssd_defaultGraph ;
             sh:closed true ;
             sh:targetSubjectsOf dcterms:hasVersion .
 
 
-
 ons:dataset_version a                sh:NodeShape ;
                     rdfs:label       "dataset versie"@en ;
-                    sh:name          ""@en ;
-                    sh:description   ""@en ;
+                    sh:name          "dataset versie"@en ;
+                    sh:description   "A collection of data, published or curated by a single source, and available for access or download in one or more representations."@en ;
                     sh:closed true ;
                     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-                    sh:property   omg_ps:dcat_accessURL, omg_ps:dcterms_subject, omg_ps:dcterms_relation, omg_ps:rdf_type,omg_ps:dcat_contactPoint,omg_ps:dcat_distribution,omg_ps:dcat_landingPage,omg_ps:dcat_theme,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,omg_ps:dcterms_accrualPeriodicity,omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_identifier,omg_ps:dcterms_issued,omg_ps:dcterms_isVersionOf,omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page,omg_ps:owl_versionInfo,omg_ps:rdfs_label,omg_ps:void_rootResource ;
+                    sh:property   omg_ps:dcat_accessURL, omg_ps:dcterms_subject, omg_ps:dcterms_relation, omg_ps:rdf_type,omg_ps:dcat_contactPoint,
+                                     omg_ps:dcat_distribution,omg_ps:dcat_landingPage,omg_ps:dcat_theme,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
+                                     omg_ps:dcterms_accrualPeriodicity,omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_identifier,
+                                     omg_ps:dcterms_issued,omg_ps:dcterms_isVersionOf,omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,
+                                     omg_ps:dcterms_rightsHolder,omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page,
+                                     omg_ps:owl_versionInfo,omg_ps:rdfs_label,omg_ps:void_rootResource ;
                     sh:targetSubjectsOf dcterms:isVersionOf  .
 
 ons:package a  sh:NodeShape ;
-            rdfs:label       ""@en ;
-            sh:name          ""@en ;
-            sh:description   ""@en ;
+            rdfs:label       "Package"@en ;
+            sh:name          "Package"@en ;
+            sh:description   "A Package represents a collection of software files that are delivered as a single functional component."@en ;
             sh:closed true ;
             rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
             sh:property   omg_ps:dcat_accessURL, omg_ps:dcterms_accrualPeriodicity, omg_ps:dcterms_language,  omg_ps:dcterms_license,
-            omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint,
-            omg_ps:dcat_landingPage,
-            omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_downloadURL,omg_ps:dc_identifier,
-            omg_ps:dcterms_accessRights,omg_ps:dcterms_description,omg_ps:dcterms_format,omg_ps:dcterms_identifier,
-            omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
-            omg_ps:rdfs_label,omg_ps:spdx_downloadLocation,omg_ps:spdx_packageFileName,omg_ps:spdx_name,
-            omg_ps:spdx_packageName,omg_ps:spdx_versionInfo;
+                omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint,
+                omg_ps:dcat_landingPage,
+                omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_downloadURL,omg_ps:dc_identifier,
+                omg_ps:dcterms_accessRights,omg_ps:dcterms_description,omg_ps:dcterms_format,omg_ps:dcterms_identifier,
+                omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
+                omg_ps:rdfs_label,omg_ps:spdx_downloadLocation,omg_ps:spdx_packageFileName,omg_ps:spdx_name,
+                omg_ps:spdx_packageName,omg_ps:spdx_versionInfo;
             sh:targetSubjectsOf spdx:packageFileName .
 
+
 ons:distribution a                sh:NodeShape ;
-                 rdfs:label       ""@en ;
-                 sh:name          ""@en ;
-                 sh:description   ""@en ;
+                 rdfs:label       "Distribution"@en ;
+                 sh:name          "Distribution"@en ;
+                 sh:description   "A specific representation of a dataset. A dataset might be available in multiple serializations that may differ in various ways, including natural language, media-type or format, schematic organization, temporal and spatial resolution, level of detail or profiles (which might specify any or all of the above)."@en ;
                  #    sh:closed true ;
                  rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
                  sh:property   omg_ps:spdx_versionInfo, omg_ps:dcterms_accrualPeriodicity, omg_ps:dcterms_language, omg_ps:dcterms_license,
-                                  omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint, omg_ps:dcat_landingPage,
-                                  omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_accessURL,
-                                  omg_ps:dcat_compressFormat,omg_ps:dcat_downloadURL,omg_ps:dcat_mediaType,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
-                                  omg_ps:dcterms_description,
-                                  omg_ps:dcterms_format,omg_ps:dcterms_identifier,omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,omg_ps:foaf_page,omg_ps:rdfs_label ;
+                  omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint, omg_ps:dcat_landingPage,
+                  omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_accessURL,
+                  omg_ps:dcat_compressFormat,omg_ps:dcat_downloadURL,omg_ps:dcat_mediaType,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
+                  omg_ps:dcterms_description, omg_ps:dcterms_format,omg_ps:dcterms_identifier,omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
+                  omg_ps:foaf_page,omg_ps:rdfs_label ;
                  sh:targetSubjectsOf dcat:mediaType .
 
-ons:a_package a  sh:NodeShape ;
-              rdfs:label       ""@en ;
-              sh:name          ""@en ;
-              sh:class    spdx:Package .
+
+ons:ssd_graphcollection
+    a                sh:NodeShape ;
+    rdfs:label       "Graph Collection"@en ;
+    sh:name          "Graph Collection"@en ;
+    sh:description   "An instance of sd:GraphCollection represents a collection of zero or more named graph descriptions. Each named graph description belonging to an sd:GraphCollection MUST be linked with the sd:namedGraph predicate."@en ;
+    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property     omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label, omg_ps:ssd_namedGraph ;
+    sh:targetClass   ssd:GraphCollection  .
+
+
+ons:dcat_dataservice
+    a                sh:NodeShape ;
+    rdfs:label       "Data service"@en ;
+    sh:name          "Data service"@en ;
+    sh:description   "A site or end-point providing operations related to the discovery of, access to, or processing functions on, data or related resources."@en ;
+    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property     omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label,
+                     omg_ps:dcterms_description, omg_ps:dcterms_isPartOf, omg_ps:dcterms_title, omg_ps:dcat_endpointDescription,
+                     omg_ps:dcat_servesDataset, omg_ps:dcat_endpointURL;
+    sh:targetClass   dcat:DataService  .
+
+ons:ssd_service
+    a                sh:NodeShape ;
+    rdfs:label       "Service"@en ;
+    sh:name          "Service"@en ;
+    sh:description   "An instance of sd:Service represents a SPARQL service made available via the SPARQL Protocol."@en ;
+    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property  omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label,
+                     omg_ps:dcterms_description, omg_ps:ssd_availableGraphs, omg_ps:ssd_defaultDataset,
+                     omg_ps:ssd_endpoint, omg_ps:ssd_feature, omg_ps:ssd_resultFormat, omg_ps:ssd_supportedLanguage ;
+    sh:targetClass   ssd:Service  .
+
+
+ons:ssd_namedgraph
+    a                sh:NodeShape ;
+    rdfs:label       "Named Graph"@en ;
+    sh:name          "Named Graph"@en ;
+    sh:description   "An instance of sd:NamedGraph represents a named graph having a name (via sd:name) and an optional graph description (via sd:graph)."@en ;
+    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property  omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label,
+                     omg_ps:dcterms_source, omg_ps:dcterms_title, omg_ps:void_rootResource, omg_ps:ssd_graph, omg_ps:ssd_name ;
+    sh:targetClass   ssd:NamedGraph  .
+
+ons:ssd_graph
+    a                sh:NodeShape ;
+    rdfs:label       "Graph"@en ;
+    sh:name          "Graph"@en ;
+    sh:description   "An instance of sd:Graph represents the description of an RDF graph."@en ;
+    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property      omg_ps:rdf_type ;
+    sh:targetClass   ssd:Graph  .
 
 # Property Shapes
+
+omg_ps:dcat_endpointURL
+    a                sh:PropertyShape ;
+    rdfs:label       "service end-point"@en ;
+    sh:name          "service end-point"@en ;
+    sh:description   "The root location or primary endpoint of the service (a web-resolvable IRI)."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         rdfs:Resource ;
+    sh:minCount      1 ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dcat:endpointURL .
+
+omg_ps:ssd_graph
+    a                sh:PropertyShape ;
+    rdfs:label       "graph"@en ;
+    sh:name          "graph"@en ;
+    sh:description   "Relates a named graph to its graph description."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:Graph ;
+    sh:minCount      1 ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:graph .
+
+
+omg_ps:ssd_name
+    a                sh:PropertyShape ;
+    rdfs:label       "name"@en ;
+    sh:name          "name"@en ;
+    sh:description   "Relates a named graph to the name by which it may be referenced in a FROM/FROM NAMED clause. The object of the sd:name property is an IRI."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:Graph ;
+    sh:minCount      1 ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:name .
+
+
+omg_ps:dcterms_source
+    a                sh:PropertyShape ;
+    rdfs:label       "source"@en ;
+    sh:name          "source"@en ;
+    sh:description   "A related resource from which the described resource is derived."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         spdx:Package ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dcterms:source .
+
+
+omg_ps:ssd_namedGraph
+    a                sh:PropertyShape ;
+    rdfs:label       "available graph descriptions"@en ;
+    sh:name          "available graph descriptions"@en ;
+    sh:description   "Relates an instance of sd:Service to a description of the graphs which are allowed in the construction of a dataset either via the SPARQL Protocol, with FROM/FROM NAMED clauses in a query, or with USING/USING NAMED in an update request, if the service limits the scope of dataset construction."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:NamedGraph ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:namedGraph .
+
+omg_ps:ssd_availableGraphs
+    a                sh:PropertyShape ;
+    rdfs:label       "available graph descriptions"@en ;
+    sh:name          "available graph descriptions"@en ;
+    sh:description   "Relates an instance of sd:Service to a description of the graphs which are allowed in the construction of a dataset either via the SPARQL Protocol, with FROM/FROM NAMED clauses in a query, or with USING/USING NAMED in an update request, if the service limits the scope of dataset construction."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:GraphCollection ;
+    sh:minCount      1 ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:availableGraphs .
+
+omg_ps:ssd_defaultDataset
+    a                sh:PropertyShape ;
+    rdfs:label       "default dataset description"@en ;
+    sh:name          "default dataset description"@en ;
+    sh:description   "Relates an instance of sd:Service to a description of the default dataset available when no explicit dataset is specified in the query, update request or via protocol parameters."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:Dataset ;
+    sh:minCount      1 ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:defaultDataset .
+
+omg_ps:ssd_endpoint
+    a                sh:PropertyShape ;
+    rdfs:label       "endpoint"@en ;
+    sh:name          "endpoint"@en ;
+    sh:description   "The SPARQL endpoint of an sd:Service that implements the SPARQL Protocol service. The object of the sd:endpoint property is an IRI."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         rdfs:Resource ;
+    sh:minCount      1 ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:endpoint .
+
+omg_ps:ssd_feature
+    a                sh:PropertyShape ;
+    rdfs:label       "feature"@en ;
+    sh:name          "feature"@en ;
+    sh:description   "Relates an instance of sd:Service with a resource representing a supported feature."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:Feature ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:feature .
+
+omg_ps:ssd_resultFormat
+    a                sh:PropertyShape ;
+    rdfs:label       "result format"@en ;
+    sh:name          "result format"@en ;
+    sh:description   "Relates an instance of sd:Service to a format that is supported for serializing query results."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         <http://www.w3.org/ns/formats/Format> ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:resultFormat .
+
+omg_ps:ssd_supportedLanguage
+    a                sh:PropertyShape ;
+    rdfs:label       "supported language"@en ;
+    sh:name          "supported language"@en ;
+    sh:description   "Relates an instance of sd:Service to a SPARQL language (e.g. Query and Update) that it implements."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:Language ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:supportedLanguage .
+
+
+
+omg_ps:dcat_servesDataset
+    a                sh:PropertyShape ;
+    rdfs:label       ""@en ;
+    sh:name          "serves dataset"@en ;
+    sh:description   "A collection of data that this DataService can distribute."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         dcat:Dataset ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dcat:servesDataset .
+
+omg_ps:dcat_endpointDescription
+    a                sh:PropertyShape ;
+    rdfs:label       ""@en ;
+    sh:name          "named graph"@en ;
+    sh:description   "A description of the service end-point, including its operations, parameters etc."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:Service ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dcat:endpointDescription .
+
+omg_ps:ssd_namedGraph
+    a                sh:PropertyShape ;
+    rdfs:label       ""@en ;
+    sh:name          "named graph"@en ;
+    sh:description   "Relates an instance of sd:GraphCollection (or its subclass sd:Dataset) to the description of one of its named graphs. The description of such a named graph MUST include the sd:name property and MAY include the sd:graph property."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:NamedGraph ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:namedGraph .
+
+omg_ps:ssd_defaultGraph
+    a                sh:PropertyShape ;
+    rdfs:label       ""@en ;
+    sh:name          "heeft dataset"@en ;
+    sh:description   "Relates an instance of sd:Dataset to the description of its default graph."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         ssd:Graph ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          ssd:defaultGraph .
+
+omg_ps:dcat_service
+    a                sh:PropertyShape ;
+    rdfs:label       ""@en ;
+    sh:name          "heeft dataset"@en ;
+    sh:description   "De relatie tussen een dcat:Catalog en een dcat:Dataset."@en ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class dcat:DataService  ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dcat:service .
+
 
 omg_ps:dcat_dataset
     a                sh:PropertyShape ;
@@ -373,8 +627,8 @@ omg_ps:dcterms_identifier
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
-    sh:nodeKind  sh:IRI ;
-    sh:path  dcterms:identifier .
+    sh:nodeKind sh:IRI ;
+    sh:path     dcterms:identifier .
 
 omg_ps:dcterms_issued
     a sh:PropertyShape ;
@@ -384,9 +638,9 @@ omg_ps:dcterms_issued
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
-    sh:datatype      xsd:dateTime ;
-    sh:nodeKind      sh:Literal ;
-    sh:path  dcterms:issued .
+    sh:datatype     xsd:dateTime ;
+    sh:nodeKind     sh:Literal ;
+    sh:path         dcterms:issued .
 
 omg_ps:dcterms_isVersionOf
     a sh:PropertyShape ;
@@ -606,7 +860,6 @@ omg_ps:spdx_versionInfo
     sh:description "Provides an indication of the version of the package that is described by this SpdxDocument."@en ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
-
     sh:datatype      xsd:string ;
     sh:nodeKind      sh:Literal ;
     sh:path  spdx:versionInfo .

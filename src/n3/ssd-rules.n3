@@ -5,6 +5,7 @@
 
 
 { ?x sd:endpoint ?y } => { ?x a sd:Service } .
+{ ?x sd:endpoint ?y } => { ?y a rdfs:Resource  } .
 
 { ?x sd:defaultEntailmentRegime ?y } => { ?x sd:feature ?y } .
 { ?x sd:defaultEntailmentRegime ?y } => { ?x a sd:Service } .

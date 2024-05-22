@@ -84,8 +84,7 @@ function construct_dcat(versions) {
             "dc.identifier": groupId.replace("graph", 'service') + '.' + "sparqlservice",
             "identifier": config.prefixes.omg_service + "sparqlservice",
             "label": "Sparql service conform SPARQL 1.1 Protocol.",
-            "comment": "Een beschrijving, met de verschillende kenmerken, van de sparql service.",
-            "namedGraph": named_graph_object,
+            "description": "Een beschrijving, met de verschillende kenmerken, van de sparql service.",
             "availableGraphs": graphcollection_object,
             "defaultDataset": graphcollection_object
         }, config.metadata.sparqlservice)
@@ -113,7 +112,8 @@ function construct_dcat(versions) {
             "title": "Sparql endpoint op de datasets binnen " + groupId.split('.id')[0].split('.').reverse().join('.'),
             "description": "Sparql endpoint api op de datasets gepubliceerd onder het domein " + groupId,
             "servesDataset": config.prefixes.omg_dataset + artifactId + '_' + Object.keys(versions[versions.length - 1])[0],
-            "endpointDescription": service_object
+            "endpointDescription": service_object,
+            "endpointURL": config.metadata.sparqlservice.endpoint
         })
 
     return {
@@ -121,7 +121,6 @@ function construct_dcat(versions) {
         "id": config.metadata.catalog.uri,
         "type": config.metadata.catalog.type,
         "dataset": dataset_object,
-        "namedGraph": named_graph_object,
         "service": dataservice_object,
         "label": "Catalog " + groupId.split('.id')[0].split('.').reverse().join('.'),
     } ;
