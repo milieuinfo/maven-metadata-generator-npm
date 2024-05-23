@@ -207,7 +207,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { generate_skos, create_metadata, deploy_latest };
+export { generate_skos, create_metadata, deploy_latest, n3_reasoning, output, jsonld_writer };
 
 
 
