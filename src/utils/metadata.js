@@ -48,7 +48,7 @@ function construct_dcat(versions) {
                     "isVersionOf": config.prefixes.omg_dataset + artifactId,
                     "issued": date_time,
                     "title": artifactId.split("-").join(' ') + ' Versie ' + version,
-                    "rootResource": config.prefixes.conceptscheme + artifactId.split("-")[1],
+                    "rootResource": config.prefixes.conceptscheme + artifactId.substring(artifactId.indexOf('-')+1),
                     "version": version,
                     "page": config.prefixes.omg_dataset_doc + artifactId + '_' + version + '.html',
                     "distribution": distributions
@@ -62,7 +62,7 @@ function construct_dcat(versions) {
             "dc.identifier": groupId.replace("graph", 'namedgraph') + '.' + artifactId, // "be.vlaanderen.omgeving.data.id.namedgraph.codelijst-matrix",
             "identifier": config.prefixes.omg_named_graph + artifactId,
             "title": "Graph " + artifactId.split("-").join(' '),
-            "rootResource": config.prefixes.conceptscheme + artifactId.split("-")[1],
+            "rootResource": config.prefixes.conceptscheme + artifactId.substring(artifactId.indexOf('-')+1),
             "source": config.prefixes.omg_distribution + artifactId + '_' + Object.keys(versions[versions.length - 1])[0] + '_jar',
             "sparql-service-description-name": config.prefixes.omg_graph + artifactId,
             "sparql-service-description-graph": config.prefixes.omg_graph + artifactId
@@ -98,7 +98,7 @@ function construct_dcat(versions) {
             "description": "Deze dataset bevat een lijst van " + config.types + ", die gebruikt worden binnen " + groupId.split('.id')[0].split('.').reverse().join('.') ,
             "identifier": config.prefixes.omg_dataset + artifactId,
             "title": artifactId.split("-").join(' '),
-            "rootResource": config.prefixes.conceptscheme + artifactId.split("-")[1],
+            "rootResource": config.prefixes.conceptscheme + artifactId.substring(artifactId.indexOf('-')+1),
             "page": config.prefixes.omg_dataset_doc + artifactId + '.html',
             "hasVersion": dataset_versions,
             "defaultGraph": config.prefixes.omg_graph + artifactId
