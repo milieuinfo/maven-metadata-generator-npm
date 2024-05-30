@@ -6,4 +6,5 @@
 { ?x dbo:iupacName ?y } => { ?x a dbo:Drug }
 { ?x dbo:formula ?y } => { ?x a dbo:ChemicalSubstance }
 { ?x dbo:pubchem ?y } => { ?x a dbo:ChemicalSubstance }
+{ ?x dbo:ecNumber ?y } => { ?x a dbo:Biomolecule }
 
