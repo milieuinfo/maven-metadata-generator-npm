@@ -64,6 +64,7 @@
 
 { ?x sd:name ?y } => { ?x a sd:NamedGraph } .
 { ?x sd:name ?y } => { ?y a sd:Graph } .
+{ ?x sd:name ?y } => { ?x sd:graph ?y } .
 
 { ?x sd:graph ?y } => { ?x a sd:NamedGraph } .
 { ?x sd:graph ?y } => { ?y a sd:Graph } .
