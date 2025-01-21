@@ -3,7 +3,6 @@ import fs from "fs";
 import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
-import request from "request";
 import path from "path";
 import jp from 'jsonpath';
 import  { json2csv }  from 'json-2-csv';
@@ -65,22 +64,26 @@ async function create_metadata() {
         artifactId +
         '&classifier=sources&repos=release'
     let options = {json: true};
-    request(url, options, (error, res, body) => {
-        if (error) {
-            return  console.log(error)
-        };
-        if (!error && res.statusCode == 200) {
-            let my_uris = new Array();
-            var re = new RegExp("^.*pom$");
-            for (const result of body.results) {
-                if (re.test(result.uri)){
-                    my_uris.push(result.uri);
-                }
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        const body = await response.json();
+        let my_uris = new Array();
+        var re = new RegExp("^.*pom$");
+        for (const result of body.results) {
+            if (re.test(result.uri)){
+                my_uris.push(result.uri);
             }
-            get_versions(my_uris)
-        };
-    });
+        }
+        get_versions(my_uris)
+        console.log(body);
+    } catch (error) {
+        console.error(error.message);
+    }
 }
+
 
 async function get_versions(uris) {
     let my_versions = new Array();

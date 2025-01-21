@@ -4,7 +4,7 @@ import request from "request";
 import jp from 'jsonpath';
 import path from "path";
 import AdmZip from "adm-zip";
-import {sortLines} from './functions.js';
+import {sortLines, select_latest_jar} from './functions.js';
 import { glob } from 'glob';
 import {RoxiReasoner} from "roxi-js";
 import fetch, { fileFromSync } from 'node-fetch';
@@ -12,10 +12,38 @@ import fetch, { fileFromSync } from 'node-fetch';
 const graph = 'https://' + groupId.split('.id')[0].split('.').reverse().join('.') + '/id/graph/' + artifactId
 
 async function deploy_latest(omgeving) {
-    select_latest_release(omgeving)
+    get_latest_jar(omgeving)
 }
 
-function select_latest_release(omgeving) {
+async function create_metadata() {
+    console.log('metadata generation: get previous versions');
+    let url = 'https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=' +
+        groupId +
+        '&a=' +
+        artifactId +
+        '&classifier=sources&repos=release'
+    let options = {json: true};
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        const body = await response.json();
+        let my_uris = new Array();
+        var re = new RegExp("^.*pom$");
+        for (const result of body.results) {
+            if (re.test(result.uri)){
+                my_uris.push(result.uri);
+            }
+        }
+        get_versions(my_uris)
+        console.log(body);
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+
+async function get_latest_jar(omgeving) {
     console.log('select latest release');
     let url = 'https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=' +
         groupId +
@@ -23,22 +51,16 @@ function select_latest_release(omgeving) {
         artifactId +
         '&classifier=sources&repos=release'
     let options = {json: true};
-    request(url, options, (error, res, body) => {
-        if (error) {
-            return  console.log(error)
-        };
-        if (!error && res.statusCode == 200) {
-            let my_uris = new Array();
-            var re = new RegExp("^.*[0-9]+\.[0-9]+\.[0-9]+\.jar$");
-            for (const result of body.results) {
-                if (re.test(result.uri)){
-                    my_uris.push(result.uri);
-                }
-            }
-            // TODO check of versie 10 juist wordt gesorteerd
-            unzip(my_uris.sort()[my_uris.length - 1], omgeving)
-        };
-    });
+    try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+        }
+        const body = await response.json();
+        unzip(select_latest_jar(body), omgeving)
+    } catch (error) {
+        console.error(error.message);
+    }
 }
 
 async function unzip(fileUrl, omgeving) {
@@ -50,6 +72,7 @@ async function unzip(fileUrl, omgeving) {
     await fs.mkdirSync(dir, { recursive: true, force: true });
     const response = await fetch(fileUrl);
     const _json = await response.json();
+
     request.get({url: jp.query(_json, '$.downloadUri')[0], encoding: null}, (err, res, body) => {
         var zip = new AdmZip(body);
         var zipEntries = zip.getEntries();
