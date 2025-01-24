@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "test": "cd src/test/utils && node semantic_versioning.js",
+    "test": "npx mocha",
     "build": "rm -rf build && npm install && rollup -c rollup.config.mjs",
     "release": "npm run build && npm version $release_version && npm publish",
     "postversion": "git push && git push --tags"
@@ -38,6 +38,7 @@
     "json-2-csv": "^5.0.1",
     "jsonld": "8.3.1",
     "jsonpath": "1.1.1",
+    "mocha": "^11.1.0",
     "node-fetch": "^3.3.2",
     "package.json": "^0.0.0",
     "rdf-validate-shacl": "^0.5.3",
