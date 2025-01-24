@@ -182,7 +182,7 @@ async function table_writer(data, filename) {
 
 async function jsonld_to_csv(csv_path, my_json){
     console.log("jsonld to csv");
-    const csv = await json2csv(jsonld_to_table(my_json),
+    const csv = await json2csv(await jsonld_to_table(my_json),
         {emptyFieldValue: null,
             expandArrayObjects: false});
     fs.writeFileSync(csv_path, csv, 'utf8' );
