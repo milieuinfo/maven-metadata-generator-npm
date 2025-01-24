@@ -1,21 +1,32 @@
 'use strict';
 
 
-function separateString(originalString) {
-    if (originalString.includes('|')) {
-        return originalString.split('|'); // pipe separated string to array
+function separateString(original) {
+    if (typeof original === 'string') {
+        if (original.includes('|')) {
+            return original.split('|'); // array
+        } else {
+            return original; // string
+        }
+    } else {
+        return original; // boolean, number or object
     }
-    else {
-        return originalString; // is string
-    }
+}
+
+function is_jar(url) {
+    var re = new RegExp("^.*[0-9]+\.[0-9]+\.[0-9]+\.jar$");
+    return re.test(url);
+}
+
+function version_from_url(url) {
+    return url.replace(/.*-([0-9]*\.[0-9]*\.[0-9]*)[\-a-z]*\..../, "$1")
 }
 
 function select_latest_jar(list_of_downloadurls) {
     let my_uris = new Map();
-    var re = new RegExp("^.*[0-9]+\.[0-9]+\.[0-9]+\.jar$");
     for (const result of list_of_downloadurls.results) {
-        if (re.test(result.uri)){
-            my_uris.set(result.uri.replace(/.*-([0-9]*\.[0-9]*\.[0-9]*)\.jar/, "$1"), result.uri);
+        if (is_jar(result.uri)){
+            my_uris.set(version_from_url(result.uri), result.uri);
         }
     }
     const versions = Array.from(my_uris.keys())
@@ -63,5 +74,5 @@ function joinArray(arr) {
 const sortLines = str => Array.from(new Set(str.split(/\r?\n/))).sort().join('\n'); // To sort the dump of the reasoner for turtle pretty printing. Easier than using the Sink or Store.
 
 
-export { separateString, joinArray, sortLines, select_latest_jar };
+export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar };
 

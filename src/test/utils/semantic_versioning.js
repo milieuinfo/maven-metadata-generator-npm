@@ -1,127 +1,50 @@
-import {select_latest_jar} from '../../utils/functions.js';
-
-import {test, describe, it} from 'node:test' ;
+import {select_latest_jar, compareSemanticVersions, version_from_url, is_jar} from '../../utils/functions.js';
+import {test, describe} from 'node:test' ;
 import assert from "node:assert";
 
+describe("Semantic versioning, sort numeric and pattern filtering", (s) => {
+    const list_of_urls = {
+        "results": [
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2-sources.jar"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2-metadata.jar"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2.pom"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2-codelijst.jar"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2.jar"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117-sources.jar"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117-metadata.jar"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117.pom"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117-codelijst.jar"},
+            {"uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117.jar"}
+        ]
+    }
+    test('Semantic versioning, sort numeric.', async (t) => {
+        await t.test("When an admin deploys the latest released jar, this jar should match a certain pattern and it should be sorted according to the rules of semantic versioning", (t) => {
+            assert.strictEqual(select_latest_jar(list_of_urls), "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117.jar")
+        });
+        await t.test('Order by semantic versions.', (t) => {
+            const array1 = ['1.12.0', '1.2.0'].sort(compareSemanticVersions)
+            assert.strictEqual(array1[0], '1.2.0');
+            assert.strictEqual(array1[1], '1.12.0');
+            const array2 = ['1.12.0', '1.2.0', '0.0.0'].sort(compareSemanticVersions)
+            assert.strictEqual(array2[0], '0.0.0');
+            assert.strictEqual(array2[1], '1.2.0');
+            assert.strictEqual(array2[2], '1.12.0');
+        });
+        await t.test('Determine version from url.', (t) => {
+            assert.strictEqual(version_from_url(list_of_urls.results[4].uri), '10.10.2');
+            assert.strictEqual(version_from_url(list_of_urls.results[2].uri), '10.10.2');
+            assert.strictEqual(version_from_url(list_of_urls.results[0].uri), '10.10.2');
+        });
 
-const list_of_urls = {
-    "results": [
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2-sources.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2-metadata.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2.pom"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2-codelijst.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.2/codelijst-gebouw-10.10.2.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117-sources.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117-metadata.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117.pom"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117-codelijst.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.1.0/codelijst-gebouw-10.1.0-sources.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.1.0/codelijst-gebouw-10.1.0-metadata.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.1.0/codelijst-gebouw-10.1.0.pom"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.1.0/codelijst-gebouw-10.1.0-codelijst.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.1.0/codelijst-gebouw-10.1.0.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/1.0.10/codelijst-gebouw-1.0.10-sources.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/1.0.10/codelijst-gebouw-1.0.10-metadata.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/1.0.10/codelijst-gebouw-1.0.10.pom"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/1.0.10/codelijst-gebouw-1.0.10-codelijst.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/1.0.10/codelijst-gebouw-1.0.10.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.0/codelijst-gebouw-0.1.0-sources.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.0/codelijst-gebouw-0.1.0-metadata.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.0/codelijst-gebouw-0.1.0.pom"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.0/codelijst-gebouw-0.1.0-codelijst.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.0/codelijst-gebouw-0.1.0.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.1/codelijst-gebouw-0.1.1-codelijst.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.1/codelijst-gebouw-0.1.1.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.1/codelijst-gebouw-0.1.1.pom"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.1/codelijst-gebouw-0.1.1-sources.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.1.1/codelijst-gebouw-0.1.1-metadata.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.2.0/codelijst-gebouw-0.2.0-metadata.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.2.0/codelijst-gebouw-0.2.0.pom"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.2.0/codelijst-gebouw-0.2.0.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.2.0/codelijst-gebouw-0.2.0-codelijst.jar"
-        },
-        {
-            "uri": "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/0.2.0/codelijst-gebouw-0.2.0-sources.jar"
-        }
-    ]
-}
-
-describe("Select latest released jar", () => {
-    test("When an admin deploys the latest released jar, this jar should match a certain pattern and it should be sorted according to the rules of semantic versioning", () => {
-        //Act
-        const most_recent_jar = select_latest_jar(list_of_urls);
-        //Assert
-        assert(most_recent_jar === "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117.jar")
+    });
+    test('Pattern recognition.', async (t) => {
+        await t.test('Determine whether url is a download url for a plain jar file.', (t) => {
+            const url1 = list_of_urls.results[4].uri;
+            assert.strictEqual(is_jar(list_of_urls.results[4].uri), true);
+            assert.strictEqual(is_jar(list_of_urls.results[2].uri), false);
+            assert.strictEqual(is_jar(list_of_urls.results[0].uri), false);
+        });
     });
 });
-
 
 
