@@ -4,7 +4,6 @@ import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
 import jsonld from "jsonld";
 import path from "path";
-import jp from 'jsonpath';
 import  { json2csv }  from 'json-2-csv';
 import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import {RoxiReasoner} from "roxi-js";
@@ -27,7 +26,7 @@ import {
 } from './utils/variables.js';
 import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
-import {joinArray, separateString, sortLines} from './utils/functions.js';
+import {joinArray, separateString, sortLines, jsonld_to_table} from './utils/functions.js';
 import {deploy_latest} from './utils/deploy.js';
 
 
@@ -183,17 +182,7 @@ async function table_writer(data, filename) {
 
 async function jsonld_to_csv(csv_path, my_json){
     console.log("jsonld to csv");
-    var array = jp.query(my_json, '$.graph[*]');
-    let temp = {};
-    const results = [];
-    for (const row of array){
-        temp = {};
-        for (const [key] of Object.entries(row)) {
-            temp[key] = joinArray(row[key])
-        }
-        results.push(temp)
-    }
-    const csv = await json2csv(results,
+    const csv = await json2csv(jsonld_to_table(my_json),
         {emptyFieldValue: null,
             expandArrayObjects: false});
     fs.writeFileSync(csv_path, csv, 'utf8' );

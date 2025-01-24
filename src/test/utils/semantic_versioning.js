@@ -22,20 +22,21 @@ describe("Semantic versioning, sort numeric and pattern filtering", (s) => {
             assert.strictEqual(select_latest_jar(list_of_urls), "https://repo.omgeving.vlaanderen.be/artifactory/api/storage/release/be/vlaanderen/omgeving/data/id/graph/codelijst-gebouw/10.10.117/codelijst-gebouw-10.10.117.jar")
         });
         await t.test('Order by semantic versions.', (t) => {
-            const array1 = ['1.12.0', '1.2.0'].sort(compareSemanticVersions)
-            assert.strictEqual(array1[0], '1.2.0');
-            assert.strictEqual(array1[1], '1.12.0');
-            const array2 = ['1.12.0', '1.2.0', '0.0.0'].sort(compareSemanticVersions)
-            assert.strictEqual(array2[0], '0.0.0');
-            assert.strictEqual(array2[1], '1.2.0');
-            assert.strictEqual(array2[2], '1.12.0');
+            const array = ['1.12.0', '1.2.0', '0.0.0'];
+            array.sort(compareSemanticVersions)
+            assert.strictEqual(array[0], '0.0.0');
+            assert.strictEqual(array[1], '1.2.0');
+            assert.strictEqual(array[2], '1.12.0');
+            array.sort()
+            assert.strictEqual(array[0], '0.0.0');
+            assert.strictEqual(array[1], '1.12.0');
+            assert.strictEqual(array[2], '1.2.0');
         });
         await t.test('Determine version from url.', (t) => {
             assert.strictEqual(version_from_url(list_of_urls.results[4].uri), '10.10.2');
             assert.strictEqual(version_from_url(list_of_urls.results[2].uri), '10.10.2');
             assert.strictEqual(version_from_url(list_of_urls.results[0].uri), '10.10.2');
         });
-
     });
     test('Pattern recognition.', async (t) => {
         await t.test('Determine whether url is a download url for a plain jar file.', (t) => {

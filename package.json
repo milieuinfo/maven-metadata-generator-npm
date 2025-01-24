@@ -5,7 +5,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "test" : "cd src/test/utils && node semantic_versioning.js",
+    "test": "cd src/test/utils && node semantic_versioning.js",
     "build": "rm -rf build && npm install && rollup -c rollup.config.mjs",
     "release": "npm run build && npm version $release_version && npm publish",
     "postversion": "git push && git push --tags"

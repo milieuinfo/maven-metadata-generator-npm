@@ -1,16 +1,12 @@
 import {
     separateString,
-    joinArray,
-    select_latest_jar,
-    compareSemanticVersions,
-    version_from_url, is_jar
+    jsonld_to_table
 } from '../../utils/functions.js';
-import { json_ld, frame, context } from './variables' ;
-import { jsonld_to_csv } from '../../index.js'
-import {test, describe} from 'node:test' ;
+import { json_ld, succes_frame, fail_frame } from './variables.js' ;
+import {test, describe, it} from 'node:test' ;
 import assert from "node:assert";
+import jsonld from 'jsonld';
 
-jsonld_to_csv('/tmp/test.csv', json_ld);
 
 describe("Pipe separated string to array", () => {
     test("For properties with a cardinality '|A| > 1', a pipe separated string is used in the source csv. " +
@@ -67,9 +63,20 @@ describe("Reading and writing tabular data (csv) to and from json-ld. Convert pi
             assert.strictEqual(Array.isArray(separateString(pipe_separated_string)), true);
         });
     });
-    test('joinArray.', async (t) => {
-        await t.test("Json arrays should be converted to concatenated pipe separated values (string) ", (t) => {
-            assert.strictEqual(joinArray(), "string");
+    test('Converting jsonld to csv requires ' +
+        '1) a `flat` json in the @graph part. This is obtained by providing a suited @context and a suited frame to transform the jsonld.' +
+        '2) selecting the content of the @graph part. ' +
+        '3) converting keys to column headers and converting arrays to pipe separated strings with the "joinArray" function.', async (t) => {
+        var my_jsonld = await jsonld.frame(json_ld, succes_frame)
+        const array = await jsonld_to_table(my_jsonld)
+        await t.test("Succes scenario for jsonld to csv transformation", (t) => {
+            assert.strictEqual(separateString(array.sort()[0].member).length, 2);
+        });
+        var my_jsonld_nesting = await jsonld.frame(json_ld, fail_frame)
+        // TODO: real await jsonld_to_table(my_jsonld_nesting)
+        await t.test("Fail scenario for jsonld to csv transformation, members van de collectie zijn genest. " +
+            "=> await jsonld_to_table(my_jsonld_nesting) triggers process.exit(1)", (t) => {
+            assert.strictEqual(my_jsonld_nesting["graph"].sort()[0].member.length, 2);
 
         });
     });

@@ -1,6 +1,8 @@
 'use strict';
 
 
+import jp from "jsonpath";
+
 function separateString(original) {
     if (typeof original === 'string') {
         if (original.includes('|')) {
@@ -16,6 +18,21 @@ function separateString(original) {
 function is_jar(url) {
     var re = new RegExp("^.*[0-9]+\.[0-9]+\.[0-9]+\.jar$");
     return re.test(url);
+}
+
+
+async function jsonld_to_table(my_jsonld) {
+    var array = jp.query(my_jsonld, '$.graph[*]');
+    let temp = {};
+    const results = [];
+    for (const row of array){
+        temp = {};
+        for (const [key] of Object.entries(row)) {
+                temp[key] = joinArray(row[key])
+        }
+        results.push(temp)
+    }
+    return results;
 }
 
 function version_from_url(url) {
@@ -36,8 +53,7 @@ function select_latest_jar(list_of_downloadurls) {
 
 const compareSemanticVersions = (a, b) => {
     // https://medium.com/geekculture/sorting-an-array-of-semantic-versions-in-typescript-55d65d411df2
-    // 1. Split the strings into their parts.
-    const a1 = a.split('.');
+    const a1 = a.split('.');    // 1. Split the strings into their parts.
     const b1 = b.split('.');    // 2. Contingency in case there's a 4th or 5th version
     const len = Math.min(a1.length, b1.length);    // 3. Look through each version number and compare.
     for (let i = 0; i < len; i++) {
@@ -46,8 +62,7 @@ const compareSemanticVersions = (a, b) => {
         if (a2 !== b2) {
             return a2 > b2 ? 1 : -1;
         }    }
-    // 4. We hit this if the all checked versions so far are equal
-    return b1.length - a1.length;
+    return b1.length - a1.length; // 4. We hit this if the all checked versions so far are equal
 }
 
 function joinArray(arr) {
@@ -74,5 +89,5 @@ function joinArray(arr) {
 const sortLines = str => Array.from(new Set(str.split(/\r?\n/))).sort().join('\n'); // To sort the dump of the reasoner for turtle pretty printing. Easier than using the Sink or Store.
 
 
-export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar };
+export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table };
 

@@ -6,6 +6,7 @@ const context = {
         "@reverse": "member"
     },
     "id": "@id",
+    "graph": "@graph",
     "type" : {
         "@id" : "@type",
         "@type" : "@id"
@@ -25,7 +26,8 @@ const context = {
 }
 
 
-const frame = {
+
+const succes_frame = {
     "@context": context,
     "@type": ["http://www.w3.org/2004/02/skos/core#Collection", "http://www.w3.org/2004/02/skos/core#Concept"],
     "member": {
@@ -33,6 +35,11 @@ const frame = {
         "@embed": "@never",
         "@omitDefault": true
     }
+}
+
+const fail_frame = {
+    "@context": context,
+    "@type": ["http://www.w3.org/2004/02/skos/core#Collection", "http://www.w3.org/2004/02/skos/core#Concept"]
 }
 
 const json_ld = {
@@ -87,4 +94,4 @@ const json_ld = {
     }
 ]
 }
-export { json_ld, frame, context };
+export { json_ld, succes_frame, fail_frame };
