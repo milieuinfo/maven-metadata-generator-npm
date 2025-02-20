@@ -3,9 +3,11 @@ import jp from "jsonpath";
 import XMLWriter from "xml-writer";
 import XmlBeautify from "xml-beautify";
 import {DOMParser} from "xmldom";
+import {RoxiReasoner} from "roxi-js";
 
 async function xsd_composer(rdf_dataset, urn) {
     let my_json = await jsonld.fromRDF(rdf_dataset);
+    identifier_present(my_json)
     let schema = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#ConceptScheme")]["http://purl.org/dc/elements/1.1/identifier"]')[0][0]['@value'];
     let concepts = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#Concept")]["@id"]');
     var xw = new XMLWriter;
@@ -33,4 +35,21 @@ async function xsd_composer(rdf_dataset, urn) {
     return await beautifiedXmlText;
 }
 
-export { xsd_composer };
+async function identifier_present(json_ld) {
+    var query = `SELECT ?identifier where {?s a <http://www.w3.org/2004/02/skos/core#ConceptScheme> ; <http://purl.org/dc/elements/1.1/identifier> ?identifier}  `;
+    const nt = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
+    const reasoner = RoxiReasoner.new();
+    reasoner.add_abox(nt);
+    let id = false
+    for (const row of reasoner.query(query)) {
+        for (const binding of row) {
+            id = binding.getValue()
+        }
+    }
+    if (!id) {
+        throw new Error('Conceptscheme without dc:identifier');
+    }
+    return id;
+}
+
+export { xsd_composer, identifier_present };

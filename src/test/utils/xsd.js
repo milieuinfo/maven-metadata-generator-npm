@@ -1,9 +1,9 @@
 import N3 from 'n3';
 import {describe, test} from "node:test";
 import assert from "node:assert";
-import { json_ld } from './variables.js' ;
+import { json_ld, json_ld_error } from './variables.js' ;
 import jsonld from "jsonld";
-import {xsd_composer} from "../../utils/xsd_composer.js";
+import {xsd_composer,identifier_present} from "../../utils/xsd_composer.js";
 import rdfDataset from "@rdfjs/dataset";
 import {RoxiReasoner} from "roxi-js";
 
@@ -24,6 +24,17 @@ describe("Convert jsonld to xsd.", (s) => {
     const groupId = 'be.vlaanderen.omgeving.data.id.graph';
     const artifactId = 'codelijst-gebouw';
     const urn = ('urn:' + groupId + ':' + artifactId);
+
+
+    test('Test Conceptscheme without dc:identifier.', async (t) => {
+        try {
+            await identifier_present(json_ld_error)}
+        catch (e) {
+            assert.strictEqual(e.message, "Conceptscheme without dc:identifier")
+        }
+    });
+
+
     test('Test xsd composer.', async (t) => {
         const dataset = await json_ld_to_dataset(json_ld)
         assert.strictEqual(await xsd_composer(dataset, urn), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -36,15 +47,9 @@ describe("Convert jsonld to xsd.", (s) => {
             "  </xs:simpleType>\n" +
             "</xs:schema>\n")
     });
+
+
     test('codedlist has a conceptscheme definition with a dc.identifier field.', async (t) => {
-        var query = `SELECT ?identifier where {?s a <http://www.w3.org/2004/02/skos/core#ConceptScheme> ; <http://purl.org/dc/elements/1.1/identifier> ?identifier}  `;
-        const nt = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
-        const reasoner = RoxiReasoner.new();
-        reasoner.add_abox(nt);
-        for (const row of reasoner.query(query)) {
-            for (const binding of row) {
-                assert.strictEqual(binding.getValue(), '"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"')
-            }
-        }
+        assert.strictEqual(await identifier_present(json_ld), '"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"')
     });
 });
