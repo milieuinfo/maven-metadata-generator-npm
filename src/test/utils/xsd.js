@@ -5,8 +5,7 @@ import { json_ld } from './variables.js' ;
 import jsonld from "jsonld";
 import {xsd_composer} from "../../utils/xsd_composer.js";
 import rdfDataset from "@rdfjs/dataset";
-import { QueryEngine } from "@comunica/query-sparql";
-import { RdfStore } from "rdf-stores";
+import {RoxiReasoner} from "roxi-js";
 
 async function json_ld_to_dataset(my_json_ld){
     let my_rdf = await jsonld.toRDF(my_json_ld, { format: "application/n-quads" })
@@ -38,34 +37,14 @@ describe("Convert jsonld to xsd.", (s) => {
             "</xs:schema>\n")
     });
     test('codedlist has a conceptscheme definition with a dc.identifier field.', async (t) => {
-        const myEngine = new QueryEngine();
         var query = `SELECT ?identifier where {?s a <http://www.w3.org/2004/02/skos/core#ConceptScheme> ; <http://purl.org/dc/elements/1.1/identifier> ?identifier}  `;
         const nt = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
-        const store = RdfStore.createDefault();
-        store.addQuads(nt)
-        //const dataset = await json_ld_to_dataset(json_ld)
-        const bindingsStream = await myEngine.queryBindings(query, {
-            sources: [store],
-        });
-        bindingsStream.on('data', (binding) => {
-            console.log(binding.toString()); // Quick way to print bindings for testing
-
-            //console.log(binding.has('s')); // Will be true
-
-            // Obtaining values
-            console.log(binding.get('identifier').value);
-
-        });
-        assert.strictEqual('a', 'a' ); //
-        // assert.strictEqual(await xsd_composer(dataset, urn), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-        //     "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" targetNamespace=\"urn:be.vlaanderen.omgeving.data.id.graph:codelijst-gebouw\">\n" +
-        //     "  <xs:simpleType name=\"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw\">\n" +
-        //     "    <xs:restriction base=\"xs:string\">\n" +
-        //     "      <xs:enumeration value=\"https://data.omgeving.vlaanderen.be/id/concept/gebouw/buitenmuur\" />\n" +
-        //     "      <xs:enumeration value=\"https://data.omgeving.vlaanderen.be/id/concept/gebouw/schoorsteen\" />\n" +
-        //     "    </xs:restriction>\n" +
-        //     "  </xs:simpleType>\n" +
-        //     "</xs:schema>\n")
+        const reasoner = RoxiReasoner.new();
+        reasoner.add_abox(nt);
+        for (const row of reasoner.query(query)) {
+            for (const binding of row) {
+                assert.strictEqual(binding.getValue(), '"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"')
+            }
+        }
     });
-
 });
