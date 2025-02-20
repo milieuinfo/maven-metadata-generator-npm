@@ -65,11 +65,21 @@ const json_ld = {
             "@id" : "http://www.w3.org/2004/02/skos/core#member",
             "@type" : "@id"
         },
+        "dc.identifier": {
+            "@id": "http://purl.org/dc/elements/1.1/identifier"
+        },
+        "conceptscheme": "https://data.omgeving.vlaanderen.be/id/conceptscheme/",
         "collectie": "https://data.omgeving.vlaanderen.be/id/collection/gebouw/",
         "skos": "http://www.w3.org/2004/02/skos/core#",
         "@base": "https://data.omgeving.vlaanderen.be/id/concept/gebouw/"
 },
     "@graph": [
+        {
+            "id": "conceptscheme:gebouw",
+            "type": "skos:ConceptScheme",
+            "prefLabel": "Codelijst bouw",
+            "dc.identifier": "be.vlaanderen.omgeving.data.id.conceptscheme.gebouw",
+        },
     {
         "id": "collectie:verwaarlozing",
         "type": "skos:Collection",
