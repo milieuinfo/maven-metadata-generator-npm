@@ -5,7 +5,6 @@ import { json_ld, json_ld_error } from './variables.js' ;
 import jsonld from "jsonld";
 import {xsd_composer,identifier_present} from "../../utils/xsd_composer.js";
 import rdfDataset from "@rdfjs/dataset";
-import {RoxiReasoner} from "roxi-js";
 
 async function json_ld_to_dataset(my_json_ld){
     let my_rdf = await jsonld.toRDF(my_json_ld, { format: "application/n-quads" })
