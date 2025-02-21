@@ -36,9 +36,6 @@ async function xsd_composer(rdf_dataset, urn) {
 }
 
 async function identifier_present(json_ld) {
-    const regexp_ns = new RegExp('^[a-z]*|[A-Z]*$')
-    let regex = /^"[a-zA-Z0-9.]+"$/;
-
     var query = `SELECT ?identifier where {?s a <http://www.w3.org/2004/02/skos/core#ConceptScheme> ; <http://purl.org/dc/elements/1.1/identifier> ?identifier}  `;
     const nt = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
     const reasoner = RoxiReasoner.new();
@@ -52,7 +49,7 @@ async function identifier_present(json_ld) {
     if (!id) {
         throw new Error('Conceptscheme without dc:identifier');
     }
-    //regex.test(id);
+    let regex = /^"*[a-zA-Z0-9\\.]+"*$/
     if (!regex.test(id)) {
         throw new Error("The value of attribute 'name' on element 'xs:simpleType' is not valid with respect to its type, 'NCName'.");
     }
