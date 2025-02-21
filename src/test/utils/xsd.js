@@ -1,7 +1,7 @@
 import N3 from 'n3';
 import {describe, test} from "node:test";
 import assert from "node:assert";
-import { json_ld, json_ld_error } from './variables.js' ;
+import { json_ld, json_ld_error, json_ld_error2 } from './variables.js' ;
 import jsonld from "jsonld";
 import {xsd_composer,identifier_present} from "../../utils/xsd_composer.js";
 import rdfDataset from "@rdfjs/dataset";
@@ -30,6 +30,14 @@ describe("Convert jsonld to xsd.", (s) => {
             await identifier_present(json_ld_error)}
         catch (e) {
             assert.strictEqual(e.message, "Conceptscheme without dc:identifier")
+        }
+    });
+
+    test('NCName', async (t) => {
+        try {
+            await identifier_present(json_ld_error2)}
+        catch (e) {
+            assert.strictEqual(e.message, "The value of attribute 'name' on element 'xs:simpleType' is not valid with respect to its type, 'NCName'.")
         }
     });
 
