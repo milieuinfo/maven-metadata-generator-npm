@@ -3,7 +3,7 @@ import {describe, test} from "node:test";
 import assert from "node:assert";
 import { json_ld, json_ld_error, json_ld_error2 } from './variables.js' ;
 import jsonld from "jsonld";
-import {xsd_composer,identifier_present, identifier_is_valid_ncname} from "../../utils/xsd_composer.js";
+import {xsd_composer,identifier_present, identifier_is_valid_ncname, has_correct_urn_pattern} from "../../utils/xsd_composer.js";
 import rdfDataset from "@rdfjs/dataset";
 
 async function json_ld_to_dataset(my_json_ld){
@@ -24,6 +24,20 @@ describe("Convert jsonld to xsd.", (s) => {
     const artifactId = 'codelijst-gebouw';
     const urn = ('urn:' + groupId + ':' + artifactId);
 
+
+    test('Test targetNamespace has a correct urn pattern.', async (t) => {
+        assert.strictEqual(has_correct_urn_pattern("urn:be.vlaanderen.bodemenondergrond.data.id.graph:codelijst-tektoniektype"), true)
+        try {
+            await has_correct_urn_pattern('be.vlaanderen.bodemenondergrond.data.id.graph:codelijst-tektoniektype')}
+        catch (e) {
+            assert.strictEqual(e.message, "TargetNamespace doesn't have a correct urn pattern.")
+        }
+        try {
+            await has_correct_urn_pattern('https://data.omgeving.vlaanderen.be/id/graph/codelijst-tektoniektype')}
+        catch (e) {
+            assert.strictEqual(e.message, "TargetNamespace doesn't have a correct urn pattern.")
+        }
+    });
 
     test('Test Conceptscheme without dc:identifier.', async (t) => {
         try {
