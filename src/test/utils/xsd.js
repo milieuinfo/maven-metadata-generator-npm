@@ -67,6 +67,5 @@ describe("Convert jsonld to xsd.", (s) => {
 
     test('codedlist has a conceptscheme definition with a dc.identifier field.', async (t) => {
         assert.strictEqual(await identifier_present(json_ld), '"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"')
-
     });
 });
