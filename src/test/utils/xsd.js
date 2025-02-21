@@ -47,7 +47,7 @@ describe("Convert jsonld to xsd.", (s) => {
         }
     });
 
-    test('NCName', async (t) => {
+    test("The value of attribute 'name' on element 'xs:simpleType' is valid with respect to its type, 'NCName'.", async (t) => {
         try {
             await identifier_present(json_ld_error2)}
         catch (e) {
