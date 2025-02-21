@@ -5,8 +5,8 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "test": "npx mocha",
-    "build": "rm -rf build && npm install && rollup -c rollup.config.mjs",
+    "test": "node --test",
+    "build": "rm -rf build && npm install && npm run test && rollup -c rollup.config.mjs",
     "release": "npm run build && npm version $release_version && npm publish",
     "postversion": "git push && git push --tags"
   },
