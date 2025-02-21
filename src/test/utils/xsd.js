@@ -3,7 +3,7 @@ import {describe, test} from "node:test";
 import assert from "node:assert";
 import { json_ld, json_ld_error, json_ld_error2 } from './variables.js' ;
 import jsonld from "jsonld";
-import {xsd_composer,identifier_present} from "../../utils/xsd_composer.js";
+import {xsd_composer,identifier_present, identifier_is_valid_ncname} from "../../utils/xsd_composer.js";
 import rdfDataset from "@rdfjs/dataset";
 
 async function json_ld_to_dataset(my_json_ld){
@@ -39,8 +39,18 @@ describe("Convert jsonld to xsd.", (s) => {
         catch (e) {
             assert.strictEqual(e.message, "The value of attribute 'name' on element 'xs:simpleType' is not valid with respect to its type, 'NCName'.")
         }
+        try {
+            await identifier_is_valid_ncname("urn:be.vlaanderen.omgeving.data.id.conceptscheme.gebouw")}
+        catch (e) {
+            assert.strictEqual(e.message, "The value of attribute 'name' on element 'xs:simpleType' is not valid with respect to its type, 'NCName'.")
+        }
+        try {
+            await identifier_is_valid_ncname("https://data.omgeving.vlaanderen.be/id/concept/gebouw/buitenmuur")}
+        catch (e) {
+            assert.strictEqual(e.message, "The value of attribute 'name' on element 'xs:simpleType' is not valid with respect to its type, 'NCName'.")
+        }
+        assert.strictEqual(identifier_is_valid_ncname("be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"), true)
     });
-
 
     test('Test xsd composer.', async (t) => {
         const dataset = await json_ld_to_dataset(json_ld)
@@ -55,8 +65,8 @@ describe("Convert jsonld to xsd.", (s) => {
             "</xs:schema>\n")
     });
 
-
     test('codedlist has a conceptscheme definition with a dc.identifier field.', async (t) => {
         assert.strictEqual(await identifier_present(json_ld), '"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"')
+
     });
 });

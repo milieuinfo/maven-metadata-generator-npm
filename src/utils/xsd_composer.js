@@ -34,6 +34,13 @@ async function xsd_composer(rdf_dataset, urn) {
     });
     return await beautifiedXmlText;
 }
+function identifier_is_valid_ncname(id) {
+    let regex = /^"*[a-zA-Z0-9\\.]+"*$/
+    if (!regex.test(id)) {
+        throw new Error("The value of attribute 'name' on element 'xs:simpleType' is not valid with respect to its type, 'NCName'.");
+    }
+    return true;
+}
 
 async function identifier_present(json_ld) {
     var query = `SELECT ?identifier where {?s a <http://www.w3.org/2004/02/skos/core#ConceptScheme> ; <http://purl.org/dc/elements/1.1/identifier> ?identifier}  `;
@@ -49,11 +56,8 @@ async function identifier_present(json_ld) {
     if (!id) {
         throw new Error('Conceptscheme without dc:identifier');
     }
-    let regex = /^"*[a-zA-Z0-9\\.]+"*$/
-    if (!regex.test(id)) {
-        throw new Error("The value of attribute 'name' on element 'xs:simpleType' is not valid with respect to its type, 'NCName'.");
-    }
+    identifier_is_valid_ncname(id)
     return id;
 }
 
-export { xsd_composer, identifier_present };
+export { xsd_composer, identifier_present, identifier_is_valid_ncname };
