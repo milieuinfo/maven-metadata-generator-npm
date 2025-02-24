@@ -72,7 +72,7 @@ describe("Convert jsonld to xsd.", (s) => {
             "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" targetNamespace=\"urn:be.vlaanderen.omgeving.data.id.graph:codelijst-gebouw\">\n" +
             "  <xs:simpleType name=\"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw\">\n" +
             "    <xs:restriction base=\"xs:string\">\n" +
-            "      <xs:enumeration value=\"ahttps://data.omgeving.vlaanderen.be/id/concept/gebouw/buitenmuur\" />\n" +
+            "      <xs:enumeration value=\"https://data.omgeving.vlaanderen.be/id/concept/gebouw/buitenmuur\" />\n" +
             "      <xs:enumeration value=\"https://data.omgeving.vlaanderen.be/id/concept/gebouw/schoorsteen\" />\n" +
             "    </xs:restriction>\n" +
             "  </xs:simpleType>\n" +
