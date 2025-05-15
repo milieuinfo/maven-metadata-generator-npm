@@ -5,6 +5,10 @@ const context = {
         "@type": "@id",
         "@reverse": "member"
     },
+    "inscheme" : {
+        "@id" : "http://www.w3.org/2004/02/skos/core#inScheme",
+        "@type" : "@id"
+    },
     "id": "@id",
     "graph": "@graph",
     "type" : {
@@ -34,7 +38,13 @@ const succes_frame = {
         "@type": "http://www.w3.org/2004/02/skos/core#Concept",
         "@embed": "@never",
         "@omitDefault": true
+    },
+    "inscheme": {
+        "@type": "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+        "@embed": "@never",
+        "@omitDefault": true
     }
+
 }
 
 const fail_frame = {
@@ -67,6 +77,10 @@ const json_ld_error = {
         },
         "identifier": {
             "@id": "http://purl.org/dc/elements/1.1/identifier"
+        },
+        "inscheme" : {
+            "@id" : "http://www.w3.org/2004/02/skos/core#inScheme",
+            "@type" : "@id"
         },
         "conceptscheme": "https://data.omgeving.vlaanderen.be/id/conceptscheme/",
         "collectie": "https://data.omgeving.vlaanderen.be/id/collection/gebouw/",
@@ -113,6 +127,10 @@ const json_ld_error2 = {
         "id": "@id",
         "type" : {
             "@id" : "@type",
+            "@type" : "@id"
+        },
+        "inscheme" : {
+            "@id" : "http://www.w3.org/2004/02/skos/core#inScheme",
             "@type" : "@id"
         },
         "prefLabel" : {
@@ -183,6 +201,10 @@ const json_ld = {
             "@id" : "http://www.w3.org/2004/02/skos/core#prefLabel",
             "@language" : "nl"
         },
+        "inscheme" : {
+            "@id" : "http://www.w3.org/2004/02/skos/core#inScheme",
+            "@type" : "@id"
+        },
         "altLabel" : {
             "@id" : "http://www.w3.org/2004/02/skos/core#altLabel",
             "@language" : "nl"
@@ -220,14 +242,16 @@ const json_ld = {
         "id": "buitenmuur",
         "type": "skos:Concept",
         "altLabel": "buiten muur",
-        "prefLabel": "buitenmuur"
+        "prefLabel": "buitenmuur",
+        "inscheme": "conceptscheme:gebouw"
     },
   {
         "id": "schoorsteen",
         "type": "skos:Concept",
         "altLabel": "schoor steen",
-        "prefLabel": "schoorsteen"
-    }
+        "prefLabel": "schoorsteen",
+        "inscheme": "conceptscheme:gebouw"
+}
 ]
 }
 export { json_ld, json_ld_error, json_ld_error2, succes_frame, fail_frame };

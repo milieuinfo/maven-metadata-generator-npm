@@ -10,7 +10,15 @@ async function xsd_composer(rdf_dataset, urn) {
     identifier_present(my_json)
     has_correct_urn_pattern(urn)
     let schema = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#ConceptScheme")]["http://purl.org/dc/elements/1.1/identifier"]')[0][0]['@value'];
-    let concepts = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#Concept")]["@id"]');
+    let targetSchemeId = jp.query(my_json, '$[?(@.@type[0]=="http://www.w3.org/2004/02/skos/core#ConceptScheme")]["@id"]')[0]
+    let concepts = []
+    for ( let item of my_json) {
+        try {
+            if ( item["http://www.w3.org/2004/02/skos/core#inScheme"][0]['@id'] === targetSchemeId ){
+                concepts.push(item['@id'])
+            }
+        } catch (error) {}
+    }
     var xw = new XMLWriter;
     xw.startDocument('1.0', 'UTF-8');
     xw.startElement('xs:schema');
