@@ -2,6 +2,7 @@ import N3 from 'n3';
 import fs from "fs";
 import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
+import {parquetSourcesFromJsonld, parquetWriter} from './utils/parquet_writer.js';
 import jsonld from "jsonld";
 import path from "path";
 import  { json2csv }  from 'json-2-csv';
@@ -28,6 +29,7 @@ import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
 import {joinArray, separateString, sortLines, jsonld_to_table} from './utils/functions.js';
 import {deploy_latest} from './utils/deploy.js';
+
 
 
 async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file, xsd_file) {
@@ -189,6 +191,14 @@ async function jsonld_to_csv(csv_path, my_json){
     if (config.metadata.distribution.xlsx){
         try {
             convertCsvToXlsx(csv_path, config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.xlsx, { sheetName : config.types , overwrite : true });
+        } catch (e) {
+            console.error(e.toString());
+        }
+    }
+    if (config.metadata.distribution.parquet){
+        const parquetSources = parquetSourcesFromJsonld(my_json)
+        try {
+            await parquetWriter(parquetSources, config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.parquet)
         } catch (e) {
             console.error(e.toString());
         }
