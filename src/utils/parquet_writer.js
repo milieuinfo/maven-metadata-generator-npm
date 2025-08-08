@@ -82,7 +82,7 @@ function typeArray(array) {
 }
 
 /**
- * Infers a Parquet schema and returns typed array and schema for Parquet writing.
+ * Infers Parquet sources from a plain array of objects.
  * @param {Array<Object>} array - Array of plain objects representing records.
  * @returns {{ typedArray: Array<Object>, parquetSchema: ParquetSchema }}
  * @throws {TypeError} If input is not an array.
@@ -91,11 +91,20 @@ function parquetSourcesFromJsonArray(array) {
     if (!Array.isArray(array)) {
         throw new TypeError('Input to parquetSourcesFromJsonArray must be an array');
     }
-    return parquetSourcesFromJsonld(array, '$[*]')
+    if (array.length === 0) {
+        throw new Error('Array is empty.');
+    }
+    const typedArray = typeArray(array);
+    const parquetSchema = inferSchema(typedArray);
+    return {
+        typedArray,
+        parquetSchema
+    };
 }
 
 /**
  * Converts a JSON-LD object (with a 'graph' array) to Parquet sources.
+ * Calling parquetSourcesFromJsonld(array, '$[*]') with a plain json array is equal to parquetSourcesFromJsonArray(array)
  * @param {Object} json_ld - The JSON-LD object.
  * @param {string} [jsonPath='$.graph[*]'] - Optional JSONPath expression to extract array.\
  * @returns {{ typedArray: Array<Object>, parquetSchema: ParquetSchema }}
@@ -105,6 +114,9 @@ function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
     if (!json_ld || typeof json_ld !== 'object') {
         throw new Error('Invalid input: json_ld must be an object.');
     }
+    if (!json_ld["@context"]) {
+        throw new Error('Invalid input: this object is not jsonld. @context is missing.');
+    }
     let array;
     try {
         array = jp.query(json_ld, jsonPath);
@@ -112,7 +124,10 @@ function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
         throw new Error(`JSONPath query failed: ${err.message}`);
     }
     if (!Array.isArray(array)) {
-        throw new Error('Extracted data is not an array.');
+        throw new TypeError('Extracted data is not an array.');
+    }
+    if (array.length === 0) {
+        throw new Error('Extracted array is empty.');
     }
     const typedArray = typeArray(array);
     const parquetSchema = inferSchema(typedArray);
@@ -124,8 +139,8 @@ function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
 
 
 async function parquetWriter(parquetSources, parquetFilePath) {
-    const writer = await parquet.ParquetWriter.openFile(parquetSources["parquetSchema"], parquetFilePath);
-    for (const row of parquetSources["typedArray"]) {
+    const writer = await parquet.ParquetWriter.openFile(parquetSources.parquetSchema, parquetFilePath);
+    for (const row of parquetSources.typedArray) {
         await writer.appendRow(row);
     }
     await writer.close();

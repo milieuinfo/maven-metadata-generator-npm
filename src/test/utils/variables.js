@@ -110,6 +110,11 @@ const fail_frame = {
     "@type": ["http://www.w3.org/2004/02/skos/core#Collection", "http://www.w3.org/2004/02/skos/core#Concept"]
 }
 
+const fail_frame_2 = {
+    "@context": context,
+    "@type": "http://www.w3.org/2004/02/skos/core#ConceptScheme",
+}
+
 const json_ld_error = {
     "@context": {
         "collections": {
@@ -408,4 +413,4 @@ const json_ld_parquet = {
     ]
 }
 
-export { json_ld, json_ld_error, json_ld_error2, succes_frame, fail_frame, json_ld_parquet, succes_frame_parquet };
+export { json_ld, json_ld_error, json_ld_error2, succes_frame, fail_frame, json_ld_parquet, succes_frame_parquet, fail_frame_2 };

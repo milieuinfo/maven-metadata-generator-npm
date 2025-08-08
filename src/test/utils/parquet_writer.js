@@ -6,8 +6,8 @@ import {
     typeArray,
     parquetWriter
 } from '../../utils/parquet_writer.js';
-import { json_ld, succes_frame_parquet, fail_frame, json_ld_parquet } from './variables.js' ;
-import {test, describe, it} from 'node:test' ;
+import { succes_frame_parquet, fail_frame_2, json_ld_parquet } from './variables.js' ;
+import {test, describe} from 'node:test' ;
 import assert from "node:assert";
 import jsonld from 'jsonld';
 import jp from "jsonpath";
@@ -161,42 +161,115 @@ const control_parquetSchema = {
 }
 
 
-describe("Writing a parquet file from jsonld.", (s) => {
+describe("Writing a parquet file from jsonld.", () => {
     test('Parquetwriter requires a schema and an array of objects that are well typed ' +
         'This means: ' +
         '1) if the value of a key is declared as an array (repeated field), it must always be an array for every record — not a string or null. ' +
-        ' => Use "@container": "@set" in the @context of a frame' +
+        ' => Use "@container": "@set" in the @context of a frame. ' +
         '2) type the json array of objects, cast the values, before infering the schema ', async (t) => {
         var my_jsonld = await jsonld.frame(json_ld_parquet, succes_frame_parquet)
+        var my_fail_jsonld = await jsonld.frame(json_ld_parquet, fail_frame_2)
         const array = jp.query(my_jsonld, '$.graph[*]')
         const typed_array = typeArray(array)
         const parquetSchema = inferSchema(typed_array)
         const parquetSourcesFromArray = parquetSourcesFromJsonArray(array)
         const parquetSourcesFromLd = parquetSourcesFromJsonld(my_jsonld)
         await parquetWriter(parquetSourcesFromLd, "src/test/result/test.parquet")
-        await t.test("Succes scenario: check input array", (t) => {
+        await t.test("Succes scenario: check input array", () => {
             assert.deepStrictEqual(array, controll_array);
         });
-        await t.test("Succes scenario: check typed array", (t) => {
+        await t.test("Succes scenario: check typed array", () => {
             assert.deepStrictEqual(typed_array, typed_controll_array);
         });
-        await t.test("Succes scenario: parquetSources typedArray" , (t) => {
+        await t.test("Succes scenario: parquetSources typedArray" , () => {
             assert.deepStrictEqual(parquetSourcesFromLd.typedArray, typed_controll_array);
         });
-        await t.test("Succes scenario: typedArray; parquetSourcesFromJsonArray vs. parquetSourcesFromJsonld" , (t) => {
+        await t.test("Succes scenario: typedArray; parquetSourcesFromJsonArray vs. parquetSourcesFromJsonld" , () => {
             assert.deepStrictEqual(parquetSourcesFromLd.typedArray, parquetSourcesFromArray.typedArray);
         });
 
-        await t.test("Succes scenario: parquetSources parquetSchema" , (t) => {
+        await t.test("Succes scenario: parquetSources parquetSchema" , () => {
             assert.deepStrictEqual(parquetSourcesFromLd.parquetSchema, parquetSchema);
             assert.deepStrictEqual(control_parquetSchema.schema, parquetSchema.schema);
         });
-        await t.test("Succes scenario: parquetSchema; parquetSourcesFromJsonArray vs. parquetSourcesFromJsonld" , (t) => {
+        await t.test("Succes scenario: parquetSchema; parquetSourcesFromJsonArray vs. parquetSourcesFromJsonld" , () => {
             assert.deepStrictEqual(parquetSourcesFromLd.parquetSchema, parquetSourcesFromArray.parquetSchema);
+        });
+
+        await t.test('parquetSourcesFromJsonld throws if input is not jsonld with graph key', () => {
+            assert.throws(() => parquetSourcesFromJsonld(my_fail_jsonld),
+                Error,
+                'Input to parquetSourcesFromJsonld must be jsonld with a graph key '
+            );
         });
 
     });
 
+    test('inferSchema: should throw TypeError if input is not an array', () => {
+        assert.throws(() => inferSchema(null), TypeError);
+        assert.throws(() => inferSchema({}), TypeError);
+        assert.throws(() => inferSchema('foo'), TypeError);
+    });
 
+    test('inferSchema: should infer schema for number, string, and boolean fields', () => {
+        const data = [
+            { a: 1, b: 'x', c: true },
+            { a: 2, b: 'y', c: false }
+        ];
+        const schema = inferSchema(data);
+        assert(schema.schema.a.type === 'DOUBLE');
+        assert(schema.schema.b.type === 'UTF8');
+        assert(schema.schema.c.type === 'BOOLEAN');
+    });
+
+    test('inferSchema: should handle missing (optional) fields', () => {
+        const data = [
+            { a: 1, b: 'x' },
+            { a: 2 }
+        ];
+        const schema = inferSchema(data);
+        assert(schema.schema.b.optional === true);
+    });
+
+    test('inferSchema: should mark arrays as repeated', () => {
+        const data = [
+            { arr: [1, 2, 3] },
+            { arr: [4] }
+        ];
+        const schema = inferSchema(data);
+        assert(schema.schema.arr.repeated === true);
+    });
+
+    test('parquetSourcesFromJsonArray throws if input is not array', () => {
+        assert.throws(
+            () => parquetSourcesFromJsonArray('foo'),
+            TypeError,
+            'Input to parquetSourcesFromJsonArray must be an array'
+        );
+        assert.throws(
+            () => parquetSourcesFromJsonArray({ a: 2 , b: "x"}),
+            TypeError,
+            'Input to parquetSourcesFromJsonArray must be an array'
+        );
+    });
+
+    test('parquetSourcesFromJsonArray processes an array', () => {
+        const arr = [{ a: 1 }, { a: 2 , b: "x"}];
+        const result = parquetSourcesFromJsonArray(arr);
+        assert.ok(result);
+        assert(result.parquetSchema.schema.a.type === 'DOUBLE');
+        assert(result.parquetSchema.schema.b.type === 'UTF8');
+    });
+
+    // test('inferSchema: should handle nested objects', () => {
+    //     const data = [
+    //         { user: { id: 1, name: 'A' }},
+    //         { user: { id: 2, name: 'B' }}
+    //     ];
+    //     const schema = inferSchema(data);
+    //     assert(schema.schema.user.fields.id.type === 'DOUBLE');
+    //     assert(schema.schema.user.fields.name.type === 'UTF8');
+    // });
+    // test/parquet_writer.test.js
 
 });
