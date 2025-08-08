@@ -13,21 +13,6 @@ function separateString(original) {
     }
 }
 
-function typeJson(original) {
-    if (typeof original === 'string') {
-        if (original.includes('|')) {
-            return original.split('|'); // array
-        } else if (!Number.isNaN(parseFloat(original))){
-            return parseFloat(original)
-        } else if (original.toLowerCase() === 'true'){
-            return true
-        }else if (original.toLowerCase() === 'false'){
-            return false
-        } else {return original} // string}
-    } else {
-        return original; // boolean, number or object
-    }
-}
 
 function is_jar(url) {
     var re = new RegExp("^.*[0-9]+\.[0-9]+\.[0-9]+\.jar$");
@@ -103,5 +88,5 @@ function joinArray(arr) {
 const sortLines = str => Array.from(new Set(str.split(/\r?\n/))).sort().join('\n'); // To sort the dump of the reasoner for turtle pretty printing. Easier than using the Sink or Store.
 
 
-export { typeJson, separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table };
+export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table };
 

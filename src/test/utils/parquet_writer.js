@@ -1,6 +1,7 @@
 
 import {
     parquetSourcesFromJsonld,
+    parquetSourcesFromJsonArray,
     inferSchema,
     typeArray,
     parquetWriter
@@ -101,6 +102,65 @@ const typed_controll_array = [
     }
 ]
 
+const control_parquetSchema = {
+    "schema": {
+        "id": {
+            "type": "UTF8",
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "type": {
+            "repeated": true,
+            "type": "UTF8",
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "altLabel": {
+            "type": "UTF8",
+            "optional": true,
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "member": {
+            "repeated": true,
+            "type": "UTF8",
+            "optional": true,
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "prefLabel": {
+            "type": "UTF8",
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "nummer": {
+            "optional": true,
+            "type": "DOUBLE",
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "inscheme": {
+            "optional": true,
+            "type": "UTF8",
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "nietwaar": {
+            "optional": true,
+            "type": "BOOLEAN",
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        },
+        "waar": {
+            "optional": true,
+            "type": "BOOLEAN",
+            "encoding": "PLAIN",
+            "compression": "UNCOMPRESSED"
+        }
+    }
+}
+
+
 describe("Writing a parquet file from jsonld.", (s) => {
     test('Parquetwriter requires a schema and an array of objects that are well typed ' +
         'This means: ' +
@@ -111,23 +171,30 @@ describe("Writing a parquet file from jsonld.", (s) => {
         const array = jp.query(my_jsonld, '$.graph[*]')
         const typed_array = typeArray(array)
         const parquetSchema = inferSchema(typed_array)
-        const parquetSources = parquetSourcesFromJsonld(my_jsonld)
+        const parquetSourcesFromArray = parquetSourcesFromJsonArray(array)
+        const parquetSourcesFromLd = parquetSourcesFromJsonld(my_jsonld)
+        await parquetWriter(parquetSourcesFromLd, "src/test/result/test.parquet")
         await t.test("Succes scenario: check input array", (t) => {
             assert.deepStrictEqual(array, controll_array);
         });
         await t.test("Succes scenario: check typed array", (t) => {
             assert.deepStrictEqual(typed_array, typed_controll_array);
         });
-        await t.test("Succes scenario: parquetSources" , (t) => {
-            assert.deepStrictEqual(parquetSources['typedArray'], typed_array);
+        await t.test("Succes scenario: parquetSources typedArray" , (t) => {
+            assert.deepStrictEqual(parquetSourcesFromLd.typedArray, typed_controll_array);
         });
-        await t.test("Succes scenario: parquetSources" , (t) => {
-            assert.deepStrictEqual(parquetSources['typedArray'], typed_array);
+        await t.test("Succes scenario: typedArray; parquetSourcesFromJsonArray vs. parquetSourcesFromJsonld" , (t) => {
+            assert.deepStrictEqual(parquetSourcesFromLd.typedArray, parquetSourcesFromArray.typedArray);
         });
-        await t.test("Succes scenario: parquetSources" , (t) => {
-            assert.deepStrictEqual(parquetSources['parquetSchema'], parquetSchema);
+
+        await t.test("Succes scenario: parquetSources parquetSchema" , (t) => {
+            assert.deepStrictEqual(parquetSourcesFromLd.parquetSchema, parquetSchema);
+            assert.deepStrictEqual(control_parquetSchema.schema, parquetSchema.schema);
         });
-        await parquetWriter(parquetSources, "src/test/result/test.parquet")
+        await t.test("Succes scenario: parquetSchema; parquetSourcesFromJsonArray vs. parquetSourcesFromJsonld" , (t) => {
+            assert.deepStrictEqual(parquetSourcesFromLd.parquetSchema, parquetSourcesFromArray.parquetSchema);
+        });
+
     });
 
 
