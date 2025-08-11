@@ -167,16 +167,15 @@ function ensureDirSync(filePath) {
     }
 }
 
-
-async function output({
-                          shapes,
-                          rdf,
-                          turtlePath,
-                          jsonldOptions,
-                          ntriplesPath,
-                          csvOptions,
-                          xsdPath
-                      }) {
+async function output(
+    shapes,
+    rdf,
+    turtlePath,
+    jsonldOptions,
+    ntriplesPath,
+    csvOptions,
+    xsdPath
+) {
     console.log("output");
     const ttl_writer = new N3.Writer({ format: 'text/turtle', prefixes: { ...config.skos.prefixes, ...config.prefixes } });
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
