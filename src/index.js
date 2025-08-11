@@ -36,11 +36,11 @@ import {deploy_latest} from './utils/deploy.js';
  * Generates SKOS (Simple Knowledge Organization System) files from CSV.
  * Converts CSV to JSON-LD, applies N3 reasoning, and outputs in various formats.
  * @async
- * @param {string} turtlePath - Output path for Turtle format file.
- * @param {Object} jsonldOptions - ['Output path for JSON-LD format file', 'frame'].
- * @param {string} ntriplesPath - Output path for N-Triples format file.
- * @param {Object} csvOptions - ['Output path for CSV format file.', 'frame']
- * @param {string} xsdPath - Output path for XSD format file.
+ * @param {string} turtlePath - Output path for Turtle serialization
+ * @param {object} jsonldOptions - { file: string, frame: object } for JSON-LD output
+ * @param {string} ntriplesPath - Output path for N-Triples serialization
+ * @param {object} csvOptions - { file: string, frame: object } for CSV output
+ * @param {string} xsdPath - Output path for XSD serialization
  * @returns {Promise<void>}
  */
 
@@ -167,6 +167,27 @@ function ensureDirSync(filePath) {
     }
 }
 
+// Promisify N3 Writer's end method for clean async/await usage
+function writerEndAsync(writer) {
+    return new Promise((resolve, reject) => {
+        writer.end((err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+        });
+    });
+}
+
+/**
+ * Writes various serializations of the given RDF data to disk.
+ * Handles Turtle, N-Triples, JSON-LD, CSV, XSD, XLSX, and Parquet based on configuration.
+ * @param {object} shapes - SHACL shapes for validation
+ * @param {string} rdf - RDF input as string
+ * @param {string} turtlePath - Output path for Turtle serialization
+ * @param {object} jsonldOptions - { file: string, frame: object } for JSON-LD output
+ * @param {string} ntriplesPath - Output path for N-Triples serialization
+ * @param {object} csvOptions - { file: string, frame: object } for CSV output
+ * @param {string} xsdPath - Output path for XSD serialization
+ */
 async function output(
     shapes,
     rdf,
@@ -176,12 +197,13 @@ async function output(
     csvOptions,
     xsdPath
 ) {
-    console.log("output");
+    // Initialize RDF writers and dataset
     const ttl_writer = new N3.Writer({ format: 'text/turtle', prefixes: { ...config.skos.prefixes, ...config.prefixes } });
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
     const dataset = rdfDataset.dataset();
     const parser = new N3.Parser();
 
+    // Parse the RDF string, add quads to writers and dataset
     await new Promise((resolve, reject) => {
         parser.parse(rdf, (error, quad) => {
             if (error) return reject(error);
@@ -190,47 +212,51 @@ async function output(
                 nt_writer.addQuad(quad);
                 dataset.add(quad);
             } else {
-                resolve();
+                resolve(); // Parsing complete
             }
         });
     });
 
+    // Validate the dataset with provided SHACL shapes
     if (!(await validate(shapes, dataset))) {
         console.error("Validation failed.");
         return;
     }
 
     try {
+        // Write Turtle serialization to file, if requested
         if (turtlePath) {
-            ensureDirSync(turtlePath);
-            ttl_writer.end(async (err, result) => {
-                if (err) return console.error(err);
-                await fs.promises.writeFile(turtlePath, result);
-            });
+            ensureDirSync(turtlePath); // Ensure directory exists
+            const ttlResult = await writerEndAsync(ttl_writer); // Get Turtle as string
+            await fs.promises.writeFile(turtlePath, ttlResult); // Write to file asynchronously
         }
+        // Write N-Triples serialization, if requested
         if (ntriplesPath) {
             ensureDirSync(ntriplesPath);
-            nt_writer.end(async (err, result) => {
-                if (err) return console.error(err);
-                await fs.promises.writeFile(ntriplesPath, result);
-            });
+            const ntResult = await writerEndAsync(nt_writer);
+            await fs.promises.writeFile(ntriplesPath, ntResult);
         }
+        // Write JSON-LD, if configured
         if (jsonldOptions) {
             await jsonld_writer(dataset, jsonldOptions.file, jsonldOptions.frame);
         }
+        // Write CSV and optionally XLSX, if configured
         if (csvOptions) {
             await table_writer(dataset, csvOptions.file, csvOptions.frame);
             if (config.metadata.distribution.xlsx) {
                 await xlsx_writer(dataset, csvOptions.file);
             }
         }
+        // Write XSD, if requested
         if (xsdPath) {
             await xsd_writer(dataset, xsdPath);
         }
+        // Write Parquet, if enabled in config and CSV options present
         if (config.metadata.distribution.parquet && csvOptions) {
             await parquet_writer(dataset, csvOptions.frame);
         }
     } catch (err) {
+        // Catch and log any errors during writing
         console.error("Output error:", err);
     }
 }
@@ -243,13 +269,17 @@ async function rdf_to_jsonld(rdf_dataset, frame) {
 }
 
 async function jsonld_writer(data, filepath, frame) {
-    fs.writeFileSync(filepath, JSON.stringify(await rdf_to_jsonld(data, frame), null, 4));
+    await fs.promises.writeFile(filepath, JSON.stringify(await rdf_to_jsonld(data, frame), null, 4));
 }
 
 async function table_writer(data, filepath, frame) {
     console.log("jsonld to csv");
     try {
-        fs.writeFileSync(filepath, await json2csv( await jsonld_to_table(  await rdf_to_jsonld(data, frame)), { emptyFieldValue: null,  expandArrayObjects: false  }), 'utf8');
+        await fs.promises.writeFile(
+            filepath,
+            await json2csv(await jsonld_to_table(await rdf_to_jsonld(data, frame)), { emptyFieldValue: null, expandArrayObjects: false }),
+            'utf8'
+        );
     } catch (e) {
         console.error(e.toString());
     }

@@ -40,8 +40,7 @@ function version_from_url(url) {
 
 function to_be_metadated(historic_version, start_version){
     const sorted = [historic_version, start_version].sort(compareSemanticVersions);
-    return sorted[0] >= start_version
-
+    return sorted[0] === start_version
 }
 
 
