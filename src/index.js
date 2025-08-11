@@ -89,29 +89,25 @@ async function create_metadata() {
 async function get_versions(uris) {
     let my_versions = new Array();
     let version = {}
-    async function _add_version(url) {
+    async function _add_version(version, date) {
         const object = {};
-        const response = await fetch(url);
-        const data = await response.json();
-        object[version_from_uri(url)] = data.lastModified
+        object[version] = date
         my_versions.push(object)
     }
-
     for (const url of uris) {
+        const response = await fetch(url);
+        const data = await response.json();
         if (config.metadata.start_version){
             if (to_be_metadated(version_from_uri(url), config.metadata.start_version)){
-                await _add_version(url)
+                await _add_version(version_from_uri(url), data.lastModified)
             }
         } else {
-            await _add_version(url)
+            await _add_version(version_from_uri(url), data.lastModified)
         }
     }
 
-    var date_time = new Date();
-
-    version[next_release_version] = date_time.toISOString()
-    my_versions.push(version)
-    const version_nt = await n3_reasoning(construct_dcat([version]), dcat_rules)
+    await _add_version(next_release_version,new Date().toISOString())
+    const version_nt = await n3_reasoning(construct_dcat([my_versions[my_versions.length - 1]]), dcat_rules)
     const versions_nt = await n3_reasoning(construct_dcat(my_versions), dcat_rules)
     if (fs.existsSync('../temp/')){
         fs.rmSync('../temp/', { recursive: true, force: true });
