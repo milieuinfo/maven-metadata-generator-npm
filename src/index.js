@@ -27,7 +27,7 @@ import {
 } from './utils/variables.js';
 import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
-import {joinArray, separateString, sortLines, jsonld_to_table} from './utils/functions.js';
+import {joinArray, separateString, sortLines, jsonld_to_table, to_be_metadated} from './utils/functions.js';
 import {deploy_latest} from './utils/deploy.js';
 
 
@@ -88,15 +88,27 @@ async function create_metadata() {
 
 async function get_versions(uris) {
     let my_versions = new Array();
-    for (const url of uris) {
+    let version = {}
+    async function _add_version(url) {
         const object = {};
         const response = await fetch(url);
         const data = await response.json();
         object[version_from_uri(url)] = data.lastModified
         my_versions.push(object)
     }
+
+    for (const url of uris) {
+        if (config.metadata.start_version){
+            if (to_be_metadated(version_from_uri(url), config.metadata.start_version)){
+                await _add_version(url)
+            }
+        } else {
+            await _add_version(url)
+        }
+    }
+
     var date_time = new Date();
-    let version = {}
+
     version[next_release_version] = date_time.toISOString()
     my_versions.push(version)
     const version_nt = await n3_reasoning(construct_dcat([version]), dcat_rules)

@@ -38,6 +38,13 @@ function version_from_url(url) {
     return url.replace(/.*-([0-9]*\.[0-9]*\.[0-9]*)[\-a-z]*\..../, "$1")
 }
 
+function to_be_metadated(historic_version, start_version){
+    const sorted = [historic_version, start_version].sort(compareSemanticVersions);
+    return sorted[0] >= start_version
+
+}
+
+
 function select_latest_jar(list_of_downloadurls) {
     let my_uris = new Map();
     for (const result of list_of_downloadurls.results) {
@@ -88,5 +95,5 @@ function joinArray(arr) {
 const sortLines = str => Array.from(new Set(str.split(/\r?\n/))).sort().join('\n'); // To sort the dump of the reasoner for turtle pretty printing. Easier than using the Sink or Store.
 
 
-export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table };
+export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table, to_be_metadated };
 
