@@ -88,7 +88,6 @@ async function create_metadata() {
 
 async function get_versions(uris) {
     let my_versions = new Array();
-    let version = {}
     async function _add_version(version, date) {
         const object = {};
         object[version] = date
