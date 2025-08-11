@@ -1,6 +1,5 @@
 import N3 from 'n3';
 import fs from "fs";
-//import fs from "fs/promises"
 import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
 import {parquetSourcesFromJsonld, parquetWriter} from './utils/parquet_writer.js';
@@ -37,14 +36,15 @@ import {deploy_latest} from './utils/deploy.js';
  * Generates SKOS (Simple Knowledge Organization System) files from CSV.
  * Converts CSV to JSON-LD, applies N3 reasoning, and outputs in various formats.
  * @async
- * @param {string} ttl_file - Output path for Turtle format file.
- * @param {Array} jsonld_file - ['Output path for JSON-LD format file', 'frame'].
- * @param {string} nt_file - Output path for N-Triples format file.
- * @param {Array} csv_file - ['Output path for CSV format file.', 'frame']
- * @param {string} xsd_file - Output path for XSD format file.
+ * @param {string} turtlePath - Output path for Turtle format file.
+ * @param {Object} jsonldOptions - ['Output path for JSON-LD format file', 'frame'].
+ * @param {string} ntriplesPath - Output path for N-Triples format file.
+ * @param {Object} csvOptions - ['Output path for CSV format file.', 'frame']
+ * @param {string} xsdPath - Output path for XSD format file.
  * @returns {Promise<void>}
  */
-async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file, xsd_file) {
+
+async function generate_skos(turtlePath, jsonldOptions, ntriplesPath, csvOptions, xsdPath) {
     console.log("skos generation: csv to jsonld ");
     await csv({
         ignoreEmpty:true,
@@ -63,8 +63,8 @@ async function generate_skos(ttl_file, jsonld_file, nt_file, csv_file, xsd_file)
             let jsonld = {"@graph": new_json, "@context": skos_context_prefixes};
             console.log("1: Csv to Jsonld");
             (async () => {
-                const nt = await n3_reasoning(jsonld, skos_rules)
-                output(shapes_skos, nt, ttl_file, jsonld_file, nt_file, csv_file, xsd_file)
+                const nt_rdf = await n3_reasoning(jsonld, skos_rules)
+                output(shapes_skos, nt_rdf, turtlePath, jsonldOptions, ntriplesPath, csvOptions, xsdPath)
             })()
         })
 }
@@ -136,8 +136,8 @@ async function get_versions(uris) {
         fs.rmSync('../temp/', { recursive: true, force: true });
     }
 
-    output(shapes_dcat, latest_version_nt, dcat_dataset_turtle, [dcat_dataset_jsonld, frame_catalog]);
-    output(shapes_dcat, all_versions_nt, dcat_catalog_turtle, [dcat_catalog_jsonld, frame_catalog]);
+    output(shapes_dcat, latest_version_nt, dcat_dataset_turtle, {"file": dcat_dataset_jsonld, "frame": frame_catalog});
+    output(shapes_dcat, all_versions_nt, dcat_catalog_turtle, {"file": dcat_catalog_jsonld, "frame": frame_catalog});
 }
 /**
  * Applies N3 reasoning to a JSON-LD structure using provided rules.
@@ -168,14 +168,21 @@ function ensureDirSync(filePath) {
 }
 
 
-async function output(shapes, rdf, turtle = false, json_ld = false, n_triples = false, csv = false, xsd = false) {
+async function output({
+                          shapes,
+                          rdf,
+                          turtlePath,
+                          jsonldOptions,
+                          ntriplesPath,
+                          csvOptions,
+                          xsdPath
+                      }) {
     console.log("output");
     const ttl_writer = new N3.Writer({ format: 'text/turtle', prefixes: { ...config.skos.prefixes, ...config.prefixes } });
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
     const dataset = rdfDataset.dataset();
     const parser = new N3.Parser();
 
-    // Parse RDF to build writers and dataset
     await new Promise((resolve, reject) => {
         parser.parse(rdf, (error, quad) => {
             if (error) return reject(error);
@@ -189,42 +196,40 @@ async function output(shapes, rdf, turtle = false, json_ld = false, n_triples = 
         });
     });
 
-    // Validate dataset
     if (!(await validate(shapes, dataset))) {
         console.error("Validation failed.");
         return;
     }
 
-    // Handle output options
     try {
-        if (turtle) {
-            ensureDirSync(turtle);
-            ttl_writer.end((err, result) => {
-                if (err) throw err;
-                fs.writeFileSync(turtle, result);
+        if (turtlePath) {
+            ensureDirSync(turtlePath);
+            ttl_writer.end(async (err, result) => {
+                if (err) return console.error(err);
+                await fs.promises.writeFile(turtlePath, result);
             });
         }
-        if (n_triples) {
-            ensureDirSync(n_triples);
-            nt_writer.end((err, result) => {
-                if (err) throw err;
-                fs.writeFileSync(n_triples, result);
+        if (ntriplesPath) {
+            ensureDirSync(ntriplesPath);
+            nt_writer.end(async (err, result) => {
+                if (err) return console.error(err);
+                await fs.promises.writeFile(ntriplesPath, result);
             });
         }
-        if (json_ld) {
-            await jsonld_writer(dataset, json_ld[0], json_ld[1]);
+        if (jsonldOptions) {
+            await jsonld_writer(dataset, jsonldOptions.file, jsonldOptions.frame);
         }
-        if (csv) {
-            await table_writer(dataset, csv[0], csv[1]);
+        if (csvOptions) {
+            await table_writer(dataset, csvOptions.file, csvOptions.frame);
             if (config.metadata.distribution.xlsx) {
-                await xlsx_writer(dataset, csv[0]);
+                await xlsx_writer(dataset, csvOptions.file);
             }
         }
-        if (xsd) {
-            await xsd_writer(dataset, xsd);
+        if (xsdPath) {
+            await xsd_writer(dataset, xsdPath);
         }
-        if (config.metadata.distribution.parquet) {
-            await parquet_writer(dataset, csv[1]);
+        if (config.metadata.distribution.parquet && csvOptions) {
+            await parquet_writer(dataset, csvOptions.frame);
         }
     } catch (err) {
         console.error("Output error:", err);
