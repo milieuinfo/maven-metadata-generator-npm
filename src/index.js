@@ -137,8 +137,8 @@ async function get_versions(uris) {
         fs.rmSync('../temp/', { recursive: true, force: true });
     }
 
-    output(shapes_dcat, latest_version_nt, dcat_dataset_turtle, {"file": dcat_dataset_jsonld, "frame": frame_catalog});
-    output(shapes_dcat, all_versions_nt, dcat_catalog_turtle, {"file": dcat_catalog_jsonld, "frame": frame_catalog});
+    output(shapes_dcat, latest_version_nt, {"turtlePath": dcat_dataset_turtle, "jsonldOptions": {"file": dcat_dataset_jsonld, "frame": frame_catalog}});
+    output(shapes_dcat, all_versions_nt, {"turtlePath": dcat_catalog_turtle, "jsonldOptions": {"file": dcat_catalog_jsonld, "frame": frame_catalog}});
 }
 /**
  * Applies N3 reasoning to a JSON-LD structure using provided rules.
