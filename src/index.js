@@ -256,7 +256,7 @@ async function output(
             await parquet_writer(dataset, options.csvOptions.frame);
         }
         // Write json, if enabled in config and CSV options present
-        if (options.jsonldOptions) {
+        if (options.jsonOptions) {
             await json_writer(dataset, options.jsonOptions);
         }
     } catch (err) {
