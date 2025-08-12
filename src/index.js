@@ -9,6 +9,7 @@ import  { json2csv }  from 'json-2-csv';
 import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import {RoxiReasoner} from "roxi-js";
 import csv from 'csvtojson';
+import jp from "jsonpath";
 import {
     artifactId,
     config,
@@ -178,24 +179,23 @@ function writerEndAsync(writer) {
 }
 
 /**
- * Writes various serializations of the given RDF data to disk.
- * Handles Turtle, N-Triples, JSON-LD, CSV, XSD, XLSX, and Parquet based on configuration.
- * @param {object} shapes - SHACL shapes for validation
- * @param {string} rdf - RDF input as string
- * @param {string} turtlePath - Output path for Turtle serialization
- * @param {object} jsonldOptions - { file: string, frame: object } for JSON-LD output
- * @param {string} ntriplesPath - Output path for N-Triples serialization
- * @param {object} csvOptions - { file: string, frame: object } for CSV output
- * @param {string} xsdPath - Output path for XSD serialization
+ * @typedef {Object} OutputOptions
+ * @property {string} turtlePath
+ * @property {{ file: string, frame: any }} jsonOptions
+ * @property {{ file: string, frame: any }} jsonldOptions
+ * @property {string} ntriplesPath
+ * @property {{ file: string, frame: any }} csvOptions
+ */
+
+/**
+ * @param {any} shapes
+ * @param {any} rdf
+ * @param {OutputOptions} options
  */
 async function output(
     shapes,
     rdf,
-    turtlePath,
-    jsonldOptions,
-    ntriplesPath,
-    csvOptions,
-    xsdPath
+    options
 ) {
     // Initialize RDF writers and dataset
     const ttl_writer = new N3.Writer({ format: 'text/turtle', prefixes: { ...config.skos.prefixes, ...config.prefixes } });
@@ -225,51 +225,74 @@ async function output(
 
     try {
         // Write Turtle serialization to file, if requested
-        if (turtlePath) {
-            ensureDirSync(turtlePath); // Ensure directory exists
+        if (options.turtlePath) {
+            ensureDirSync(options.turtlePath); // Ensure directory exists
             const ttlResult = await writerEndAsync(ttl_writer); // Get Turtle as string
-            await fs.promises.writeFile(turtlePath, ttlResult); // Write to file asynchronously
+            await fs.promises.writeFile(options.turtlePath, ttlResult); // Write to file asynchronously
         }
         // Write N-Triples serialization, if requested
-        if (ntriplesPath) {
-            ensureDirSync(ntriplesPath);
+        if (options.ntriplesPath) {
+            ensureDirSync(options.ntriplesPath);
             const ntResult = await writerEndAsync(nt_writer);
-            await fs.promises.writeFile(ntriplesPath, ntResult);
+            await fs.promises.writeFile(options.ntriplesPath, ntResult);
         }
         // Write JSON-LD, if configured
-        if (jsonldOptions) {
-            await jsonld_writer(dataset, jsonldOptions.file, jsonldOptions.frame);
+        if (options.jsonldOptions) {
+            await jsonld_writer(dataset, options.jsonldOptions.file, options.jsonldOptions.frame);
         }
         // Write CSV and optionally XLSX, if configured
-        if (csvOptions) {
-            await table_writer(dataset, csvOptions.file, csvOptions.frame);
+        if (options.csvOptions) {
+            await table_writer(dataset, options.csvOptions.file, options.csvOptions.frame);
             if (config.metadata.distribution.xlsx) {
-                await xlsx_writer(dataset, csvOptions.file);
+                await xlsx_writer(dataset, options.csvOptions.file);
             }
         }
         // Write XSD, if requested
-        if (xsdPath) {
-            await xsd_writer(dataset, xsdPath);
+        if (options.xsdPath) {
+            await xsd_writer(dataset, options.xsdPath);
         }
         // Write Parquet, if enabled in config and CSV options present
-        if (config.metadata.distribution.parquet && csvOptions) {
-            await parquet_writer(dataset, csvOptions.frame);
+        if (config.metadata.distribution.parquet && options.csvOptions) {
+            await parquet_writer(dataset, options.csvOptions.frame);
+        }
+        // Write json, if enabled in config and CSV options present
+        if (options.jsonldOptions) {
+            await json_writer(dataset, options.jsonOptions);
         }
     } catch (err) {
         // Catch and log any errors during writing
         console.error("Output error:", err);
     }
 }
-
+/**
+ * @throws {Error} If input is invalid or extraction fails.
+ */
 async function rdf_to_jsonld(rdf_dataset, frame) {
     console.log("rdf to jsonld");
-    let my_json = await jsonld.fromRDF(rdf_dataset);
+    let json_ld = await jsonld.fromRDF(rdf_dataset);
+    if (!json_ld["@context"]) {
+        throw new Error('Invalid input: this object is not jsonld. @context is missing.');
+    }
     console.log("Extract ... as a tree using a frame.");
-    return await jsonld.frame(my_json, frame);
+    return await jsonld.frame(json_ld, frame);
 }
 
 async function jsonld_writer(data, filepath, frame) {
     await fs.promises.writeFile(filepath, JSON.stringify(await rdf_to_jsonld(data, frame), null, 4));
+}
+
+/**
+ * @param {string} data - RDF input as string
+ * @param {{ file: string, frame: any }} jsonOptions
+ * @param {string} [jsonPath='$.graph[*]'] - Optional JSONPath expression to extract array.
+ * @throws {Error} If input is invalid or extraction fails.
+ */
+async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
+    const jsonld = await rdf_to_jsonld(data, jsonOptions.frame)
+    if (!jsonld["@context"]) {
+        throw new Error('Invalid input: this object is not jsonld. @context is missing.');
+    }
+    await fs.promises.writeFile(jsonOptions.file, JSON.stringify( jp.query(jsonld, jsonPath), null, 4));
 }
 
 async function table_writer(data, filepath, frame) {
@@ -309,7 +332,7 @@ function version_from_uri(uri) {
     return uri.replace(/.*-(.*).pom$/, "$1")
 }
 
-export { generate_skos, create_metadata, deploy_latest, n3_reasoning, output, jsonld_writer };
+export { generate_skos, create_metadata, deploy_latest, n3_reasoning, output, jsonld_writer, json_writer };
 
 
 

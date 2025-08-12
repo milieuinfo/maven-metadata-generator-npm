@@ -63,6 +63,7 @@ function typeArray(array) {
         const cleanRow = {};
         for (const key of Object.keys(row)) {
             cleanRow[key] = _typeJson(row[key]);
+            //TODO niet casten, maar uit de jsonld context halen
         }
         return cleanRow;
     });
