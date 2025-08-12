@@ -264,17 +264,12 @@ async function output(
         console.error("Output error:", err);
     }
 }
-/**
- * @throws {Error} If input is invalid or extraction fails.
- */
+
 async function rdf_to_jsonld(rdf_dataset, frame) {
     console.log("rdf to jsonld");
-    let json_ld = await jsonld.fromRDF(rdf_dataset);
-    if (!json_ld["@context"]) {
-        throw new Error('Invalid input: this object is not jsonld. @context is missing.');
-    }
+    let my_json = await jsonld.fromRDF(rdf_dataset);
     console.log("Extract ... as a tree using a frame.");
-    return await jsonld.frame(json_ld, frame);
+    return await jsonld.frame(my_json, frame);
 }
 
 async function jsonld_writer(data, filepath, frame) {
