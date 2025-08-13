@@ -32,20 +32,26 @@ import {separateString, sortLines, jsonld_to_table, to_be_metadated} from './uti
 import {deploy_latest} from './utils/deploy.js';
 
 
+/**
+ * @typedef {Object} OutputOptions
+ * @property {string} turtlePath - Output path for Turtle serialization
+ * @property {{ file: string, frame: any }} jsonOptions - { file: string, frame: object } for JSON output
+ * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ * @property {string} ntriplesPath - Output path for N-Triples serialization
+ * @property {string} xsdPath  - Output path for XSD serialization
+ * @property {{ file: string, frame: any }} csvOptions - { file: string, frame: object } for CSV output
+ */
 
 /**
  * Generates SKOS (Simple Knowledge Organization System) files from CSV.
  * Converts CSV to JSON-LD, applies N3 reasoning, and outputs in various formats.
  * @async
- * @param {string} turtlePath - Output path for Turtle serialization
- * @param {object} jsonldOptions - { file: string, frame: object } for JSON-LD output
- * @param {string} ntriplesPath - Output path for N-Triples serialization
- * @param {object} csvOptions - { file: string, frame: object } for CSV output
- * @param {string} xsdPath - Output path for XSD serialization
- * @returns {Promise<void>}
+ * @param {OutputOptions} options
  */
+//turtlePath, jsonldOptions, ntriplesPath, csvOptions, xsdPath
 
-async function generate_skos(turtlePath, jsonldOptions, ntriplesPath, csvOptions, xsdPath) {
+async function generate_skos(options) {
+
     console.log("skos generation: csv to jsonld ");
     await csv({
         ignoreEmpty:true,
@@ -65,7 +71,7 @@ async function generate_skos(turtlePath, jsonldOptions, ntriplesPath, csvOptions
             console.log("1: Csv to Jsonld");
             (async () => {
                 const nt_rdf = await n3_reasoning(jsonld, skos_rules)
-                output(shapes_skos, nt_rdf, turtlePath, jsonldOptions, ntriplesPath, csvOptions, xsdPath)
+                output(shapes_skos, nt_rdf, options)
             })()
         })
 }
