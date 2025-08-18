@@ -87,10 +87,23 @@ async function generate_skos(options, skosSource ) {
 }
 
 /**
- * Creates metadata by fetching previous versions from a remote repository,
- * processes them, and outputs version information.
+ * Generates metadata for artifacts by retrieving previous versions from a remote repository,
+ * processing them, and outputting version information in multiple formats.
+ *
+ * - Fetches artifact POM URIs based on groupId and artifactId from a remote API.
+ * - Filters and processes only POM artifact URIs.
+ * - For each version, retrieves version metadata and determines if it should be included based on a start version.
+ * - Also includes information about the next release version.
+ * - Produces RDF representations for both the latest and all versions, and triggers output in the specified formats.
+ *
  * @async
- * @returns {Promise<void>}
+ * @function create_metadata
+ * @param {Object} metadataSource - The source object containing SHACL shapes, prefixes, rules, and other metadata context.
+ * @param {Object} metadataOptions - Options including groupId, artifactId, startVersion, next_release_version, etc.
+ * @param {Object} datasetOptions - Output options for the dataset (e.g., Turtle and JSON-LD paths/frames).
+ * @param {Object} catalogOptions - Output options for the catalog (e.g., Turtle and JSON-LD paths/frames).
+ * @returns {Promise<void>} Resolves when metadata generation and output are complete.
+ * @throws {Error} If the remote API request fails or returns an error status.
  */
 async function create_metadata(
         metadataSource,
@@ -120,11 +133,22 @@ async function create_metadata(
 }
 
 /**
- * Processes an array of URIs to extract and record version information.
- * Outputs version datasets in several formats.
+ * Processes an array of artifact URIs to extract and record version information,
+ * outputting version datasets in several formats.
+ *
+ * For each URI, fetches JSON metadata, extracts the version number, and records
+ * its last modified date if it meets the metadataOptions criteria. Adds the
+ * next release version as well. Generates RDF representations of the latest and
+ * all versions, applies reasoning, and writes results using output().
+ *
  * @async
  * @param {Array<string>} uris - Array of artifact URIs to process.
- * @returns {Promise<void>}
+ * @param {Object} metadataSource - Source definition with SHACL shapes, prefixes, and rules for reasoning.
+ * @param {Object} metadataOptions - Metadata options, must include next_release_version, startVersion, groupId, and artifactId.
+ * @param {Object} datasetOptions - Output options for the latest version dataset (e.g., paths for Turtle and JSON-LD).
+ * @param {Object} catalogOptions - Output options for the full catalog of versions (e.g., paths for Turtle and JSON-LD).
+ * @returns {Promise<void>} Resolves when all processing and output are complete.
+ * @throws {Error} If any fetch or processing step fails.
  */
 async function get_versions(uris, metadataSource, metadataOptions, datasetOptions, catalogOptions) {
     const versions = [];
@@ -370,14 +394,18 @@ async function xlsx_writer(excelOptions) {
 }
 
 /**
- * Applies N3 reasoning to a JSON-LD structure using provided rules.
- * Returns RDF statements in N-Triples format.
+ * Writes RDF data to a Parquet file using provided options.
+ * Converts the RDF dataset to JSON-LD with a given frame, then serializes the result to Parquet format.
+ *
  * @async
- * @param {Object} json_ld - The JSON-LD input data.
- * @param {Array|Object} rules - The reasoning rules to apply.
- * @returns {Promise<string>} - The resulting N-Triples output.
- * @throws {Error} If parquetOptions object contains no specified output.
- * @throws {TypeError} If parquetOptions object contains no valid frame.
+ * @function parquet_writer
+ * @param {rdfDataset.Dataset} data - The RDF dataset to serialize.
+ * @param {Object} parquetOptions - Options for Parquet serialization.
+ * @param {string} parquetOptions.file - Path to the Parquet output file.
+ * @param {Object} parquetOptions.frame - JSON-LD frame to apply for shaping the data.
+ * @throws {Error} If no output file is specified in parquetOptions.
+ * @throws {TypeError} If the frame is invalid or missing a @context property.
+ * @returns {Promise<void>} A promise that resolves when the Parquet file has been written.
  */
 async function parquet_writer(data, parquetOptions) {
     console.log("jsonld to parquet");
