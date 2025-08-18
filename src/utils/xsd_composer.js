@@ -5,6 +5,21 @@ import XmlBeautify from "xml-beautify";
 import {DOMParser} from "xmldom";
 import {RoxiReasoner} from "roxi-js";
 
+/**
+ * Composes an XML Schema Definition (XSD) as a string from an RDF dataset and a URN.
+ *
+ * This function parses the given RDF dataset into JSON-LD, ensures that the ConceptScheme
+ * has a valid identifier and that the URN matches the required pattern. It then queries
+ * all SKOS concepts belonging to the target ConceptScheme and generates a simple XSD enumeration
+ * of their identifiers. The resulting XSD string is beautified for readability.
+ *
+ * @async
+ * @param {string} rdf_dataset - The RDF dataset in a serialization compatible with jsonld.fromRDF (e.g., N-Quads).
+ * @param {string} urn - The target namespace URN for the XSD schema. Must follow the urn pattern.
+ * @returns {Promise<string>} A promise that resolves to the beautified XSD schema as a string.
+ * @throws {Error} If the ConceptScheme does not have an identifier, the identifier is not a valid NCName,
+ *                 or the URN does not match the required pattern.
+ */
 async function xsd_composer(rdf_dataset, urn) {
     let my_json = await jsonld.fromRDF(rdf_dataset);
     identifier_present(my_json)
@@ -58,6 +73,12 @@ function has_correct_urn_pattern(urn) {
     return true;
 }
 
+/**
+ * Checks if a ConceptScheme has a valid dc:identifier and returns it.
+ * @param {Object} json_ld - JSON-LD object to process.
+ * @returns {Promise<string>} - The valid identifier.
+ * @throws {Error} - If no valid identifier is found or validation fails.
+ */
 async function identifier_present(json_ld) {
     var query = `SELECT ?identifier where {?s a <http://www.w3.org/2004/02/skos/core#ConceptScheme> ; <http://purl.org/dc/elements/1.1/identifier> ?identifier}  `;
     const nt = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
