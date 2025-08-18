@@ -16,6 +16,15 @@ import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
 import {separateString, sortLines, jsonld_to_table, to_be_metadated} from './utils/functions.js';
 import {deploy_latest} from './utils/deploy.js';
+import {
+    artifactId,
+    config,
+    context,
+    groupId,
+    next_release_version,
+    shapes_dcat,
+    skos_context_prefixes
+} from "./utils/variables.js";
 
 
 /**
@@ -86,6 +95,8 @@ async function generate_skos(options, skosSource ) {
         })
 }
 
+
+
 /**
  * Generates metadata for artifacts by retrieving previous versions from a remote repository,
  * processing them, and outputting version information in multiple formats.
@@ -95,13 +106,44 @@ async function generate_skos(options, skosSource ) {
  * - For each version, retrieves version metadata and determines if it should be included based on a start version.
  * - Also includes information about the next release version.
  * - Produces RDF representations for both the latest and all versions, and triggers output in the specified formats.
- *
+ */
+
+/**
+ * @typedef {Object} MetadataOptions
+ * @property {string} artifactId - pom.xml atifactId
+ * @property {string} groupId - pom.xml groupId
+ * @property {string} next_release_version - next release version
+ * @property {string} startVersion - start metatadata from this version
+ */
+
+/**
+ * @typedef {Object} MetadataSource
+ * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
+ * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @Property {Object} prefixes - Object wit key - value prefixes
+ */
+
+/**
+ * @typedef {Object} DatasetOptions
+ * @property {string} turtlePath - Output path for Turtle serialization
+ * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ */
+
+/**
+ * @typedef {Object} CatalogOptions
+ * @property {string} turtlePath - Output path for Turtle serialization
+ * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ */
+
+/**
+ * Generates SKOS (Simple Knowledge Organization System) files from CSV.
+ * Converts CSV to JSON-LD, applies N3 reasoning, and outputs in various formats.
  * @async
  * @function create_metadata
- * @param {Object} metadataSource - The source object containing SHACL shapes, prefixes, rules, and other metadata context.
- * @param {Object} metadataOptions - Options including groupId, artifactId, startVersion, next_release_version, etc.
- * @param {Object} datasetOptions - Output options for the dataset (e.g., Turtle and JSON-LD paths/frames).
- * @param {Object} catalogOptions - Output options for the catalog (e.g., Turtle and JSON-LD paths/frames).
+ * @param {MetadataSource} metadataSource
+ * @param {MetadataOptions} metadataOptions
+ * @param {DatasetOptions} datasetOptions
+ * @param {CatalogOptions} catalogOptions
  * @returns {Promise<void>} Resolves when metadata generation and output are complete.
  * @throws {Error} If the remote API request fails or returns an error status.
  */

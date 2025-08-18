@@ -53,20 +53,16 @@ const frame_catalog = {
 }
 
 
-
 const metadataOptions = {
     "artifactId": artifactId,
     "groupId": groupId,
-    "config": config,
-    "context": context,
-    "skos_context_prefixes": skos_context_prefixes,
-    "frame_catalog": frame_catalog,
     "next_release_version": next_release_version,
-    "shapes_dcat": shapes_dcat,
     "startVersion": config.metadata.start_version
 }
 
+
 export {
+    frame_catalog,
     metadataOptions,
     artifactId,
     groupId,
