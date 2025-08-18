@@ -31,6 +31,8 @@ const skos_context = JSON.parse(readFileSync(config.source.path + config.source.
 
 const skos_context_prefixes = Object.assign({},skos_context , skos_prefixes)
 
+const urn = ('urn:' + groupId + ':' + artifactId);
+
 const frame_catalog = {
     "@context": context,
     "@type": ["dcat:Catalog"],
@@ -76,7 +78,7 @@ export {
     next_release_version,
     shapes_dcat,
     skos_rules,
-    dcat_rules
+    urn
 };
 
 
