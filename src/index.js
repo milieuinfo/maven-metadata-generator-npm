@@ -16,7 +16,6 @@ import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
 import {separateString, sortLines, jsonld_to_table, to_be_metadated} from './utils/functions.js';
 import {deploy_latest} from './utils/deploy.js';
-import rdf from "@zazuko/env-node";
 
 
 /**
@@ -248,7 +247,7 @@ async function output(
         options.jsonOptions?.file,
         options.csvOptions?.file,
         options.ntriplesPath,
-        options.xsdPath,
+        options.xsdOptions?.file,
         options.parquetOptions?.file
     ].some(Boolean)) {
         throw new Error('Invalid options: no specified output.');
@@ -305,8 +304,8 @@ async function output(
             }
         }
         // Write XSD, if requested
-        if (options.xsdPath) {
-            await xsd_writer(dataset, options.xsdPath);
+        if (options.xsdOptions) {
+            await xsd_writer(dataset, options.xsdOptions);
         }
         // Write Parquet, if enabled in config and CSV options present
         if (options.parquetOptions) {
