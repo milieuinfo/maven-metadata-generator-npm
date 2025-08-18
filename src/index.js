@@ -25,7 +25,7 @@ import {deploy_latest} from './utils/deploy.js';
  * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
  * @property {{ file: string, sourcefile: string, sheetName: string }} excelOptions  - { file: string, sourcefile: string, sheetName: string } for excel output based on csv sourcefile
  * @property {string} ntriplesPath - Output path for N-Triples serialization
- * @property {string} xsdPath  - Output path for XSD serialization
+ * @property {{ file: string, urn: string }} xsdOptions - { file: string, urn: string } The file path where the generated XSD will be written. xsdOptions.urn - The URN to be used for XSD composition.
  * @property {{ file: string, frame: any }} csvOptions - { file: string, frame: object } for CSV output
  * @property {{ file: string, frame: any }} parquetOptions - { file: string, frame: object } for Parquet output
  */
@@ -57,7 +57,7 @@ async function generate_skos(options, skosSource ) {
         options.jsonOptions?.file,
         options.csvOptions?.file,
         options.ntriplesPath,
-        options.xsdPath,
+        options.xsdOptions?.file,
         options.parquetOptions?.file
     ].some(Boolean)) {
         throw new Error('Invalid options: no specified output.');
@@ -175,9 +175,6 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
     // Generate RDF representations
     const latest_version_nt = await n3_reasoning(construct_dcat([versions[versions.length - 1]]), metadataSource.rules);
     const all_versions_nt = await n3_reasoning(construct_dcat(versions), metadataSource.rules);
-
-
-
 
     // Clean up temp directory if it exists
     if (fs.existsSync('../temp/')) {
