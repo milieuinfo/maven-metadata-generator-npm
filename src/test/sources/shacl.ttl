@@ -1,0 +1,285 @@
+@prefix vv:            <https://data.vlaanderen.be/ns/> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix xhv:           <http://www.w3.org/1999/xhtml/vocab#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:          <http://www.w3.org/2004/02/skos/core#> .
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix omg_dataset:   <https://data.omgeving.vlaanderen.be/id/dataset/> .
+@prefix dct:           <http://purl.org/dc/terms/> .
+@prefix sh:            <http://www.w3.org/ns/shacl#> .
+@prefix omg_ont:       <https://data.omgeving.vlaanderen.be/id/ontology/> .
+@prefix omg_ag_cl:     <https://data.omgeving.vlaanderen.be/id/person/codelijst/> .
+@prefix omg_voc:       <https://data.omgeving.vlaanderen.be/ns/> .
+@prefix vl_org:        <http://data.vlaanderen.be/id/organisatie/> .
+@prefix xkos:          <http://rdf-vocabulary.ddialliance.org/xkos#> .
+@prefix dbo:           <http://dbpedia.org/ontology/> .
+@prefix vcs:            <https://data.vlaanderen.be/ns/luchtzuiveringssysteem#> .
+@prefix dbp:           <http://dbpedia.org/property/> .
+@prefix omg_ps:        <https://data.omgeving.vlaanderen.be/id/propertyshape/> .
+@prefix rdf:           <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix ons:           <https://data.omgeving.vlaanderen.be/id/nodeshape/> .
+@prefix schema:        <http://schema.org/> .
+@prefix foaf:          <http://xmlns.com/foaf/0.1/> .
+@prefix csc:           <https://data.omgeving.vlaanderen.be/id/concept/chemische_stof/> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+
+omg_ont:luchtzuiveringssysteem-ap-constraints
+    a               owl:Ontology ;
+    rdfs:comment
+        "Specifieert hoe de data in de codelijst van luchtzuiveringssystemen te encoderen in RDF (i.e. RDF termen, kardinaliteiten,...)."@en ;
+    rdfs:label      "Matrix AP Constraints"@en ;
+    dct:abstract    "Het luchtzuiveringssysteem applicatieprofiel specifieert de RDF termen (klassen en properties) en bijhorende constraints die gebruikt worden voor het beschrijven van luchtzuiveringssystemen. Het maakt hierbij zoveel mogelijk gebruik van bestaande termen (klassen en properties) uit bestaande , skos, dbo, dbp en een minimale set van nieuwe termen gedefinieerd in het Matrix Vocabularium."@en ;
+    dct:alternative "Matrix AP Shapes"@en ;
+    dct:creator     omg_ag_cl:creator ;
+    dct:description "Dit is de SHACL encodering van het applicatieprofiel van een luchtzuiveringssysteem."@en ;
+    dct:issued      "2022-10-03"^^xsd:date ;
+    dct:title       "Matrix AP Constraints"@en ;
+    xkos:belongsTo  omg_dataset:codelijst-luchtzuiveringssysteem ;
+    xhv:last        omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    owl:sameAs      omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    owl:versionInfo "Versie 1.0.0  oktober 2023"@en .
+
+
+omg_voc:luchtzuiveringssysteem-ap-constraints
+    a          owl:Ontology ;
+    rdfs:label "Matrix AP Constraints"@en ;
+    owl:sameAs omg_ont:luchtzuiveringssysteem-ap-constraints .
+
+omg_ag_cl:creator
+    rdfs:label "Ontwikkelaar codelijst"@en ;
+    schema:affiliation vl_org:OVO003749 ;
+    a foaf:Person;
+    foaf:firstName "Geert";
+    foaf:lastName "Van Haute";
+    foaf:mbox <mailto:geert.vanhaute@vlaanderen.be>.
+
+# Node Shapes
+ons:schema
+    a                sh:NodeShape ;
+    rdfs:label       "conceptschema van luchtzuiveringssystemen"@en ;
+    sh:name          "conceptschema van luchtzuiveringssystemen"@en ;
+    sh:description   "Het schema waarbinnen de luchtzuiveringssystemen gedefinieerd zijn"@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:property      omg_ps:conceptscheme_prefLabel, omg_ps:schema_hasTopConcept,
+                         omg_ps:definition, omg_ps:rdf_type;
+
+    sh:targetClass   skos:ConceptScheme .
+
+
+
+ons:collection
+    a                sh:NodeShape ;
+    rdfs:label       "verzameling"@en ;
+    sh:name          "verzameling"@en ;
+    sh:description   "Verzamelingen bundelen luchtzuiveringssystemen met gelijkaardige eigenschappen, analysemethoden of luchtzuiveringssystemen waarin ze gemeten worden."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:property      omg_ps:prefLabel, omg_ps:collection_member,
+                         omg_ps:inScheme, omg_ps:rdf_type;
+
+    sh:targetClass   skos:Collection .
+
+
+
+ons:luchtzuiveringssysteem
+    a                sh:NodeShape ;
+    rdfs:label       "luchtzuiveringssysteem"@en ;
+    sh:name          "luchtzuiveringssysteem"@en ;
+    sh:description   "analysemethodes"@en ;
+    rdfs:comment     ""@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:property      omg_ps:notation, omg_ps:inScheme,
+                         omg_ps:references, omg_ps:definition,
+                         omg_ps:prefLabel, omg_ps:theme,
+                         omg_ps:topConceptOf, omg_ps:altLabel,
+                         omg_ps:rdf_type, omg_ps:note ;
+
+    sh:targetClass   skos:Concept .
+
+
+
+# Property Shapes
+
+omg_ps:rdf_type
+    a                sh:PropertyShape ;
+    rdfs:label       "rdf type"@en ;
+    sh:name          "rdf type"@en ;
+    sh:description   "Aanduiding dat een bron een instantie van een bepaalde klasse is."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          rdf:type .
+
+
+omg_ps:topConceptOf
+    a                sh:PropertyShape ;
+    rdfs:label       "topconcept van"@en ;
+    sh:name          "topconcept van"@en ;
+    sh:description   "De relatie tussen een concept en het schema, waarvan het een topconcept is."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:class         skos:ConceptScheme ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          skos:topConceptOf .
+
+
+omg_ps:theme
+    a                sh:PropertyShape ;
+    rdfs:label       "thema"@en ;
+    sh:name          "thema"@en ;
+    sh:description   "De relatie naar een europees thema"@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dcat:theme .
+
+
+omg_ps:topConceptOf
+    a                sh:PropertyShape ;
+    rdfs:label       "topconcept van"@en ;
+    sh:name          "topconcept van"@en ;
+    sh:description   "De relatie tussen een concept en het schema, waarvan het een topconcept is."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:class         skos:ConceptScheme ;
+    sh:maxCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          skos:topConceptOf .
+
+omg_ps:altLabel
+    a                sh:PropertyShape ;
+    rdfs:label       "alternatief label"@en ;
+    sh:name          "alternatief label"@en ;
+    sh:description   "Een alternatief lexicaal label voor een bepaalde bron."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:datatype      rdf:langString ;
+    sh:languageIn    ( "nl" "en" ) ;
+    sh:nodeKind      sh:Literal ;
+    sh:path          skos:altLabel .
+
+omg_ps:collection_member
+    a                sh:PropertyShape ;
+    rdfs:label       "onderdeel"@en ;
+    sh:name          "onderdeel"@en ;
+    sh:description   "Een collectie heeft minstens 1 onderdeel."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:class         skos:Concept ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          skos:member .
+
+
+
+#omg_ps:exactMatch
+#    a                sh:PropertyShape ;
+#    rdfs:label       "heeft exacte overeenkomst"@en ;
+#    sh:name          "heeft exacte overeenkomst"@en ;
+#    sh:description   "skos:exactMatch wordt gebruikt om twee concepten te koppelen, wat aangeeft dat er een hoge mate van vertrouwen bestaat dat de concepten onderling uitwisselbaar kunnen worden gebruikt in een breed scala aan toepassingen voor het ophalen van informatie. skos:exactMatch is een transitieve eigenschap en is een subeigenschap van skos:closeMatch"@en ;
+#    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+#    sh:nodeKind      sh:IRI ;
+#    sh:path          skos:exactMatch .
+
+omg_ps:notation
+    a                sh:PropertyShape ;
+    rdfs:label       "notatie"@en ;
+    sh:name          "notatie"@en ;
+    sh:description   "Een notatie, ook wel classificatiecode genoemd, is een reeks tekens zoals \"PCB151\" of \"EtFOSA\" die wordt gebruikt om een luchtzuiveringssysteem op unieke wijze te identificeren binnen de context van dit schema."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:datatype      xsd:string ;
+    sh:nodeKind      sh:Literal ;
+    sh:property      omg_ps:unique_notation ;
+    sh:path          skos:notation .
+
+omg_ps:unique_notation
+    a                  sh:PropertyShape ;
+    rdfs:label         "unieke notatie"@en ;
+    sh:name            "unieke notatie"@en ;
+    sh:description     "Een notatie, ook wel classificatiecode genoemd, is een reeks tekens zoals \"PCB151\" of \"EtFOSA\" die wordt gebruikt om een luchtzuiveringssysteem op unieke wijze te identificeren binnen de context van dit schema. Er kan vanuit verschillende classificatiesystemen, met meerdere notaties verwezen worden naar een luchtzuiveringssysteem, maar een notatie is uniek voor een luchtzuiveringssysteem, ttz. vanuit 1 notatie kan slechts naar 1 luchtzuiveringssysteem worden verwezen."@en ;
+    rdfs:isDefinedBy   omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:nodeKind        sh:IRI ;
+    sh:targetObjectsOf skos:notation ;
+    sh:path            [ sh:inversePath skos:notation ] ;
+    sh:minCount        1 ;
+    sh:maxCount        1 .
+
+omg_ps:schema_hasTopConcept
+    a                sh:PropertyShape ;
+    rdfs:label       "heeft topconcept"@en ;
+    sh:name          "heeft topconcept"@en ;
+    sh:description   "Verbindt een conceptschema met een concept dat bovenaan in een 'broader/narrower' hierarchie staat en voorziet aldus een ingang tot die hierarchie."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:class         skos:Concept ; #dbo:ChemicalCompound, dbo:ChemicalSubstance,
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          skos:hasTopConcept .
+
+
+omg_ps:references
+    a                sh:PropertyShape ;
+    rdfs:label       "wordt vermeld in"@en ;
+    sh:name          "wordt vermeld in"@en ;
+    sh:description   "Binnen dit schema wordt dct:references gebruikt om de relatie tussen analysemethodes en wat geanalyseerd wordt te leggen, die betrekking hebben op de luchtzuiveringssysteem."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dct:references .
+
+omg_ps:definition
+    a                sh:PropertyShape ;
+    rdfs:label       "definitie"@en ;
+    sh:name          "definitie"@en ;
+    sh:description   "Een uitspraak over de betekenis van het concept, de collectie of het schema."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:datatype      rdf:langString ;
+    sh:languageIn    ( "nl" "en" ) ;
+    sh:maxCount      2 ;
+    sh:nodeKind      sh:Literal ;
+    sh:path          skos:definition .
+
+omg_ps:note
+    a                sh:PropertyShape ;
+    rdfs:label       "note"@en ;
+    sh:name          "note"@en ;
+    sh:description   "Een uitspraak over de betekenis van het concept, de collectie of het schema."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:datatype      rdf:langString ;
+    sh:languageIn    ( "nl" "en" ) ;
+    sh:nodeKind      sh:Literal ;
+    sh:path          skos:note .
+
+omg_ps:prefLabel
+    a                sh:PropertyShape ;
+    rdfs:label       "voorkeurslabel"@en ;
+    sh:name          "voorkeurslabel"@en ;
+    sh:description   "Het voorkeurslabel in de Nederlandse taal. Slechts 1 voorkeurslabel is toegelaten."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:datatype      rdf:langString ;
+    sh:languageIn    ( "nl" ) ;
+    sh:maxCount      1 ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:Literal ;
+    sh:path          skos:prefLabel .
+
+
+omg_ps:conceptscheme_prefLabel
+    a                sh:PropertyShape ;
+    rdfs:label       "voorkeurslabel"@en ;
+    sh:name          "voorkeurslabel"@en ;
+    sh:description   "Het voorkeurslabel."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:datatype      rdf:langString ;
+    sh:languageIn    ( "en" "nl" ) ;
+    sh:uniqueLang true ;
+    sh:maxCount      2 ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:Literal ;
+    sh:path          skos:prefLabel .
+
+omg_ps:inScheme
+    a                sh:PropertyShape ;
+    rdfs:label       "is in schema"@en ;
+    sh:name          "is in schema"@en ;
+    sh:description   "Drukt de relatie uit tussen een 'resource' en het schema dat het bevat."@en ;
+    rdfs:isDefinedBy omg_ont:luchtzuiveringssysteem-ap-constraints, omg_voc:luchtzuiveringssysteem-ap-constraints ;
+    sh:class         skos:ConceptScheme ;
+    sh:maxCount      1 ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          skos:inScheme .

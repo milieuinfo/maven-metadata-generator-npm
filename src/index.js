@@ -1,3 +1,5 @@
+'use strict';
+
 import N3 from 'n3';
 import fs from "fs";
 import rdfDataset from "@rdfjs/dataset";
@@ -10,26 +12,11 @@ import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import {RoxiReasoner} from "roxi-js";
 import csv from 'csvtojson';
 import jp from "jsonpath";
-import {
-    artifactId,
-    config,
-    skos_context_prefixes,
-    dcat_catalog_jsonld,
-    dcat_catalog_turtle,
-    dcat_dataset_jsonld,
-    dcat_dataset_turtle,
-    dcat_rules,
-    frame_catalog,
-    groupId,
-    next_release_version,
-    shapes_dcat,
-    shapes_skos,
-    skos_rules
-} from './utils/variables.js';
 import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
 import {separateString, sortLines, jsonld_to_table, to_be_metadated} from './utils/functions.js';
 import {deploy_latest} from './utils/deploy.js';
+import rdf from "@zazuko/env-node";
 
 
 /**
@@ -37,27 +24,51 @@ import {deploy_latest} from './utils/deploy.js';
  * @property {string} turtlePath - Output path for Turtle serialization
  * @property {{ file: string, frame: any }} jsonOptions - { file: string, frame: object } for JSON output
  * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ * @property {{ file: string, sourcefile: string, sheetName: string }} excelOptions  - { file: string, sourcefile: string, sheetName: string } for excel output based on csv sourcefile
  * @property {string} ntriplesPath - Output path for N-Triples serialization
  * @property {string} xsdPath  - Output path for XSD serialization
  * @property {{ file: string, frame: any }} csvOptions - { file: string, frame: object } for CSV output
+ * @property {{ file: string, frame: any }} parquetOptions - { file: string, frame: object } for Parquet output
+ */
+
+/**
+ * @typedef {Object} SkosSource
+ * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @property {Object} contextPrefixes - @context with prefixes included
+ * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
+ * @Property {Object} prefixes
  */
 
 /**
  * Generates SKOS (Simple Knowledge Organization System) files from CSV.
  * Converts CSV to JSON-LD, applies N3 reasoning, and outputs in various formats.
  * @async
+ * @param {SkosSource} skosSource
  * @param {OutputOptions} options
+ * @throws {Error} If options object contains no specified output.
+ * @throws {TypeError} If OutputOptions is not an object.
  */
-//turtlePath, jsonldOptions, ntriplesPath, csvOptions, xsdPath
-
-async function generate_skos(options) {
-
-    console.log("skos generation: csv to jsonld ");
+async function generate_skos(options, skosSource ) {
+    if (typeof options !== "object"){
+        throw new TypeError('Expected an object');
+    }
+    if (![
+        options.turtlePath,
+        options.jsonldOptions?.file,
+        options.jsonOptions?.file,
+        options.csvOptions?.file,
+        options.ntriplesPath,
+        options.xsdPath,
+        options.parquetOptions?.file
+    ].some(Boolean)) {
+        throw new Error('Invalid options: no specified output.');
+    }
+    console.log("skos generation: csv to jsonld");
     await csv({
         ignoreEmpty:true,
         flatKeys:true
     })
-        .fromFile(config.source.path + config.source.codelijst_csv)
+        .fromFile(skosSource.sourcePath)
         .then((jsonObj)=>{
             var new_json = [];
             for(var i = 0; i < jsonObj.length; i++){
@@ -67,11 +78,11 @@ async function generate_skos(options) {
                 })
                 new_json.push(object)
             }
-            let jsonld = {"@graph": new_json, "@context": skos_context_prefixes};
+            let jsonld = {"@graph": new_json, "@context": skosSource.contextPrefixes};
             console.log("1: Csv to Jsonld");
             (async () => {
-                const nt_rdf = await n3_reasoning(jsonld, skos_rules)
-                output(shapes_skos, nt_rdf, options)
+                const nt_rdf = await n3_reasoning(jsonld, skosSource.rules)
+                output(skosSource, nt_rdf, options)
             })()
         })
 }
@@ -82,9 +93,13 @@ async function generate_skos(options) {
  * @async
  * @returns {Promise<void>}
  */
-async function create_metadata() {
+async function create_metadata(
+        metadataSource,
+        metadataOptions,
+        datasetOptions,
+        catalogOptions) {
     console.log('metadata generation: get previous versions');
-    const url = `https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=${groupId}&a=${artifactId}&classifier=sources&repos=release`;
+    const url = `https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=${metadataOptions.groupId}&a=${metadataOptions.artifactId}&classifier=sources&repos=release`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -98,7 +113,7 @@ async function create_metadata() {
                 uris.push(result.uri);
             }
         }
-        await get_versions(uris);
+        await get_versions(uris, metadataSource, metadataOptions, datasetOptions, catalogOptions);
         console.log(body);
     } catch (error) {
         console.error(error.message);
@@ -112,7 +127,7 @@ async function create_metadata() {
  * @param {Array<string>} uris - Array of artifact URIs to process.
  * @returns {Promise<void>}
  */
-async function get_versions(uris) {
+async function get_versions(uris, metadataSource, metadataOptions, datasetOptions, catalogOptions) {
     const versions = [];
 
     // Fetch all URIs in parallel
@@ -121,7 +136,7 @@ async function get_versions(uris) {
             const response = await fetch(url);
             const data = await response.json();
             const version = version_from_uri(url);
-            if (!config.metadata.start_version || to_be_metadated(version, config.metadata.start_version)) {
+            if (!metadataOptions.startVersion || to_be_metadated(version, metadataOptions.startVersion)) {
                 versions.push({ [version]: data.lastModified });
             }
         } catch (e) {
@@ -132,19 +147,22 @@ async function get_versions(uris) {
     await Promise.all(fetches);
 
     // Add next release version
-    versions.push({ [next_release_version]: new Date().toISOString() });
+    versions.push({ [metadataOptions.next_release_version]: new Date().toISOString() });
 
     // Generate RDF representations
-    const latest_version_nt = await n3_reasoning(construct_dcat([versions[versions.length - 1]]), dcat_rules);
-    const all_versions_nt = await n3_reasoning(construct_dcat(versions), dcat_rules);
+    const latest_version_nt = await n3_reasoning(construct_dcat([versions[versions.length - 1]]), metadataSource.rules);
+    const all_versions_nt = await n3_reasoning(construct_dcat(versions), metadataSource.rules);
+
+
+
 
     // Clean up temp directory if it exists
     if (fs.existsSync('../temp/')) {
         fs.rmSync('../temp/', { recursive: true, force: true });
     }
 
-    output(shapes_dcat, latest_version_nt, {"turtlePath": dcat_dataset_turtle, "jsonldOptions": {"file": dcat_dataset_jsonld, "frame": frame_catalog}});
-    output(shapes_dcat, all_versions_nt, {"turtlePath": dcat_catalog_turtle, "jsonldOptions": {"file": dcat_catalog_jsonld, "frame": frame_catalog}});
+    output(metadataSource, latest_version_nt, {"turtlePath": datasetOptions.turtlePath, "jsonldOptions": {"file": datasetOptions.jsonldOptions.file, "frame": datasetOptions.jsonldOptions.frame}});
+    output(metadataSource, all_versions_nt, {"turtlePath": catalogOptions.turtlePath, "jsonldOptions": {"file": catalogOptions.jsonldOptions.file, "frame": catalogOptions.jsonldOptions.frame}});
 }
 /**
  * Applies N3 reasoning to a JSON-LD structure using provided rules.
@@ -185,6 +203,14 @@ function writerEndAsync(writer) {
 }
 
 /**
+ * @typedef {Object} Source
+ * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @property {Object} contextPrefixes - @context with prefixes included
+ * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
+ * @Property {Object} prefixes
+ */
+
+/**
  * @typedef {Object} OutputOptions
  * @property {string} turtlePath
  * @property {{ file: string, frame: any }} jsonOptions
@@ -194,17 +220,41 @@ function writerEndAsync(writer) {
  */
 
 /**
- * @param {any} shapes
- * @param {any} rdf
+ * @param {Source} source
+ * @param {string} rdf - RDF input as string
  * @param {OutputOptions} options
+ * @throws {Error} If options object contains no specified output.
+ * @throws {TypeError} If OutputOptions is not an object.
+ * @throws {TypeError} If source.shapesDataset is not a rdfDataset.
+ * @throws {TypeError} If rdf is not a string.
  */
 async function output(
-    shapes,
+    source,
     rdf,
     options
 ) {
+    if (typeof options !== "object"){
+        throw new TypeError('Expected an object');
+    }
+    if (source.shapesDataset.constructor.name !== "Dataset"){
+        throw new TypeError('Expected a Dataset');
+    }
+    if (typeof rdf !== "string"){
+        throw new TypeError('Expected a string');
+    }
+    if (![
+        options.turtlePath,
+        options.jsonldOptions?.file,
+        options.jsonOptions?.file,
+        options.csvOptions?.file,
+        options.ntriplesPath,
+        options.xsdPath,
+        options.parquetOptions?.file
+    ].some(Boolean)) {
+        throw new Error('Invalid options: no specified output.');
+    }
     // Initialize RDF writers and dataset
-    const ttl_writer = new N3.Writer({ format: 'text/turtle', prefixes: { ...config.skos.prefixes, ...config.prefixes } });
+    const ttl_writer = new N3.Writer({ format: 'text/turtle', prefixes: source.prefixes});
     const nt_writer = new N3.Writer({ format: 'N-Triples' });
     const dataset = rdfDataset.dataset();
     const parser = new N3.Parser();
@@ -224,7 +274,7 @@ async function output(
     });
 
     // Validate the dataset with provided SHACL shapes
-    if (!(await validate(shapes, dataset))) {
+    if (!(await validate(source.shapesDataset, dataset))) {
         console.error("Validation failed.");
         return;
     }
@@ -249,8 +299,9 @@ async function output(
         // Write CSV and optionally XLSX, if configured
         if (options.csvOptions) {
             await table_writer(dataset, options.csvOptions.file, options.csvOptions.frame);
-            if (config.metadata.distribution.xlsx) {
-                await xlsx_writer(dataset, options.csvOptions.file);
+            //TODO write excel from csv-string
+            if (options.excelOptions) {
+                await xlsx_writer(options.excelOptions);
             }
         }
         // Write XSD, if requested
@@ -258,8 +309,8 @@ async function output(
             await xsd_writer(dataset, options.xsdPath);
         }
         // Write Parquet, if enabled in config and CSV options present
-        if (config.metadata.distribution.parquet && options.csvOptions) {
-            await parquet_writer(dataset, options.csvOptions.frame);
+        if (options.parquetOptions) {
+            await parquet_writer(dataset, options.parquetOptions);
         }
         // Write json, if enabled in config and CSV options present
         if (options.jsonOptions) {
@@ -309,20 +360,37 @@ async function table_writer(data, filepath, frame) {
     }
 }
 
-async function xlsx_writer(data, csv_filepath) {
+
+async function xlsx_writer(excelOptions) {
     console.log("csv to excel");
     try {
-        convertCsvToXlsx(csv_filepath, config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.xlsx, { sheetName : config.types , overwrite : true });
+        convertCsvToXlsx(excelOptions.sourcefile, excelOptions.file, { sheetName : excelOptions.sheetName , overwrite : true });
     } catch (e) {
         console.error(e.toString());
     }
 }
 
-async function parquet_writer(data, frame) {
+/**
+ * Applies N3 reasoning to a JSON-LD structure using provided rules.
+ * Returns RDF statements in N-Triples format.
+ * @async
+ * @param {Object} json_ld - The JSON-LD input data.
+ * @param {Array|Object} rules - The reasoning rules to apply.
+ * @returns {Promise<string>} - The resulting N-Triples output.
+ * @throws {Error} If parquetOptions object contains no specified output.
+ * @throws {TypeError} If parquetOptions object contains no valid frame.
+ */
+async function parquet_writer(data, parquetOptions) {
     console.log("jsonld to parquet");
-    const parquetSources = parquetSourcesFromJsonld(await rdf_to_jsonld(data, frame))
+    if (!parquetOptions.file ) {
+        throw new Error('Invalid options: no specified output.');
+    }
+    if (!parquetOptions.frame["@context"]) {
+        throw new TypeError("Expected an objects with a @context");
+    }
+    const parquetSources = parquetSourcesFromJsonld(await rdf_to_jsonld(data, parquetOptions.frame))
     try {
-        await parquetWriter(parquetSources, config.skos.path + config.skos.name + '/' + config.skos.name + config.skos.parquet)
+        await parquetWriter(parquetSources, parquetOptions.file)
     } catch (e) {
         console.error(e.toString());
     }

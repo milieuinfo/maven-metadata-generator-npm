@@ -21,23 +21,15 @@ const artifactId = jp.query(pom, '$.project.artifactId._text').toString();
 
 const next_release_version = jp.query(pom, '$.project.version._text').toString().split('-')[0];
 
-const dcat_rules = this_config.dcat.rules ;
-
-const dcat_catalog_path = '../temp/' + config.dcat.path_catalog + artifactId + '/'
-
-const dcat_dataset_path = '../temp/' + config.dcat.path_dataset + artifactId + '/'
-
-const dcat_dataset_jsonld = dcat_dataset_path + config.dcat.dataset_jsonld
-
-const dcat_dataset_turtle = dcat_dataset_path + config.dcat.dataset_turtle
-
-const dcat_catalog_jsonld = dcat_catalog_path + config.dcat.catalog_jsonld
-
-const dcat_catalog_turtle = dcat_catalog_path + config.dcat.catalog_turtle
-
 const skos_rules = config.skos.rules ;
 
-const urn = ('urn:' + groupId + ':' + artifactId);
+const dcat_rules = this_config.dcat.rules ;
+
+const skos_prefixes = Object.assign( {}, config.skos.prefixes, config.prefixes, { '@base' : config.skos.prefixes.concept })
+
+const skos_context = JSON.parse(readFileSync(config.source.path + config.source.context));
+
+const skos_context_prefixes = Object.assign({},skos_context , skos_prefixes)
 
 const frame_catalog = {
     "@context": context,
@@ -60,33 +52,31 @@ const frame_catalog = {
     }
 }
 
-const skos_prefixes = Object.assign( {}, config.skos.prefixes, config.prefixes, { '@base' : config.skos.prefixes.concept })
 
-const skos_context = JSON.parse(readFileSync(config.source.path + config.source.context));
 
-const skos_context_prefixes = Object.assign({},skos_context , skos_prefixes)
-
-const shapes_skos = await rdf.dataset().import(rdf.fromFile(config.ap.path + config.ap.name + '-' + config.ap.type + '/' + config.ap.name + '-' + config.ap.type + config.ap.turtle))
+const metadataOptions = {
+    "artifactId": artifactId,
+    "groupId": groupId,
+    "config": config,
+    "context": context,
+    "skos_context_prefixes": skos_context_prefixes,
+    "frame_catalog": frame_catalog,
+    "next_release_version": next_release_version,
+    "shapes_dcat": shapes_dcat,
+    "startVersion": config.metadata.start_version
+}
 
 export {
+    metadataOptions,
     artifactId,
+    groupId,
     config,
     context,
     skos_context_prefixes,
-    dcat_catalog_jsonld,
-    dcat_catalog_path,
-    dcat_catalog_turtle,
-    dcat_dataset_jsonld,
-    dcat_dataset_path,
-    dcat_dataset_turtle,
-    dcat_rules,
-    frame_catalog,
-    groupId,
     next_release_version,
     shapes_dcat,
-    shapes_skos,
     skos_rules,
-    urn
+    dcat_rules
 };
 
 
