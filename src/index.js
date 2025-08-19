@@ -4,13 +4,11 @@ import N3 from 'n3';
 import fs from "fs";
 import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
-import jsonld from "jsonld";
 import path from "path";
-import {RoxiReasoner} from "roxi-js";
 import csv from 'csvtojson';
 import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
-import {separateString, sortLines, to_be_metadated, version_from_uri} from './utils/functions.js';
+import {separateString, to_be_metadated, version_from_uri, n3_reasoning} from './utils/functions.js';
 import {json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer } from './utils/writers.js';
 import {deploy_latest} from './utils/deploy.js';
 
@@ -18,13 +16,13 @@ import {deploy_latest} from './utils/deploy.js';
 /**
  * @typedef {Object} OutputOptions
  * @property {string} turtlePath - Output path for Turtle serialization
- * @property {{ file: string, frame: any }} jsonOptions - { file: string, frame: object } for JSON output
- * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ * @property {{ file: string, frame: Frame }} jsonOptions - { file: string, frame: JsonLdObj } for JSON output
+ * @property {{ file: string, frame: Frame }} jsonldOptions  - { file: string, frame: JsonLdObj } for JSON-LD output
  * @property {{ file: string, sourcefile: string, sheetName: string }} excelOptions  - { file: string, sourcefile: string, sheetName: string } for excel output based on csv sourcefile
  * @property {string} ntriplesPath - Output path for N-Triples serialization
  * @property {{ file: string, urn: string }} xsdOptions - { file: string, urn: string } The file path where the generated XSD will be written. xsdOptions.urn - The URN to be used for XSD composition.
- * @property {{ file: string, frame: any }} csvOptions - { file: string, frame: object } for CSV output
- * @property {{ file: string, frame: any }} parquetOptions - { file: string, frame: object } for Parquet output
+ * @property {{ file: string, frame: Frame }} csvOptions - { file: string, frame: JsonLdObj } for CSV output
+ * @property {{ file: string, frame: Frame }} parquetOptions - { file: string, frame: JsonLdObj } for Parquet output
  */
 
 /**
@@ -114,13 +112,13 @@ async function generate_skos(options, skosSource ) {
 /**
  * @typedef {Object} DatasetOptions
  * @property {string} turtlePath - Output path for Turtle serialization
- * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ * @property {{ file: string, frame: Frame }} jsonldOptions  - { file: string, frame: JsonLdObj } for JSON-LD output
  */
 
 /**
  * @typedef {Object} CatalogOptions
  * @property {string} turtlePath - Output path for Turtle serialization
- * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ * @property {{ file: string, frame: Frame }} jsonldOptions  - { file: string, frame: JsonLdObj } for JSON-LD output
  */
 
 /**
@@ -190,13 +188,13 @@ async function create_metadata(
 /**
  * @typedef {Object} DatasetOptions
  * @property {string} turtlePath - Output path for Turtle serialization
- * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ * @property {{ file: string, frame: Frame }} jsonldOptions  - { file: string, frame: JsonLdObj } for JSON-LD output
  */
 
 /**
  * @typedef {Object} CatalogOptions
  * @property {string} turtlePath - Output path for Turtle serialization
- * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ * @property {{ file: string, frame: Frame }} jsonldOptions  - { file: string, frame: JsonLdObj } for JSON-LD output
  */
 
 /**
@@ -243,25 +241,7 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
     output(metadataSource, latest_version_nt, {"turtlePath": datasetOptions.turtlePath, "jsonldOptions": {"file": datasetOptions.jsonldOptions.file, "frame": datasetOptions.jsonldOptions.frame}});
     output(metadataSource, all_versions_nt, {"turtlePath": catalogOptions.turtlePath, "jsonldOptions": {"file": catalogOptions.jsonldOptions.file, "frame": catalogOptions.jsonldOptions.frame}});
 }
-/**
- * Applies N3 reasoning to a JSON-LD structure using provided rules.
- * Returns RDF statements in N-Triples format.
- * @async
- * @param {Object} json_ld - The JSON-LD input data.
- * @param {Array|Object} rules - The reasoning rules to apply.
- * @returns {Promise<string>} - The resulting N-Triples output.
- */
-async function n3_reasoning(json_ld, rules) {
-    console.log("n3 reasoning ");
-    let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
-    const reasoner = RoxiReasoner.new();
-    reasoner.add_abox(rdf);
-    for (let rule in rules) {
-        reasoner.add_rules(fs.readFileSync(process.cwd() + rules[rule], 'utf8'));
-    }
-    reasoner.materialize();
-    return sortLines(reasoner.get_abox_dump());
-}
+
 
 
 
@@ -276,10 +256,10 @@ async function n3_reasoning(json_ld, rules) {
 /**
  * @typedef {Object} OutputOptions
  * @property {string} turtlePath
- * @property {{ file: string, frame: any }} jsonOptions
- * @property {{ file: string, frame: any }} jsonldOptions
+ * @property {{ file: string, frame: Frame }} jsonOptions
+ * @property {{ file: string, frame: Frame }} jsonldOptions
  * @property {string} ntriplesPath
- * @property {{ file: string, frame: any }} csvOptions
+ * @property {{ file: string, frame: Frame }} csvOptions
  */
 
 /**

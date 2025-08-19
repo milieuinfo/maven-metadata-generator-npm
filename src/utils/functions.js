@@ -1,6 +1,43 @@
 'use strict';
 
 import jp from "jsonpath";
+import jsonld from "jsonld";
+import {RoxiReasoner} from "roxi-js";
+
+
+/**
+ * Applies N3 reasoning to a JSON-LD structure using provided rules.
+ * Returns RDF statements in N-Triples format.
+ * @async
+ * @param {jsonld.NodeObject} json_ld - The JSON-LD input data.
+ * @param {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
+ * @returns {Promise<string>} - The resulting N-Triples output.
+ */
+async function n3_reasoning(json_ld, rules) {
+    console.log("n3 reasoning ");
+    let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
+    const reasoner = RoxiReasoner.new();
+    reasoner.add_abox(rdf);
+    for (let rule in rules) {
+        reasoner.add_rules(fs.readFileSync(process.cwd() + rules[rule], 'utf8'));
+    }
+    reasoner.materialize();
+    return sortLines(reasoner.get_abox_dump());
+}
+
+/**
+ * @async
+ * @function rdf_to_jsonld
+ * @param {string} data - RDF input as string
+ * @param {Frame} frame - Frame = JsonLdObj
+ * @returns {Promise<jsonld.NodeObject>} A framed jsonld object.
+ */
+async function rdf_to_jsonld(data, frame) {
+    console.log("rdf to jsonld");
+    let my_json = await jsonld.fromRDF(data);
+    console.log("Extract ... as a tree using a frame.");
+    return await jsonld.frame(my_json, frame);
+}
 
 /**
  * Separates a string by the '|' character if present, otherwise returns the original value.
@@ -143,4 +180,4 @@ const sortLines = str => Array.from(new Set(str.split(/\r?\n/))).sort().join('\n
 /**
  * Exported functions for use in other modules.
  */
-export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table, to_be_metadated };
+export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table, to_be_metadated, rdf_to_jsonld, n3_reasoning };

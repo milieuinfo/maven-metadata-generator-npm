@@ -10,7 +10,7 @@ import {jsonld_to_table, rdf_to_jsonld} from './functions.js';
  * @async
  * @function jsonld_writer
  * @param {string} data - RDF input as string
- * @param {{ file: string, frame: any }} jsonldOptions
+ * @param {{ file: string, frame: Frame }} jsonldOptions
  * @throws {Error} If input is invalid or extraction fails.
  * @returns {Promise<void>} A promise that resolves when the jsonld file has been written.
  */
@@ -21,7 +21,7 @@ async function jsonld_writer(data, jsonldOptions) {
     }
     try {
         await fs.promises.writeFile(
-            jsonldOptions.file,
+            jsonldOptions.file, 
             JSON.stringify(jsonld, null, 4)
         );
     } catch (e) {
@@ -33,7 +33,7 @@ async function jsonld_writer(data, jsonldOptions) {
  * @async
  * @function json_writer
  * @param {string} data - RDF input as string
- * @param {{ file: string, frame: any }} jsonOptions
+ * @param {{ file: string, frame: Frame }} jsonOptions
  * @param {string} [jsonPath='$.graph[*]'] - Optional JSONPath expression to extract array.
  * @throws {Error} If input is invalid or extraction fails.
  * @returns {Promise<void>} A promise that resolves when the json file has been written.
@@ -50,7 +50,7 @@ async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
  * @async
  * @function table_writer
  * @param {string} data - RDF input as string
- * @param {{ file: string, frame: any }} csvOptions
+ * @param {{ file: string, frame: Frame }} csvOptions
  * @throws {Error} If input is invalid or extraction fails.
  * @returns {Promise<void>} A promise that resolves when the CSV file has been written.
  */
