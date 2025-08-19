@@ -182,13 +182,42 @@ async function create_metadata(
  * its last modified date if it meets the metadataOptions criteria. Adds the
  * next release version as well. Generates RDF representations of the latest and
  * all versions, applies reasoning, and writes results using output().
- *
- * @async
+
+
+ /**
+ * @typedef {Object} MetadataOptions
+ * @property {string} artifactId - pom.xml atifactId
+ * @property {string} groupId - pom.xml groupId
+ * @property {string} next_release_version - next release version
+ * @property {string} startVersion - start metatadata from this version
+ */
+
+/**
+ * @typedef {Object} MetadataSource
+ * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
+ * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @Property {Object} prefixes - Object wit key - value prefixes
+ */
+
+/**
+ * @typedef {Object} DatasetOptions
+ * @property {string} turtlePath - Output path for Turtle serialization
+ * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ */
+
+/**
+ * @typedef {Object} CatalogOptions
+ * @property {string} turtlePath - Output path for Turtle serialization
+ * @property {{ file: string, frame: any }} jsonldOptions  - { file: string, frame: object } for JSON-LD output
+ */
+
+/**
+* @async
  * @param {Array<string>} uris - Array of artifact URIs to process.
- * @param {Object} metadataSource - Source definition with SHACL shapes, prefixes, and rules for reasoning.
- * @param {Object} metadataOptions - Metadata options, must include next_release_version, startVersion, groupId, and artifactId.
- * @param {Object} datasetOptions - Output options for the latest version dataset (e.g., paths for Turtle and JSON-LD).
- * @param {Object} catalogOptions - Output options for the full catalog of versions (e.g., paths for Turtle and JSON-LD).
+ * @param {MetadataSource} metadataSource - Source definition with SHACL shapes, prefixes, and rules for reasoning.
+ * @param {MetadataOptions} metadataOptions - Metadata options, must include next_release_version, startVersion, groupId, and artifactId.
+ * @param {DatasetOptions} datasetOptions - Output options for the latest version dataset (e.g., paths for Turtle and JSON-LD).
+ * @param {CatalogOptions} catalogOptions  - Output options for the full catalog of versions (e.g., paths for Turtle and JSON-LD).
  * @returns {Promise<void>} Resolves when all processing and output are complete.
  * @throws {Error} If any fetch or processing step fails.
  */
