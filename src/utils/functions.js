@@ -3,7 +3,7 @@
 import jp from "jsonpath";
 import jsonld from "jsonld";
 import {RoxiReasoner} from "roxi-js";
-
+import fs from "fs";
 
 /**
  * Applies N3 reasoning to a JSON-LD structure using provided rules.

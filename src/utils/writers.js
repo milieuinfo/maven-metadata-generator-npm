@@ -3,7 +3,7 @@ import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import jp from "jsonpath";
 import {parquetSourcesFromJsonld, parquetWriter} from './parquet_writer.js';
 import {jsonld_to_table, rdf_to_jsonld} from './functions.js';
-
+import fs from "fs";
 
 
 /**
