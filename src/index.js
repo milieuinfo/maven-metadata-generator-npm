@@ -4,27 +4,15 @@ import N3 from 'n3';
 import fs from "fs";
 import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
-import {parquetSourcesFromJsonld, parquetWriter} from './utils/parquet_writer.js';
 import jsonld from "jsonld";
 import path from "path";
-import  { json2csv }  from 'json-2-csv';
-import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import {RoxiReasoner} from "roxi-js";
 import csv from 'csvtojson';
-import jp from "jsonpath";
 import {construct_dcat} from './utils/metadata.js';
 import {xsd_writer} from './utils/xsd.js';
-import {separateString, sortLines, jsonld_to_table, to_be_metadated} from './utils/functions.js';
+import {separateString, sortLines, to_be_metadated, version_from_uri} from './utils/functions.js';
+import {json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer } from './utils/writers.js';
 import {deploy_latest} from './utils/deploy.js';
-import {
-    artifactId,
-    config,
-    context,
-    groupId,
-    next_release_version,
-    shapes_dcat,
-    skos_context_prefixes
-} from "./utils/variables.js";
 
 
 /**
@@ -110,7 +98,7 @@ async function generate_skos(options, skosSource ) {
 
 /**
  * @typedef {Object} MetadataOptions
- * @property {string} artifactId - pom.xml atifactId
+ * @property {string} artifactId - pom.xml artifactId
  * @property {string} groupId - pom.xml groupId
  * @property {string} next_release_version - next release version
  * @property {string} startVersion - start metatadata from this version
@@ -275,23 +263,7 @@ async function n3_reasoning(json_ld, rules) {
     return sortLines(reasoner.get_abox_dump());
 }
 
-// Utility to ensure a directory exists
-function ensureDirSync(filePath) {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-}
 
-// Promisify N3 Writer's end method for clean async/await usage
-function writerEndAsync(writer) {
-    return new Promise((resolve, reject) => {
-        writer.end((err, result) => {
-            if (err) return reject(err);
-            resolve(result);
-        });
-    });
-}
 
 /**
  * @typedef {Object} Source
@@ -373,23 +345,23 @@ async function output(
     try {
         // Write Turtle serialization to file, if requested
         if (options.turtlePath) {
-            ensureDirSync(options.turtlePath); // Ensure directory exists
-            const ttlResult = await writerEndAsync(ttl_writer); // Get Turtle as string
+            _ensureDirSync(options.turtlePath); // Ensure directory exists
+            const ttlResult = await _writerEndAsync(ttl_writer); // Get Turtle as string
             await fs.promises.writeFile(options.turtlePath, ttlResult); // Write to file asynchronously
         }
         // Write N-Triples serialization, if requested
         if (options.ntriplesPath) {
-            ensureDirSync(options.ntriplesPath);
-            const ntResult = await writerEndAsync(nt_writer);
+            _ensureDirSync(options.ntriplesPath);
+            const ntResult = await _writerEndAsync(nt_writer);
             await fs.promises.writeFile(options.ntriplesPath, ntResult);
         }
         // Write JSON-LD, if configured
         if (options.jsonldOptions) {
-            await jsonld_writer(dataset, options.jsonldOptions.file, options.jsonldOptions.frame);
+            await jsonld_writer(dataset, options.jsonldOptions);
         }
         // Write CSV and optionally XLSX, if configured
         if (options.csvOptions) {
-            await table_writer(dataset, options.csvOptions.file, options.csvOptions.frame);
+            await table_writer(dataset, options.csvOptions);
             //TODO write excel from csv-string
             if (options.excelOptions) {
                 await xlsx_writer(options.excelOptions);
@@ -411,92 +383,27 @@ async function output(
         // Catch and log any errors during writing
         console.error("Output error:", err);
     }
-}
 
-async function rdf_to_jsonld(rdf_dataset, frame) {
-    console.log("rdf to jsonld");
-    let my_json = await jsonld.fromRDF(rdf_dataset);
-    console.log("Extract ... as a tree using a frame.");
-    return await jsonld.frame(my_json, frame);
-}
-
-async function jsonld_writer(data, filepath, frame) {
-    await fs.promises.writeFile(filepath, JSON.stringify(await rdf_to_jsonld(data, frame), null, 4));
-}
-
-/**
- * @param {string} data - RDF input as string
- * @param {{ file: string, frame: any }} jsonOptions
- * @param {string} [jsonPath='$.graph[*]'] - Optional JSONPath expression to extract array.
- * @throws {Error} If input is invalid or extraction fails.
- */
-async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
-    const jsonld = await rdf_to_jsonld(data, jsonOptions.frame)
-    if (!jsonld["@context"]) {
-        throw new Error('Invalid input: this object is not jsonld. @context is missing.');
+    // Utility to ensure a directory exists
+    function _ensureDirSync(filePath) {
+        const dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
     }
-    await fs.promises.writeFile(jsonOptions.file, JSON.stringify( jp.query(jsonld, jsonPath), null, 4));
-}
 
-async function table_writer(data, filepath, frame) {
-    console.log("jsonld to csv");
-    try {
-        await fs.promises.writeFile(
-            filepath,
-            await json2csv(await jsonld_to_table(await rdf_to_jsonld(data, frame)), { emptyFieldValue: null, expandArrayObjects: false }),
-            'utf8'
-        );
-    } catch (e) {
-        console.error(e.toString());
+    // Promisify N3 Writer's end method for clean async/await usage
+    function _writerEndAsync(writer) {
+        return new Promise((resolve, reject) => {
+            writer.end((err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
     }
 }
 
-
-async function xlsx_writer(excelOptions) {
-    console.log("csv to excel");
-    try {
-        convertCsvToXlsx(excelOptions.sourcefile, excelOptions.file, { sheetName : excelOptions.sheetName , overwrite : true });
-    } catch (e) {
-        console.error(e.toString());
-    }
-}
-
-/**
- * Writes RDF data to a Parquet file using provided options.
- * Converts the RDF dataset to JSON-LD with a given frame, then serializes the result to Parquet format.
- *
- * @async
- * @function parquet_writer
- * @param {rdfDataset.Dataset} data - The RDF dataset to serialize.
- * @param {Object} parquetOptions - Options for Parquet serialization.
- * @param {string} parquetOptions.file - Path to the Parquet output file.
- * @param {Object} parquetOptions.frame - JSON-LD frame to apply for shaping the data.
- * @throws {Error} If no output file is specified in parquetOptions.
- * @throws {TypeError} If the frame is invalid or missing a @context property.
- * @returns {Promise<void>} A promise that resolves when the Parquet file has been written.
- */
-async function parquet_writer(data, parquetOptions) {
-    console.log("jsonld to parquet");
-    if (!parquetOptions.file ) {
-        throw new Error('Invalid options: no specified output.');
-    }
-    if (!parquetOptions.frame["@context"]) {
-        throw new TypeError("Expected an objects with a @context");
-    }
-    const parquetSources = parquetSourcesFromJsonld(await rdf_to_jsonld(data, parquetOptions.frame))
-    try {
-        await parquetWriter(parquetSources, parquetOptions.file)
-    } catch (e) {
-        console.error(e.toString());
-    }
-}
-
-
-function version_from_uri(uri) {
-    return uri.replace(/.*-(.*).pom$/, "$1")
-}
-
-export { generate_skos, create_metadata, deploy_latest, n3_reasoning, output, jsonld_writer, json_writer };
+export { generate_skos, create_metadata, deploy_latest };
 
 
 
