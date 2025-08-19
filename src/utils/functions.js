@@ -95,6 +95,15 @@ function version_from_url(url) {
 }
 
 /**
+ * Extracts the semantic version (X) from a URL.
+ * @param {string} uri - The URL string to extract the version from.
+ * @returns {string} - The extracted version string, or the original string if no match.
+ */
+function version_from_uri(uri) {
+    return uri.replace(/.*-(.*).pom$/, "$1")
+}
+
+/**
  * Determines if a start version should be metadated, comparing it with a historic version.
  * @param {string} historic_version - The historic version string (semantic version).
  * @param {string} start_version - The start version string (semantic version).
@@ -180,4 +189,4 @@ const sortLines = str => Array.from(new Set(str.split(/\r?\n/))).sort().join('\n
 /**
  * Exported functions for use in other modules.
  */
-export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, is_jar, jsonld_to_table, to_be_metadated, rdf_to_jsonld, n3_reasoning };
+export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, version_from_uri, is_jar, jsonld_to_table, to_be_metadated, rdf_to_jsonld, n3_reasoning };
