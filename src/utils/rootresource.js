@@ -11,18 +11,18 @@ import fs from "fs";
 function getSchemas(file_path) {
     let schemas = []
 
-        var query = `SELECT ?schema where {?schema a <http://www.w3.org/2004/02/skos/core#ConceptScheme>}`;
-        const nt = fs.readFileSync(file_path, 'utf8')
-        const reasoner = RoxiReasoner.new();
-        reasoner.add_abox(nt);
-        for (const row of reasoner.query(query)) {
-            for (const binding of row) {
-                schemas.push(binding.getValue().replace('<', '').replace('>', ''))
-            }
+    var query = `SELECT ?schema where {?schema a <http://www.w3.org/2004/02/skos/core#ConceptScheme>}`;
+    const nt = fs.readFileSync(file_path, 'utf8')
+    const reasoner = RoxiReasoner.new();
+    reasoner.add_abox(nt);
+    for (const row of reasoner.query(query)) {
+        for (const binding of row) {
+            schemas.push(binding.getValue().replace('<', '').replace('>', ''))
         }
-        if (!schemas[0]) {
-            throw new Error('No Conceptscheme found');
-        }
+    }
+    if (!schemas[0]) {
+        throw new Error('No Conceptscheme found');
+    }
 
     return schemas;
 }
