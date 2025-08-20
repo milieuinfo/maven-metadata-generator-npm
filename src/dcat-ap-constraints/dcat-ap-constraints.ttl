@@ -186,6 +186,17 @@ ons:ssd_graph
     sh:property      omg_ps:rdf_type ;
     sh:targetClass   ssd:Graph  .
 
+ons:provenancestatement
+    a                sh:NodeShape       ;
+    rdfs:label       "vormvereisten voor een uitspraak over de herkomst van iets."@nl ;
+    sh:name          "vormvereisten voor een uitspraak over de herkomst van iets."@nl ;
+    sh:description   "De shacl/ontologie die de vormvereisten voor een uitspraak over de herkomst van iets beschrijft"@nl ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property      omg_ps:rdf_type, omg_ps:rdfs_label;
+    sh:closed true ;
+    sh:targetClass   dcterms:ProvenanceStatement .
+
+
 # Property Shapes
 
 omg_ps:dcat_endpointURL
