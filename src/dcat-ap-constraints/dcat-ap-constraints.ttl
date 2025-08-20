@@ -1,4 +1,3 @@
-@prefix vv:            <https://data.vlaanderen.be/ns/> .
 @prefix owl:           <http://www.w3.org/2002/07/owl#> .
 @prefix xhv:           <http://www.w3.org/1999/xhtml/vocab#> .
 @prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
@@ -12,16 +11,11 @@
 @prefix omg_voc:       <https://data.omgeving.vlaanderen.be/ns/> .
 @prefix vl_org:        <http://data.vlaanderen.be/id/organisatie/> .
 @prefix xkos:          <http://rdf-vocabulary.ddialliance.org/xkos#> .
-@prefix dbo:           <http://dbpedia.org/ontology/> .
-@prefix vcs:            <https://data.vlaanderen.be/ns/dcat#> .
-@prefix dbp:           <http://dbpedia.org/property/> .
 @prefix omg_ps:        <https://data.omgeving.vlaanderen.be/id/propertyshape/> .
 @prefix rdf:           <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix ons:           <https://data.omgeving.vlaanderen.be/id/nodeshape/> .
-@prefix ost:           <https://data.omgeving.vlaanderen.be/id/sparqltarget/> .
 @prefix schema:        <http://schema.org/> .
 @prefix foaf:          <http://xmlns.com/foaf/0.1/> .
-@prefix csc:           <https://data.omgeving.vlaanderen.be/id/concept/chemische_stof/> .
 @prefix dcat:  <http://www.w3.org/ns/dcat#> .
 @prefix dc: <http://purl.org/dc/elements/1.1/>.
 @prefix dcterms: <http://purl.org/dc/terms/>.
@@ -33,27 +27,27 @@
 omg_ont:dcat-ap-constraints
     a               owl:Ontology ;
     rdfs:comment
-                    "Specifieert hoe de data in de DCAT metadata te encoderen in RDF (i.e. RDF termen, kardinaliteiten,...)."@en ;
-    rdfs:label      "DCAT AP Constraints"@en ;
-    dct:abstract    "Het dcat applicatieprofiel specifieert de RDF termen (klassen en properties) en bijhorende constraints die gebruikt worden voor het beschrijven van matrices. Het maakt hierbij zoveel mogelijk gebruik van bestaande termen (klassen en properties) uit bestaande , skos, dbo, dbp en een minimale set van nieuwe termen gedefinieerd in het DCAT Vocabularium."@en ;
-    dct:alternative "DCAT AP Shapes"@en ;
+        "Specifieert hoe de data in de DCAT metadata te encoderen in RDF (i.e. RDF termen, kardinaliteiten,...)."@nl ;
+    rdfs:label      "DCAT AP Constraints"@nl ;
+    dct:abstract    "Het dcat applicatieprofiel specifieert de RDF termen (klassen en properties) en bijhorende constraints die gebruikt worden voor het beschrijven van matrices. Het maakt hierbij zoveel mogelijk gebruik van bestaande termen (klassen en properties) uit bestaande , skos, dbo, dbp en een minimale set van nieuwe termen gedefinieerd in het DCAT Vocabularium."@nl ;
+    dct:alternative "DCAT AP Shapes"@nl ;
     dct:creator     omg_ag_cl:creator ;
-    dct:description "Dit is de SHACL encodering van het applicatieprofiel van een dcat."@en ;
+    dct:description "Dit is de SHACL encodering van het applicatieprofiel van een dcat."@nl ;
     dct:issued      "2022-10-03"^^xsd:date ;
-    dct:title       "DCAT AP Constraints"@en ;
+    dct:title       "DCAT AP Constraints"@nl ;
     xkos:belongsTo  omg_dataset:codelijst-dcat ;
     xhv:last        omg_voc:dcat-ap-constraints ;
     owl:sameAs      omg_voc:dcat-ap-constraints ;
-    owl:versionInfo "Versie 1.0.0  oktober 2023"@en .
+    owl:versionInfo "Versie 1.0.0  oktober 2023"@nl .
 
 
 omg_voc:dcat-ap-constraints
     a          owl:Ontology ;
-    rdfs:label "DCAT AP Constraints"@en ;
+    rdfs:label "DCAT AP Constraints"@nl ;
     owl:sameAs omg_ont:dcat-ap-constraints .
 
 omg_ag_cl:creator
-    rdfs:label "Ontwikkelaar codelijst"@en ;
+    rdfs:label "Ontwikkelaar codelijst"@nl ;
     schema:affiliation vl_org:OVO003751 ;
     a foaf:Person;
     foaf:firstName "Geert";
@@ -64,82 +58,82 @@ omg_ag_cl:creator
 
 # Node Shapes
 ons:catalog a                sh:NodeShape ;
-            rdfs:label       "vormvereisten voor de catalogus van codelijsten"@en ;
-            sh:name          "vormvereisten voor de catalogus van codelijsten"@en ;
-            sh:description   "De shacl/ontologie die de vormvereisten voor een catalogus beschrijft"@en ;
-            rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-            sh:property      omg_ps:dcterms_hasPart, omg_ps:rdfs_member, omg_ps:dcat_dataset, omg_ps:rdf_type, omg_ps:rdfs_label,
-                             omg_ps:dcat_service ;
-            sh:closed true ;
-            sh:targetClass   dcat:Catalog .
+    rdfs:label       "vormvereisten voor de catalogus van codelijsten"@nl ;
+    sh:name          "vormvereisten voor de catalogus van codelijsten"@nl ;
+    sh:description   "De shacl/ontologie die de vormvereisten voor een catalogus beschrijft"@nl ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property      omg_ps:dcterms_hasPart, omg_ps:rdfs_member, omg_ps:dcat_dataset, omg_ps:rdf_type, omg_ps:rdfs_label, omg_ps:dcterms_title,
+                         omg_ps:dcat_service, omg_ps:dcterms_description ;
+    sh:closed true ;
+    sh:targetClass   dcat:Catalog .
 
 ons:dataset a                sh:NodeShape ;
-            rdfs:label       "dataset"@en ;
-            sh:name          "dataset"@en ;
-            sh:description   "A collection of data, published or curated by a single source, and available for access or download in one or more representations."@en ;
-            rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-            sh:property     omg_ps:dcat_accessURL, omg_ps:dcterms_isPartOf, omg_ps:dcterms_subject,
-                             omg_ps:rdf_type,omg_ps:dcat_contactPoint,omg_ps:dcat_landingPage,omg_ps:dcat_theme,
-                             omg_ps:dc_identifier,omg_ps:dcterms_accessRights,omg_ps:dcterms_accrualPeriodicity,
-                             omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_hasVersion,omg_ps:dcterms_identifier,
-                             omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,omg_ps:dcterms_rightsHolder,
-                             omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page,
-                             omg_ps:rdfs_label,omg_ps:void_rootResource, omg_ps:ssd_defaultGraph ;
-            sh:closed true ;
-            sh:targetSubjectsOf dcterms:hasVersion .
+    rdfs:label       "dataset"@nl ;
+    sh:name          "dataset"@nl ;
+    sh:description   "A collection of data, published or curated by a single source, and available for access or download in one or more representations."@nl ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property     omg_ps:dcat_accessURL, omg_ps:dcterms_isPartOf, omg_ps:dcterms_subject,
+                        omg_ps:rdf_type,omg_ps:dcat_contactPoint,omg_ps:dcat_landingPage,omg_ps:dcat_theme,
+                        omg_ps:dc_identifier,omg_ps:dcterms_accessRights,omg_ps:dcterms_accrualPeriodicity,
+                        omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_hasVersion,omg_ps:dcterms_identifier,
+                        omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,omg_ps:dcterms_rightsHolder,
+                        omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page, omg_ps:dcterms_provenance,
+                        omg_ps:rdfs_label,omg_ps:void_rootResource, omg_ps:ssd_defaultGraph ;
+    sh:closed true ;
+    sh:targetSubjectsOf dcterms:hasVersion .
 
 
 ons:dataset_version a                sh:NodeShape ;
-                    rdfs:label       "dataset versie"@en ;
-                    sh:name          "dataset versie"@en ;
-                    sh:description   "A collection of data, published or curated by a single source, and available for access or download in one or more representations."@en ;
-                    sh:closed true ;
-                    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-                    sh:property   omg_ps:dcat_accessURL, omg_ps:dcterms_subject, omg_ps:dcterms_relation, omg_ps:rdf_type,omg_ps:dcat_contactPoint,
-                                     omg_ps:dcat_distribution,omg_ps:dcat_landingPage,omg_ps:dcat_theme,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
-                                     omg_ps:dcterms_accrualPeriodicity,omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_identifier,
-                                     omg_ps:dcterms_issued,omg_ps:dcterms_isVersionOf,omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,
-                                     omg_ps:dcterms_rightsHolder,omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page,
-                                     omg_ps:owl_versionInfo,omg_ps:rdfs_label,omg_ps:void_rootResource ;
-                    sh:targetSubjectsOf dcterms:isVersionOf  .
+    rdfs:label       "dataset versie"@nl ;
+    sh:name          "dataset versie"@nl ;
+    sh:description   "A collection of data, published or curated by a single source, and available for access or download in one or more representations."@nl ;
+    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property   omg_ps:dcat_accessURL, omg_ps:dcterms_subject, omg_ps:dcterms_relation, omg_ps:rdf_type,omg_ps:dcat_contactPoint,
+                      omg_ps:dcat_distribution,omg_ps:dcat_landingPage,omg_ps:dcat_theme,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
+                      omg_ps:dcterms_accrualPeriodicity,omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_identifier,
+                      omg_ps:dcterms_issued,omg_ps:dcterms_isVersionOf,omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,
+                      omg_ps:dcterms_rightsHolder,omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page, omg_ps:dcterms_provenance,
+                      omg_ps:owl_versionInfo,omg_ps:rdfs_label,omg_ps:void_rootResource ;
+    sh:targetSubjectsOf dcterms:isVersionOf  .
 
 ons:package a  sh:NodeShape ;
-            rdfs:label       "Package"@en ;
-            sh:name          "Package"@en ;
-            sh:description   "A Package represents a collection of software files that are delivered as a single functional component."@en ;
-            sh:closed true ;
-            rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-            sh:property   omg_ps:dcat_accessURL, omg_ps:dcterms_accrualPeriodicity, omg_ps:dcterms_language,  omg_ps:dcterms_license,
-                omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint,
-                omg_ps:dcat_landingPage,
-                omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_downloadURL,omg_ps:dc_identifier,
-                omg_ps:dcterms_accessRights,omg_ps:dcterms_description,omg_ps:dcterms_format,omg_ps:dcterms_identifier,
-                omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
-                omg_ps:rdfs_label,omg_ps:spdx_downloadLocation,omg_ps:spdx_packageFileName,omg_ps:spdx_name,
-                omg_ps:spdx_packageName,omg_ps:spdx_versionInfo;
-            sh:targetSubjectsOf spdx:packageFileName .
+    rdfs:label       "Package"@nl ;
+    sh:name          "Package"@nl ;
+    sh:description   "A Package represents a collection of software files that are delivered as a single functional component."@nl ;
+    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property   omg_ps:dcat_accessURL, omg_ps:dcterms_accrualPeriodicity, omg_ps:dcterms_language,  omg_ps:dcterms_license,
+                      omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint,
+                      omg_ps:dcat_landingPage,
+                      omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_downloadURL,omg_ps:dc_identifier,
+                      omg_ps:dcterms_accessRights,omg_ps:dcterms_description,omg_ps:dcterms_format,omg_ps:dcterms_identifier,
+                      omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
+                      omg_ps:rdfs_label,omg_ps:spdx_downloadLocation,omg_ps:spdx_packageFileName,omg_ps:spdx_name,
+                      omg_ps:spdx_packageName,omg_ps:spdx_versionInfo;
+    sh:targetSubjectsOf spdx:packageFileName .
 
 
 ons:distribution a                sh:NodeShape ;
-                 rdfs:label       "Distribution"@en ;
-                 sh:name          "Distribution"@en ;
-                 sh:description   "A specific representation of a dataset. A dataset might be available in multiple serializations that may differ in various ways, including natural language, media-type or format, schematic organization, temporal and spatial resolution, level of detail or profiles (which might specify any or all of the above)."@en ;
-                 #    sh:closed true ;
-                 rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-                 sh:property   omg_ps:spdx_versionInfo, omg_ps:dcterms_accrualPeriodicity, omg_ps:dcterms_language, omg_ps:dcterms_license,
-                  omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint, omg_ps:dcat_landingPage,
-                  omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_accessURL,
-                  omg_ps:dcat_compressFormat,omg_ps:dcat_downloadURL,omg_ps:dcat_mediaType,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
-                  omg_ps:dcterms_description, omg_ps:dcterms_format,omg_ps:dcterms_identifier,omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
-                  omg_ps:foaf_page,omg_ps:rdfs_label ;
-                 sh:targetSubjectsOf dcat:mediaType .
+    rdfs:label       "Distribution"@nl ;
+    sh:name          "Distribution"@nl ;
+    sh:description   "A specific representation of a dataset. A dataset might be available in multiple serializations that may differ in various ways, including natural language, media-type or format, schematic organization, temporal and spatial resolution, level of detail or profiles (which might specify any or all of the above)."@nl ;
+#    sh:closed true ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:property   omg_ps:spdx_versionInfo, omg_ps:dcterms_accrualPeriodicity, omg_ps:dcterms_language, omg_ps:dcterms_license,
+                      omg_ps:dcterms_publisher, omg_ps:dcterms_spatial, omg_ps:dcterms_subject, omg_ps:dcat_contactPoint, omg_ps:dcat_landingPage,
+                      omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_accessURL,
+                      omg_ps:dcat_compressFormat,omg_ps:dcat_downloadURL,omg_ps:dcat_mediaType,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
+                      omg_ps:dcterms_description, omg_ps:dcterms_format,omg_ps:dcterms_identifier,omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
+                      omg_ps:foaf_page,omg_ps:rdfs_label ;
+    sh:targetSubjectsOf dcat:mediaType .
 
 
 ons:ssd_graphcollection
     a                sh:NodeShape ;
-    rdfs:label       "Graph Collection"@en ;
-    sh:name          "Graph Collection"@en ;
-    sh:description   "An instance of sd:GraphCollection represents a collection of zero or more named graph descriptions. Each named graph description belonging to an sd:GraphCollection MUST be linked with the sd:namedGraph predicate."@en ;
+    rdfs:label       "Graph Collection"@nl ;
+    sh:name          "Graph Collection"@nl ;
+    sh:description   "An instance of sd:GraphCollection represents a collection of zero or more named graph descriptions. Each named graph description belonging to an sd:GraphCollection MUST be linked with the sd:namedGraph predicate."@nl ;
     sh:closed true ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:property     omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label, omg_ps:ssd_namedGraph ;
@@ -148,34 +142,34 @@ ons:ssd_graphcollection
 
 ons:dcat_dataservice
     a                sh:NodeShape ;
-    rdfs:label       "Data service"@en ;
-    sh:name          "Data service"@en ;
-    sh:description   "A site or end-point providing operations related to the discovery of, access to, or processing functions on, data or related resources."@en ;
+    rdfs:label       "Data service"@nl ;
+    sh:name          "Data service"@nl ;
+    sh:description   "A site or end-point providing operations related to the discovery of, access to, or processing functions on, data or related resources."@nl ;
     sh:closed true ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:property     omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label,
-                     omg_ps:dcterms_description, omg_ps:dcterms_isPartOf, omg_ps:dcterms_title, omg_ps:dcat_endpointDescription,
-                     omg_ps:dcat_servesDataset, omg_ps:dcat_endpointURL;
+                        omg_ps:dcterms_description, omg_ps:dcterms_isPartOf, omg_ps:dcterms_title, omg_ps:dcat_endpointDescription,
+                        omg_ps:dcat_servesDataset, omg_ps:dcat_endpointURL;
     sh:targetClass   dcat:DataService  .
 
 ons:ssd_service
     a                sh:NodeShape ;
-    rdfs:label       "Service"@en ;
-    sh:name          "Service"@en ;
-    sh:description   "An instance of sd:Service represents a SPARQL service made available via the SPARQL Protocol."@en ;
+    rdfs:label       "Service"@nl ;
+    sh:name          "Service"@nl ;
+    sh:description   "An instance of sd:Service represents a SPARQL service made available via the SPARQL Protocol."@nl ;
     sh:closed true ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:property  omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label,
-                     omg_ps:dcterms_description, omg_ps:ssd_availableGraphs, omg_ps:ssd_defaultDataset,
+                     omg_ps:dcterms_description, omg_ps:ssd_availableGraphs, omg_ps:ssd_defaultDataset, omg_ps:dcterms_title,
                      omg_ps:ssd_endpoint, omg_ps:ssd_feature, omg_ps:ssd_resultFormat, omg_ps:ssd_supportedLanguage ;
     sh:targetClass   ssd:Service  .
 
 
 ons:ssd_namedgraph
     a                sh:NodeShape ;
-    rdfs:label       "Named Graph"@en ;
-    sh:name          "Named Graph"@en ;
-    sh:description   "An instance of sd:NamedGraph represents a named graph having a name (via sd:name) and an optional graph description (via sd:graph)."@en ;
+    rdfs:label       "Named Graph"@nl ;
+    sh:name          "Named Graph"@nl ;
+    sh:description   "An instance of sd:NamedGraph represents a named graph having a name (via sd:name) and an optional graph description (via sd:graph)."@nl ;
     sh:closed true ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:property  omg_ps:rdf_type, omg_ps:dc_identifier, omg_ps:dcterms_identifier, omg_ps:rdfs_label,
@@ -184,9 +178,9 @@ ons:ssd_namedgraph
 
 ons:ssd_graph
     a                sh:NodeShape ;
-    rdfs:label       "Graph"@en ;
-    sh:name          "Graph"@en ;
-    sh:description   "An instance of sd:Graph represents the description of an RDF graph."@en ;
+    rdfs:label       "Graph"@nl ;
+    sh:name          "Graph"@nl ;
+    sh:description   "An instance of sd:Graph represents the description of an RDF graph."@nl ;
     sh:closed true ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:property      omg_ps:rdf_type ;
@@ -196,9 +190,9 @@ ons:ssd_graph
 
 omg_ps:dcat_endpointURL
     a                sh:PropertyShape ;
-    rdfs:label       "service end-point"@en ;
-    sh:name          "service end-point"@en ;
-    sh:description   "The root location or primary endpoint of the service (a web-resolvable IRI)."@en ;
+    rdfs:label       "service end-point"@nl ;
+    sh:name          "service end-point"@nl ;
+    sh:description   "The root location or primary endpoint of the service (a web-resolvable IRI)."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         rdfs:Resource ;
     sh:minCount      1 ;
@@ -208,9 +202,9 @@ omg_ps:dcat_endpointURL
 
 omg_ps:ssd_graph
     a                sh:PropertyShape ;
-    rdfs:label       "graph"@en ;
-    sh:name          "graph"@en ;
-    sh:description   "Relates a named graph to its graph description."@en ;
+    rdfs:label       "graph"@nl ;
+    sh:name          "graph"@nl ;
+    sh:description   "Relates a named graph to its graph description."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:Graph ;
     sh:minCount      1 ;
@@ -221,9 +215,9 @@ omg_ps:ssd_graph
 
 omg_ps:ssd_name
     a                sh:PropertyShape ;
-    rdfs:label       "name"@en ;
-    sh:name          "name"@en ;
-    sh:description   "Relates a named graph to the name by which it may be referenced in a FROM/FROM NAMED clause. The object of the sd:name property is an IRI."@en ;
+    rdfs:label       "name"@nl ;
+    sh:name          "name"@nl ;
+    sh:description   "Relates a named graph to the name by which it may be referenced in a FROM/FROM NAMED clause. The object of the sd:name property is an IRI."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:Graph ;
     sh:minCount      1 ;
@@ -234,9 +228,9 @@ omg_ps:ssd_name
 
 omg_ps:dcterms_source
     a                sh:PropertyShape ;
-    rdfs:label       "source"@en ;
-    sh:name          "source"@en ;
-    sh:description   "A related resource from which the described resource is derived."@en ;
+    rdfs:label       "source"@nl ;
+    sh:name          "source"@nl ;
+    sh:description   "A related resource from which the described resource is derived."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         spdx:Package ;
     sh:minCount      1 ;
@@ -246,9 +240,9 @@ omg_ps:dcterms_source
 
 omg_ps:ssd_namedGraph
     a                sh:PropertyShape ;
-    rdfs:label       "available graph descriptions"@en ;
-    sh:name          "available graph descriptions"@en ;
-    sh:description   "Relates an instance of sd:Service to a description of the graphs which are allowed in the construction of a dataset either via the SPARQL Protocol, with FROM/FROM NAMED clauses in a query, or with USING/USING NAMED in an update request, if the service limits the scope of dataset construction."@en ;
+    rdfs:label       "available graph descriptions"@nl ;
+    sh:name          "available graph descriptions"@nl ;
+    sh:description   "Relates an instance of sd:Service to a description of the graphs which are allowed in the construction of a dataset either via the SPARQL Protocol, with FROM/FROM NAMED clauses in a query, or with USING/USING NAMED in an update request, if the service limits the scope of dataset construction."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:NamedGraph ;
     sh:minCount      1 ;
@@ -257,9 +251,9 @@ omg_ps:ssd_namedGraph
 
 omg_ps:ssd_availableGraphs
     a                sh:PropertyShape ;
-    rdfs:label       "available graph descriptions"@en ;
-    sh:name          "available graph descriptions"@en ;
-    sh:description   "Relates an instance of sd:Service to a description of the graphs which are allowed in the construction of a dataset either via the SPARQL Protocol, with FROM/FROM NAMED clauses in a query, or with USING/USING NAMED in an update request, if the service limits the scope of dataset construction."@en ;
+    rdfs:label       "available graph descriptions"@nl ;
+    sh:name          "available graph descriptions"@nl ;
+    sh:description   "Relates an instance of sd:Service to a description of the graphs which are allowed in the construction of a dataset either via the SPARQL Protocol, with FROM/FROM NAMED clauses in a query, or with USING/USING NAMED in an update request, if the service limits the scope of dataset construction."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:GraphCollection ;
     sh:minCount      1 ;
@@ -269,9 +263,9 @@ omg_ps:ssd_availableGraphs
 
 omg_ps:ssd_defaultDataset
     a                sh:PropertyShape ;
-    rdfs:label       "default dataset description"@en ;
-    sh:name          "default dataset description"@en ;
-    sh:description   "Relates an instance of sd:Service to a description of the default dataset available when no explicit dataset is specified in the query, update request or via protocol parameters."@en ;
+    rdfs:label       "default dataset description"@nl ;
+    sh:name          "default dataset description"@nl ;
+    sh:description   "Relates an instance of sd:Service to a description of the default dataset available when no explicit dataset is specified in the query, update request or via protocol parameters."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:Dataset ;
     sh:minCount      1 ;
@@ -281,9 +275,9 @@ omg_ps:ssd_defaultDataset
 
 omg_ps:ssd_endpoint
     a                sh:PropertyShape ;
-    rdfs:label       "endpoint"@en ;
-    sh:name          "endpoint"@en ;
-    sh:description   "The SPARQL endpoint of an sd:Service that implements the SPARQL Protocol service. The object of the sd:endpoint property is an IRI."@en ;
+    rdfs:label       "endpoint"@nl ;
+    sh:name          "endpoint"@nl ;
+    sh:description   "The SPARQL endpoint of an sd:Service that implements the SPARQL Protocol service. The object of the sd:endpoint property is an IRI."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         rdfs:Resource ;
     sh:minCount      1 ;
@@ -293,9 +287,9 @@ omg_ps:ssd_endpoint
 
 omg_ps:ssd_feature
     a                sh:PropertyShape ;
-    rdfs:label       "feature"@en ;
-    sh:name          "feature"@en ;
-    sh:description   "Relates an instance of sd:Service with a resource representing a supported feature."@en ;
+    rdfs:label       "feature"@nl ;
+    sh:name          "feature"@nl ;
+    sh:description   "Relates an instance of sd:Service with a resource representing a supported feature."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:Feature ;
     sh:minCount      1 ;
@@ -304,9 +298,9 @@ omg_ps:ssd_feature
 
 omg_ps:ssd_resultFormat
     a                sh:PropertyShape ;
-    rdfs:label       "result format"@en ;
-    sh:name          "result format"@en ;
-    sh:description   "Relates an instance of sd:Service to a format that is supported for serializing query results."@en ;
+    rdfs:label       "result format"@nl ;
+    sh:name          "result format"@nl ;
+    sh:description   "Relates an instance of sd:Service to a format that is supported for serializing query results."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         <http://www.w3.org/ns/formats/Format> ;
     sh:minCount      1 ;
@@ -315,9 +309,9 @@ omg_ps:ssd_resultFormat
 
 omg_ps:ssd_supportedLanguage
     a                sh:PropertyShape ;
-    rdfs:label       "supported language"@en ;
-    sh:name          "supported language"@en ;
-    sh:description   "Relates an instance of sd:Service to a SPARQL language (e.g. Query and Update) that it implements."@en ;
+    rdfs:label       "supported language"@nl ;
+    sh:name          "supported language"@nl ;
+    sh:description   "Relates an instance of sd:Service to a SPARQL language (e.g. Query and Update) that it implements."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:Language ;
     sh:minCount      1 ;
@@ -328,9 +322,9 @@ omg_ps:ssd_supportedLanguage
 
 omg_ps:dcat_servesDataset
     a                sh:PropertyShape ;
-    rdfs:label       ""@en ;
-    sh:name          "serves dataset"@en ;
-    sh:description   "A collection of data that this DataService can distribute."@en ;
+    rdfs:label       ""@nl ;
+    sh:name          "serves dataset"@nl ;
+    sh:description   "A collection of data that this DataService can distribute."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         dcat:Dataset ;
     sh:minCount      1 ;
@@ -339,9 +333,9 @@ omg_ps:dcat_servesDataset
 
 omg_ps:dcat_endpointDescription
     a                sh:PropertyShape ;
-    rdfs:label       ""@en ;
-    sh:name          "named graph"@en ;
-    sh:description   "A description of the service end-point, including its operations, parameters etc."@en ;
+    rdfs:label       ""@nl ;
+    sh:name          "named graph"@nl ;
+    sh:description   "A description of the service end-point, including its operations, parameters etc."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:Service ;
     sh:minCount      1 ;
@@ -350,9 +344,9 @@ omg_ps:dcat_endpointDescription
 
 omg_ps:ssd_namedGraph
     a                sh:PropertyShape ;
-    rdfs:label       ""@en ;
-    sh:name          "named graph"@en ;
-    sh:description   "Relates an instance of sd:GraphCollection (or its subclass sd:Dataset) to the description of one of its named graphs. The description of such a named graph MUST include the sd:name property and MAY include the sd:graph property."@en ;
+    rdfs:label       ""@nl ;
+    sh:name          "named graph"@nl ;
+    sh:description   "Relates an instance of sd:GraphCollection (or its subclass sd:Dataset) to the description of one of its named graphs. The description of such a named graph MUST include the sd:name property and MAY include the sd:graph property."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:NamedGraph ;
     sh:minCount      1 ;
@@ -361,9 +355,9 @@ omg_ps:ssd_namedGraph
 
 omg_ps:ssd_defaultGraph
     a                sh:PropertyShape ;
-    rdfs:label       ""@en ;
-    sh:name          "heeft dataset"@en ;
-    sh:description   "Relates an instance of sd:Dataset to the description of its default graph."@en ;
+    rdfs:label       ""@nl ;
+    sh:name          "heeft dataset"@nl ;
+    sh:description   "Relates an instance of sd:Dataset to the description of its default graph."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         ssd:Graph ;
     sh:maxCount      1 ;
@@ -372,9 +366,9 @@ omg_ps:ssd_defaultGraph
 
 omg_ps:dcat_service
     a                sh:PropertyShape ;
-    rdfs:label       ""@en ;
-    sh:name          "heeft dataset"@en ;
-    sh:description   "De relatie tussen een dcat:Catalog en een dcat:Dataset."@en ;
+    rdfs:label       ""@nl ;
+    sh:name          "heeft dataset"@nl ;
+    sh:description   "De relatie tussen een dcat:Catalog en een dcat:Dataset."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class dcat:DataService  ;
     sh:minCount      1 ;
@@ -384,9 +378,9 @@ omg_ps:dcat_service
 
 omg_ps:dcat_dataset
     a                sh:PropertyShape ;
-    rdfs:label       "heeft dataset"@en ;
-    sh:name          "heeft dataset"@en ;
-    sh:description   "De relatie tussen een dcat:Catalog en een dcat:Dataset."@en ;
+    rdfs:label       "heeft dataset"@nl ;
+    sh:name          "heeft dataset"@nl ;
+    sh:description   "De relatie tussen een dcat:Catalog en een dcat:Dataset."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
 #sh:class         dcat:Dataset ;
     sh:or (dcat:Dataset void:Dataset rdfs:Resource dcat:Resource) ;
@@ -397,9 +391,9 @@ omg_ps:dcat_dataset
 
 omg_ps:rdfs_member
     a                sh:PropertyShape ;
-    rdfs:label       "heeft lid"@en ;
-    sh:name          "heeft lid"@en ;
-    sh:description   "De relatie tussen een groep en een lid."@en ;
+    rdfs:label       "heeft lid"@nl ;
+    sh:name          "heeft lid"@nl ;
+    sh:description   "De relatie tussen een groep en een lid."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
 #sh:class         dcat:Dataset ;
     sh:or (dcat:Dataset void:Dataset rdfs:Resource dcat:Resource) ;
@@ -409,9 +403,9 @@ omg_ps:rdfs_member
 
 omg_ps:dcterms_hasPart
     a                sh:PropertyShape ;
-    rdfs:label       "heeft onderdeel"@en ;
-    sh:name          "heeft onderdeel"@en ;
-    sh:description   "Een verwante bron die, fysiek of logisch, onderdeel is van de beschreven bron."@en ;
+    rdfs:label       "heeft onderdeel"@nl ;
+    sh:name          "heeft onderdeel"@nl ;
+    sh:description   "Een verwante bron die, fysiek of logisch, onderdeel is van de beschreven bron."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
 #sh:class         dcat:Dataset ;
     sh:or (dcat:Dataset void:Dataset rdfs:Resource dcat:Resource) ;
@@ -419,11 +413,24 @@ omg_ps:dcterms_hasPart
     sh:nodeKind      sh:IRI ;
     sh:path          dcterms:hasPart .
 
+omg_ps:dcterms_provenance
+    a                sh:PropertyShape ;
+    rdfs:label       "herkomst"@nl ;
+    sh:name          "herkomst"@nl ;
+    rdfs:label       "provenance"@en ;
+    sh:name          "provenance"@en ;
+    sh:description   "Een verklaring over de herkomst van de data, die in de datasets wordt beschreven."@nl ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:class         dcterms:ProvenanceStatement ;
+    sh:minCount      1 ;
+    sh:nodeKind      sh:IRI ;
+    sh:path          dcterms:provenance .
+
 omg_ps:dcterms_isPartOf
     a                sh:PropertyShape ;
-    rdfs:label       "is onderdeel van"@en ;
-    sh:name          "is onderdeel van"@en ;
-    sh:description   "Een verwante bron waartoe de beschreven bron, fysiek of logisch, behoort."@en ;
+    rdfs:label       "is onderdeel van"@nl ;
+    sh:name          "is onderdeel van"@nl ;
+    sh:description   "Een verwante bron waartoe de beschreven bron, fysiek of logisch, behoort."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:class         dcat:Dataset ;
     sh:minCount      1 ;
@@ -433,9 +440,9 @@ omg_ps:dcterms_isPartOf
 
 omg_ps:dcat_accessURL
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -445,9 +452,9 @@ omg_ps:dcat_accessURL
 
 omg_ps:dcat_compressFormat
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -456,9 +463,9 @@ omg_ps:dcat_compressFormat
 
 omg_ps:dcat_contactPoint
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -468,9 +475,9 @@ omg_ps:dcat_contactPoint
 
 omg_ps:dcat_distribution
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -478,9 +485,9 @@ omg_ps:dcat_distribution
 
 omg_ps:dcat_downloadURL
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -490,9 +497,9 @@ omg_ps:dcat_downloadURL
 
 omg_ps:dcat_landingPage
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -502,9 +509,9 @@ omg_ps:dcat_landingPage
 
 omg_ps:dcat_mediaType
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -514,9 +521,9 @@ omg_ps:dcat_mediaType
 
 omg_ps:dcat_theme
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -525,9 +532,9 @@ omg_ps:dcat_theme
 
 omg_ps:dc_identifier
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -537,9 +544,9 @@ omg_ps:dc_identifier
 
 omg_ps:dc_language
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -550,9 +557,9 @@ omg_ps:dc_language
 
 omg_ps:dcterms_accessRights
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -562,8 +569,8 @@ omg_ps:dcterms_accessRights
 
 omg_ps:dcterms_accrualPeriodicity
     a sh:PropertyShape ;
-    rdfs:label  ""@en ; sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ; sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -573,9 +580,9 @@ omg_ps:dcterms_accrualPeriodicity
 
 omg_ps:dcterms_alternative
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -586,9 +593,9 @@ omg_ps:dcterms_alternative
 
 omg_ps:dcterms_description
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -599,9 +606,9 @@ omg_ps:dcterms_description
 
 omg_ps:dcterms_format
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -610,9 +617,9 @@ omg_ps:dcterms_format
 
 omg_ps:dcterms_hasVersion
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -621,9 +628,9 @@ omg_ps:dcterms_hasVersion
 
 omg_ps:dcterms_identifier
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -632,9 +639,9 @@ omg_ps:dcterms_identifier
 
 omg_ps:dcterms_issued
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -644,9 +651,9 @@ omg_ps:dcterms_issued
 
 omg_ps:dcterms_isVersionOf
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ; sh:minCount 1 ; sh:nodeKind  sh:IRI ;
     sh:class rdfs:Resource ;
@@ -654,9 +661,9 @@ omg_ps:dcterms_isVersionOf
 
 omg_ps:dcterms_relation
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -665,9 +672,9 @@ omg_ps:dcterms_relation
 
 omg_ps:dcterms_language
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -677,9 +684,9 @@ omg_ps:dcterms_language
 
 omg_ps:dcterms_license
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -689,9 +696,9 @@ omg_ps:dcterms_license
 
 omg_ps:dcterms_publisher
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -701,9 +708,9 @@ omg_ps:dcterms_publisher
 
 omg_ps:dcterms_rightsHolder
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -713,9 +720,9 @@ omg_ps:dcterms_rightsHolder
 
 omg_ps:dcterms_spatial
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:class dcterms:Location ;
@@ -724,9 +731,9 @@ omg_ps:dcterms_spatial
 
 omg_ps:dcterms_temporal
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -736,9 +743,9 @@ omg_ps:dcterms_temporal
 
 omg_ps:dcterms_subject
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -747,11 +754,10 @@ omg_ps:dcterms_subject
 
 omg_ps:dcterms_title
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-    sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:datatype      rdf:langString ;
     sh:languageIn    ( "nl" "en" ) ;
@@ -760,9 +766,9 @@ omg_ps:dcterms_title
 
 omg_ps:foaf_page
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
@@ -771,9 +777,9 @@ omg_ps:foaf_page
 
 omg_ps:owl_versionInfo
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -783,11 +789,10 @@ omg_ps:owl_versionInfo
 
 omg_ps:rdfs_label
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-    sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:datatype      rdf:langString ;
     sh:languageIn    ( "nl" "en" ) ;
@@ -796,9 +801,9 @@ omg_ps:rdfs_label
 
 omg_ps:rdf_type
     a                sh:PropertyShape ;
-    rdfs:label       "rdf type"@en ;
-    sh:name          "rdf type"@en ;
-    sh:description   "Aanduiding dat een bron een instantie van een bepaalde klasse is."@en ;
+    rdfs:label       "rdf type"@nl ;
+    sh:name          "rdf type"@nl ;
+    sh:description   "Aanduiding dat een bron een instantie van een bepaalde klasse is."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:minCount      1 ;
     sh:nodeKind      sh:IRI ;
@@ -807,9 +812,9 @@ omg_ps:rdf_type
 
 omg_ps:spdx_downloadLocation
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -819,9 +824,9 @@ omg_ps:spdx_downloadLocation
 
 omg_ps:spdx_packageFileName
     a sh:PropertyShape ;
-    rdfs:label  "package bestandsnaam"@en ;
-    sh:name "package bestandsnaam"@en ;
-    sh:description "The name of the file relative to the root of the package."@en ;
+    rdfs:label  "package bestandsnaam"@nl ;
+    sh:name "package bestandsnaam"@nl ;
+    sh:description "The name of the file relative to the root of the package."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -831,9 +836,9 @@ omg_ps:spdx_packageFileName
 
 omg_ps:spdx_packageName
     a sh:PropertyShape ;
-    rdfs:label  "packagenaam"@en ;
-    sh:name "packagenaam"@en ;
-    sh:description "Identify the full name of the package as given by Package Originator."@en ;
+    rdfs:label  "packagenaam"@nl ;
+    sh:name "packagenaam"@nl ;
+    sh:description "Identify the full name of the package as given by Package Originator."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -843,9 +848,9 @@ omg_ps:spdx_packageName
 
 omg_ps:spdx_name
     a sh:PropertyShape ;
-    rdfs:label  "naam"@en ;
-    sh:name "naam"@en ;
-    sh:description "Identify name of this SpdxElement."@en ;
+    rdfs:label  "naam"@nl ;
+    sh:name "naam"@nl ;
+    sh:description "Identify name of this SpdxElement."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:minCount 1 ;
@@ -855,9 +860,9 @@ omg_ps:spdx_name
 
 omg_ps:spdx_versionInfo
     a sh:PropertyShape ;
-    rdfs:label  "versie-info"@en ;
-    sh:name "versie-info"@en ;
-    sh:description "Provides an indication of the version of the package that is described by this SpdxDocument."@en ;
+    rdfs:label  "versie-info"@nl ;
+    sh:name "versie-info"@nl ;
+    sh:description "Provides an indication of the version of the package that is described by this SpdxDocument."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
     sh:datatype      xsd:string ;
@@ -866,11 +871,10 @@ omg_ps:spdx_versionInfo
 
 omg_ps:void_rootResource
     a sh:PropertyShape ;
-    rdfs:label  ""@en ;
-    sh:name ""@en ;
-    sh:description ""@en ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-    sh:maxCount 1 ;
     sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
     sh:class skos:ConceptScheme ;
