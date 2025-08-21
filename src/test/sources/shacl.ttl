@@ -1,27 +1,23 @@
-@prefix vv:            <https://data.vlaanderen.be/ns/> .
-@prefix owl:           <http://www.w3.org/2002/07/owl#> .
-@prefix xhv:           <http://www.w3.org/1999/xhtml/vocab#> .
-@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
-@prefix skos:          <http://www.w3.org/2004/02/skos/core#> .
-@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix omg_dataset:   <https://data.omgeving.vlaanderen.be/id/dataset/> .
+@prefix dcat:          <http://www.w3.org/ns/dcat#> .
 @prefix dct:           <http://purl.org/dc/terms/> .
-@prefix sh:            <http://www.w3.org/ns/shacl#> .
-@prefix omg_ont:       <https://data.omgeving.vlaanderen.be/id/ontology/> .
-@prefix omg_ag_cl:     <https://data.omgeving.vlaanderen.be/id/person/codelijst/> .
-@prefix omg_voc:       <https://data.omgeving.vlaanderen.be/ns/> .
-@prefix vl_org:        <http://data.vlaanderen.be/id/organisatie/> .
-@prefix xkos:          <http://rdf-vocabulary.ddialliance.org/xkos#> .
-@prefix dbo:           <http://dbpedia.org/ontology/> .
-@prefix vcs:            <https://data.vlaanderen.be/ns/luchtzuiveringssysteem#> .
-@prefix dbp:           <http://dbpedia.org/property/> .
-@prefix omg_ps:        <https://data.omgeving.vlaanderen.be/id/propertyshape/> .
-@prefix rdf:           <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix ons:           <https://data.omgeving.vlaanderen.be/id/nodeshape/> .
-@prefix schema:        <http://schema.org/> .
 @prefix foaf:          <http://xmlns.com/foaf/0.1/> .
-@prefix csc:           <https://data.omgeving.vlaanderen.be/id/concept/chemische_stof/> .
-@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix omg_ag_cl:     <https://data.omgeving.vlaanderen.be/id/person/codelijst/> .
+@prefix omg_dataset:   <https://data.omgeving.vlaanderen.be/id/dataset/> .
+@prefix omg_ont:       <https://data.omgeving.vlaanderen.be/id/ontology/> .
+@prefix omg_ps:        <https://data.omgeving.vlaanderen.be/id/propertyshape/> .
+@prefix omg_voc:       <https://data.omgeving.vlaanderen.be/ns/> .
+@prefix ons:           <https://data.omgeving.vlaanderen.be/id/nodeshape/> .
+@prefix owl:           <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:           <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:          <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema:        <http://schema.org/> .
+@prefix sh:            <http://www.w3.org/ns/shacl#> .
+@prefix skos:          <http://www.w3.org/2004/02/skos/core#> .
+@prefix vl_org:        <http://data.vlaanderen.be/id/organisatie/> .
+@prefix xhv:           <http://www.w3.org/1999/xhtml/vocab#> .
+@prefix xkos:          <http://rdf-vocabulary.ddialliance.org/xkos#> .
+@prefix xsd:           <http://www.w3.org/2001/XMLSchema#> .
+
 
 omg_ont:luchtzuiveringssysteem-ap-constraints
     a               owl:Ontology ;
