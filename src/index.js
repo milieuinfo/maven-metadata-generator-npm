@@ -140,24 +140,22 @@ async function create_metadata(
         catalogOptions) {
     console.log('metadata generation: get previous versions');
     const url = `https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=${metadataOptions.groupId}&a=${metadataOptions.artifactId}&classifier=sources&repos=release`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-        }
-        const body = await response.json();
-        const uris = [];
-        const pomRegex = /^.*pom$/;
-        for (const result of body.results) {
-            if (pomRegex.test(result.uri)) {
-                uris.push(result.uri);
-            }
-        }
-        await get_versions(uris, metadataSource, metadataOptions, datasetOptions, catalogOptions);
-        console.log(body);
-    } catch (error) {
-        console.error(error.message);
+
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
     }
+    const body = await response.json();
+    const uris = [];
+    const pomRegex = /^.*pom$/;
+    for (const result of body.results) {
+        if (pomRegex.test(result.uri)) {
+            uris.push(result.uri);
+        }
+    }
+    await get_versions(uris, metadataSource, metadataOptions, datasetOptions, catalogOptions);
+    console.log(body);
+
 }
 
 /**
