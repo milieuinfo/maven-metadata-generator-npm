@@ -1,0 +1,41 @@
+{
+  "type": {
+    "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+    "@type": "@id"
+  },
+  "conforms": {
+    "@id": "http://www.w3.org/ns/shacl#conforms",
+    "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+  },
+  "focusNode": {
+    "@id": "http://www.w3.org/ns/shacl#focusNode",
+    "@type": "@id"
+  },
+  "result": {
+    "@id": "http://www.w3.org/ns/shacl#result",
+    "@type": "@id"
+  },
+  "resultMessage": {
+    "@id": "http://www.w3.org/ns/shacl#resultMessage"
+  },
+  "resultPath": {
+    "@id": "http://www.w3.org/ns/shacl#resultPath",
+    "@type": "@id"
+  },
+  "resultSeverity": {
+    "@id": "http://www.w3.org/ns/shacl#resultSeverity",
+    "@type": "@id"
+  },
+  "sourceConstraintComponent": {
+    "@id": "http://www.w3.org/ns/shacl#sourceConstraintComponent",
+    "@type": "@id"
+  },
+  "sourceShape": {
+    "@id": "http://www.w3.org/ns/shacl#sourceShape",
+    "@type": "@id"
+  },
+  "value": {
+    "@id": "http://www.w3.org/ns/shacl#value",
+    "@type": "@id"
+  }
+}
