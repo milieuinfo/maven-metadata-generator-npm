@@ -1,6 +1,5 @@
 import rdf from '@zazuko/env-node'
 import SHACLValidator from 'rdf-validate-shacl'
-import jp from "jsonpath";
 
 
 const writerOptions = {
@@ -8,7 +7,6 @@ const writerOptions = {
         "@context": {
             "graph": "@graph",
             "_type" : "@type",
-            "_id": "@id",
             "type": {
                 "@id": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                 "@type": "@id"
@@ -55,25 +53,31 @@ const writerOptions = {
 
 /**
  * Validates RDF
+ *
  * @async
  * @function validate
- * @param {Dataset} shapesDataset - SHACL shapes for validating the RDF
- * @param {rdf.Dataset} dataSet - RDF input as string
- * @returns {Promise<ValidationReport>} .
- * @throws {Error} - If Dataset validation failed.
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} dataSet - RDF input as a dataset
+ * @returns {Promise<{report: ValidationReport, writerOptions: object}>}
+ * @throws {Error} - If Dataset validation fails.
+ * @throws {TypeError} - If shapesDataset is not a Dataset or DatasetCore.
+ * @throws {TypeError} - If dataSet is not a Dataset or DatasetCore.
  */
 async function validate(shapesDataset, dataSet) {
-    let report;
-    const validator = new SHACLValidator(shapesDataset, { factory: rdf })
+    if (typeof shapesDataset !== 'object' || !(shapesDataset && 'match' in shapesDataset && 'add' in shapesDataset)) {
+        throw new TypeError('Invalid input: shapesDataset must be a DatasetCore.');
+    }
+    if (typeof dataSet !== 'object' || !(dataSet && 'match' in dataSet && 'add' in dataSet)) {
+        throw new TypeError('Invalid input: dataSet must be a DatasetCore.');
+    }
+    const validator = new SHACLValidator(shapesDataset, { factory: rdf });
     try {
-        report = await validator.validate(dataSet)
+        const report = await validator.validate(dataSet);
+        return { report, writerOptions };
     } catch (err) {
         throw new Error(`Dataset validation failed: ${err.message}`);
     }
-    report.writerOptions = writerOptions
-    // Check conformance: `true` or `false`
-    console.log('Dataset valid: ' + report.conforms)
-    return report;
 }
-export default validate
+
+export default validate;
 

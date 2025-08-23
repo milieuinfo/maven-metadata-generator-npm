@@ -27,7 +27,7 @@ import {deploy_latest} from './utils/deploy.js';
 
 /**
  * @typedef {Object} SkosSource
- * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @property {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} shapesDataset - SHACL shapes for validating the RDF
  * @property {Object} contextPrefixes - @context with prefixes included
  * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
  * @Property {Object} prefixes
@@ -105,7 +105,7 @@ async function generate_skos(options, skosSource ) {
 /**
  * @typedef {Object} MetadataSource
  * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
- * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @property {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} shapesDataset - SHACL shapes for validating the RDF
  * @Property {Object} prefixes - Object wit key - value prefixes
  */
 
@@ -179,7 +179,7 @@ async function create_metadata(
 /**
  * @typedef {Object} MetadataSource
  * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
- * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @property {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} shapesDataset - SHACL shapes for validating the RDF
  * @Property {Object} prefixes - Object wit key - value prefixes
  */
 
@@ -245,7 +245,7 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
 
 /**
  * @typedef {Object} Source
- * @property {Dataset} shapesDataset - SHACL shapes for validating the RDF
+ * @property {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} shapesDataset - SHACL shapes for validating the RDF
  * @property {Object} contextPrefixes - @context with prefixes included
  * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
  * @Property {Object} prefixes
@@ -317,14 +317,14 @@ async function output(
     // Validate the dataset with provided SHACL shapes
     const report = await validate(source.shapesDataset, dataset)
     if (!(report.conforms)) {
-        console.error("Validation failed.");
+        console.error("Validation failed. See ../validation/validation_result.parquet or ../validation/validation_result.json");
         // Validation report as file
-        if (fs.existsSync('../temp/')) {
-            fs.rmSync('../temp/', { recursive: true, force: true });
+        if (fs.existsSync('../validation/')) {
+            fs.rmSync('../validation/', { recursive: true, force: true });
         }
-        _ensureDirSync('../temp/')
-        await parquet_writer(report.dataset, {file : '../temp/validation_result.parquet', frame: report.writerOptions.frame});
-        await json_writer(report.dataset, {file : '../temp/validation_result.json', frame: report.writerOptions.frame});
+        _ensureDirSync('../validation/')
+        await parquet_writer(report.dataset, {file : '../validation/validation_result.parquet', frame: report.writerOptions.frame});
+        await json_writer(report.dataset, {file : '../validation/validation_result.json', frame: report.writerOptions.frame});
         return;
     }
 
