@@ -315,7 +315,7 @@ async function output(
     });
 
     // Validate the dataset with provided SHACL shapes
-    const report = await validate(source.shapesDataset, dataset)
+    const { report, writerOptions } = await validate(source.shapesDataset, dataset)
     if (!(report.conforms)) {
         console.error("Validation failed. See ../validation/validation_result.parquet or ../validation/validation_result.json");
         // Validation report as file
@@ -323,8 +323,8 @@ async function output(
             fs.rmSync('../validation/', { recursive: true, force: true });
         }
         _ensureDirSync('../validation/')
-        await parquet_writer(report.dataset, {file : '../validation/validation_result.parquet', frame: report.writerOptions.frame});
-        await json_writer(report.dataset, {file : '../validation/validation_result.json', frame: report.writerOptions.frame});
+        await parquet_writer(report.dataset, {file : '../validation/validation_result.parquet', frame: writerOptions.frame});
+        await json_writer(report.dataset, {file : '../validation/validation_result.json', frame: writerOptions.frame});
         return;
     }
 
