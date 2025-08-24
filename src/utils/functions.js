@@ -14,7 +14,7 @@ import fs from "fs";
  * @returns {Promise<string>} - The resulting N-Triples output.
  */
 async function n3_reasoning(json_ld, rules) {
-    console.log("n3 reasoning ");
+    //console.log("n3 reasoning ");
     let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
     const reasoner = RoxiReasoner.new();
     reasoner.add_abox(rdf);
@@ -33,9 +33,9 @@ async function n3_reasoning(json_ld, rules) {
  * @returns {Promise<jsonld.NodeObject>} A framed jsonld object.
  */
 async function rdf_to_jsonld(data, frame) {
-    console.log("rdf to jsonld");
+    // console.log("rdf to jsonld");
     let my_json = await jsonld.fromRDF(data);
-    console.log("Extract ... as a tree using a frame.");
+    //console.log("Extract ... as a tree using a frame.");
     return await jsonld.frame(my_json, frame);
 }
 

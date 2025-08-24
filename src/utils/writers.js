@@ -99,7 +99,7 @@ function xlsx_writer(excelOptions) {
  * @returns {Promise<void>} A promise that resolves when the Parquet file has been written.
  */
 async function parquet_writer(data, parquetOptions) {
-    console.log("jsonld to parquet");
+    // console.log("jsonld to parquet");
     if (!parquetOptions.file ) {
         throw new Error('Invalid options: no specified output.');
     }

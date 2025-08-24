@@ -322,7 +322,7 @@ async function output(
         if (fs.existsSync('../validation/')) {
             fs.rmSync('../validation/', { recursive: true, force: true });
         }
-        _ensureDirSync('../validation/')
+        _ensureDirSync('../validation/validation_result.parquet')
         await parquet_writer(report.dataset, {file : '../validation/validation_result.parquet', frame: writerOptions.frame});
         await json_writer(report.dataset, {file : '../validation/validation_result.json', frame: writerOptions.frame});
         return;
