@@ -7,9 +7,8 @@ import validate from './utils/shacl_validation.js';
 import path from "path";
 import csv from 'csvtojson';
 import {construct_dcat} from './utils/metadata.js';
-import {xsd_writer} from './utils/xsd.js';
 import {separateString, to_be_metadated, version_from_uri, n3_reasoning} from './utils/functions.js';
-import {json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer } from './utils/writers.js';
+import {json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer } from './utils/writers.js';
 import {deploy_latest} from './utils/deploy.js';
 
 
@@ -317,7 +316,7 @@ async function output(
     // Validate the dataset with provided SHACL shapes
     const { report, writerOptions } = await validate(source.shapesDataset, dataset)
     if (!(report.conforms)) {
-        console.error("Validation failed. See ../validation/validation_result.parquet or ../validation/validation_result.json");
+        console.error("Validation failed.");
         // Validation report as file
         if (fs.existsSync('../validation/')) {
             fs.rmSync('../validation/', { recursive: true, force: true });

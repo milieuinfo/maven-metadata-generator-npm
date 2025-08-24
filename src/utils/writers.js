@@ -4,6 +4,33 @@ import jp from "jsonpath";
 import {parquetSourcesFromJsonld, parquetWriter} from './parquet_writer.js';
 import {jsonld_to_table, rdf_to_jsonld} from './functions.js';
 import fs from "fs";
+import {xsd_composer} from './xsd_composer.js';
+
+
+
+
+/**
+ * Writes an XSD file generated from the given RDF dataset and options.
+ *
+ * @async
+ * @function xsd_writer
+ * @param {any} rdf_dataset - The RDF dataset to be transformed into XSD.
+ * @param {Object} xsdOptions - Options for XSD generation.
+ * @param {string} xsdOptions.file - The file path where the generated XSD will be written
+ * @param {string} xsdOptions.urn - The URN to be used for XSD composition.
+ * @returns {Promise<void>} A promise that resolves when the file is written.
+ * @throws Will log an error message to the console if writing fails.
+ */
+async function xsd_writer(rdf_dataset, xsdOptions) {
+    try {
+        fs.writeFileSync(xsdOptions.file, await xsd_composer(rdf_dataset, xsdOptions.urn), 'utf8' );
+        console.log(`Xsd enum file written to ${xsdOptions.file}`);
+    }
+    catch(e) {
+        console.log(e.message);
+    }
+}
+
 
 
 /**
@@ -24,6 +51,7 @@ async function jsonld_writer(data, jsonldOptions) {
             jsonldOptions.file, 
             JSON.stringify(jsonld, null, 4)
         );
+        console.log(`Jsonld file written to ${jsonldOptions.file}`);
     } catch (e) {
         console.error(e.toString());
     }
@@ -43,7 +71,16 @@ async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
     if (!jsonld["@context"]) {
         throw new Error('Invalid input: this object is not jsonld. @context is missing.');
     }
-    await fs.promises.writeFile(jsonOptions.file, JSON.stringify( jp.query(jsonld, jsonPath), null, 4));
+    try {
+        await fs.promises.writeFile(
+            jsonOptions.file,
+            JSON.stringify(
+                jp.query(jsonld, jsonPath),
+                null, 4));
+        console.log(`Json file written to ${jsonOptions.file}`);
+    } catch (e) {
+            console.error(e.toString());
+    }
 }
 
 /**
@@ -55,7 +92,6 @@ async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
  * @returns {Promise<void>} A promise that resolves when the CSV file has been written.
  */
 async function table_writer(data, csvOptions) {
-    console.log("jsonld to csv");
     const jsonld = await rdf_to_jsonld(data, csvOptions.frame)
     if (!jsonld["@context"]) {
         throw new Error('Invalid input: this object is not jsonld. @context is missing.');
@@ -66,6 +102,7 @@ async function table_writer(data, csvOptions) {
             await json2csv(await jsonld_to_table(jsonld), { emptyFieldValue: null, expandArrayObjects: false }),
             'utf8'
         );
+        console.log(`CSV file written to ${csvOptions.file}`);
     } catch (e) {
         console.error(e.toString());
     }
@@ -76,9 +113,9 @@ async function table_writer(data, csvOptions) {
  * @param {{ file: string, sourcefile: string, sheetName: string }} excelOptions  - { file: string, sourcefile: string, sheetName: string } for excel output based on csv sourcefile
  */
 function xlsx_writer(excelOptions) {
-    console.log("csv to excel");
     try {
         convertCsvToXlsx(excelOptions.sourcefile, excelOptions.file, { sheetName : excelOptions.sheetName , overwrite : true });
+        console.log(`Excel file written to ${excelOptions.file}`);
     } catch (e) {
         console.error(e.toString());
     }
@@ -114,4 +151,4 @@ async function parquet_writer(data, parquetOptions) {
     }
 }
 
-export { json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer };
+export { json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer };
