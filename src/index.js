@@ -154,7 +154,6 @@ async function create_metadata(
     }
     await get_versions(uris, metadataSource, metadataOptions, datasetOptions, catalogOptions);
     console.log(body);
-
 }
 
 /**
@@ -333,12 +332,14 @@ async function output(
             _ensureDirSync(options.turtlePath); // Ensure directory exists
             const ttlResult = await _writerEndAsync(ttl_writer); // Get Turtle as string
             await fs.promises.writeFile(options.turtlePath, ttlResult); // Write to file asynchronously
+            console.log(`Turtle file written to ${options.turtlePath}`);
         }
         // Write N-Triples serialization, if requested
         if (options.ntriplesPath) {
             _ensureDirSync(options.ntriplesPath);
             const ntResult = await _writerEndAsync(nt_writer);
             await fs.promises.writeFile(options.ntriplesPath, ntResult);
+            console.log(`N-Triples file written to ${options.ntriplesPath}`);
         }
         // Write JSON-LD, if configured
         if (options.jsonldOptions) {
