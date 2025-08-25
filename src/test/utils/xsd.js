@@ -1,5 +1,5 @@
 import N3 from 'n3';
-import {describe, test} from "node:test";
+import {describe, it, test} from "node:test";
 import assert from "node:assert";
 import { json_ld, json_ld_error, json_ld_error2 } from './variables.js' ;
 import jsonld from "jsonld";
@@ -19,13 +19,13 @@ async function json_ld_to_dataset(my_json_ld){
     return dataset;
 }
 
-describe("Convert jsonld to xsd.", (s) => {
+describe("Convert jsonld to xsd.", () => {
     const groupId = 'be.vlaanderen.omgeving.data.id.graph';
     const artifactId = 'codelijst-gebouw';
     const urn = ('urn:' + groupId + ':' + artifactId);
 
 
-    test('Test targetNamespace has a correct urn pattern.', async (t) => {
+    test('Test targetNamespace has a correct urn pattern.', async () => {
         assert.strictEqual(has_correct_urn_pattern("urn:be.vlaanderen.bodemenondergrond.data.id.graph:codelijst-tektoniektype"), true)
         try {
             await has_correct_urn_pattern('be.vlaanderen.bodemenondergrond.data.id.graph:codelijst-tektoniektype')}
@@ -39,7 +39,7 @@ describe("Convert jsonld to xsd.", (s) => {
         }
     });
 
-    test('Test Conceptscheme without dc:identifier.', async (t) => {
+    test('Test Conceptscheme without dc:identifier.', async () => {
         try {
             await identifier_present(json_ld_error)}
         catch (e) {
@@ -47,7 +47,7 @@ describe("Convert jsonld to xsd.", (s) => {
         }
     });
 
-    test("The value of attribute 'name' on element 'xs:simpleType' is valid with respect to its type, 'NCName'.", async (t) => {
+    test("The value of attribute 'name' on element 'xs:simpleType' is valid with respect to its type, 'NCName'.", async () => {
         try {
             await identifier_present(json_ld_error2)}
         catch (e) {
@@ -66,7 +66,7 @@ describe("Convert jsonld to xsd.", (s) => {
         assert.strictEqual(identifier_is_valid_ncname("be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"), true)
     });
 
-    test('Test xsd composer.', async (t) => {
+    test('Test xsd composer. DatasetCore as param', async () => {
         const dataset = await json_ld_to_dataset(json_ld)
         assert.strictEqual(await xsd_composer(dataset, urn), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
             "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" targetNamespace=\"urn:be.vlaanderen.omgeving.data.id.graph:codelijst-gebouw\">\n" +
@@ -79,7 +79,28 @@ describe("Convert jsonld to xsd.", (s) => {
             "</xs:schema>\n")
     });
 
-    test('codedlist has a conceptscheme definition with a dc.identifier field.', async (t) => {
+    test('Test xsd composer. n-quads as param: string', async () => {
+        const datasetstring = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
+        assert.strictEqual(await xsd_composer(datasetstring, urn), "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+            "<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" targetNamespace=\"urn:be.vlaanderen.omgeving.data.id.graph:codelijst-gebouw\">\n" +
+            "  <xs:simpleType name=\"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw\">\n" +
+            "    <xs:restriction base=\"xs:string\">\n" +
+            "      <xs:enumeration value=\"https://data.omgeving.vlaanderen.be/id/concept/gebouw/buitenmuur\" />\n" +
+            "      <xs:enumeration value=\"https://data.omgeving.vlaanderen.be/id/concept/gebouw/schoorsteen\" />\n" +
+            "    </xs:restriction>\n" +
+            "  </xs:simpleType>\n" +
+            "</xs:schema>\n")
+    });
+    it('should throw an error for invalid input; xsd composer. ', async function () {
+        await assert.rejects(
+            async () => {
+                await xsd_composer(json_ld, urn)
+            },
+            TypeError, 'Invalid input: dataSet must be a DatasetCore.'
+        );
+    });
+
+    test('codedlist has a conceptscheme definition with a dc.identifier field.', async () => {
         assert.strictEqual(await identifier_present(json_ld), '"be.vlaanderen.omgeving.data.id.conceptscheme.gebouw"')
     });
 });

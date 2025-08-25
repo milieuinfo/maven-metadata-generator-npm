@@ -54,7 +54,7 @@ async function n3_reasoning(json_ld, rules) {
 /**
  * @async
  * @function rdf_to_jsonld
- * @param {string} data - RDF input as string
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset | string} data - RDF input as string
  * @param {Frame} frame - Frame = JsonLdObj
  * @returns {Promise<jsonld.NodeObject>} A framed jsonld object.
  */
@@ -181,13 +181,13 @@ const compareSemanticVersions = (a, b) => {
  * Joins an array into a pipe-separated string, or returns the value as-is if not an array.
  * Throws an error and exits if a nested object is detected.
  * @param {Array|string|object} arr - The array or value to join.
+ * @throws {TypeError} If the array in not an array of strings.
  * @returns {string} - The joined string or the value itself.
  */
 function joinArray(arr) {
     if (Array.isArray(arr)) {
         if (typeof(arr[0]) === "object"){
-            console.log(new Error('Transformation to csv failed.\nThis json is nested. Please add properties to "frame_skos_no_prefixes" in variables.js\nExit process'))
-            process.exit(1);
+            throw new TypeError(arr + ' contains an object Transformation to csv failed.\nThis json is nested. Please add properties to "frame_skos_no_prefixes" in variables.js\nExit process');
         }
         else {
             return arr.join('|') // array to pipe separated string
@@ -195,8 +195,7 @@ function joinArray(arr) {
     }
     else {
         if (typeof(arr) === "object"){
-            console.log(new Error('Transformation to csv failed.\nThis json is nested. Please add properties to "frame_skos_no_prefixes" in variables.js\nExit process'))
-            process.exit(1);
+            throw new TypeError(arr + ' is an object Transformation to csv failed.\nThis json is nested. Please add properties to "frame_skos_no_prefixes" in variables.js\nExit process');
         }
         else {
             return arr; // is string

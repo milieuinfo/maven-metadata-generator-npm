@@ -4,6 +4,11 @@ import XMLWriter from "xml-writer";
 import XmlBeautify from "xml-beautify";
 import {DOMParser} from "xmldom";
 import {RoxiReasoner} from "roxi-js";
+import rdf from '@rdfjs/dataset';
+import { Parser } from 'n3';
+
+
+
 
 /**
  * Composes an XML Schema Definition (XSD) as a string from an RDF dataset and a URN.
@@ -14,13 +19,19 @@ import {RoxiReasoner} from "roxi-js";
  * of their identifiers. The resulting XSD string is beautified for readability.
  *
  * @async
- * @param {string} rdf_dataset - The RDF dataset in a serialization compatible with jsonld.fromRDF (e.g., N-Quads).
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset | string} rdf_dataset - The RDF dataset in a serialization compatible with jsonld.fromRDF (e.g., N-Quads, DatasetCore). RDF input to be transformed into XSD.
  * @param {string} urn - The target namespace URN for the XSD schema. Must follow the urn pattern.
  * @returns {Promise<string>} A promise that resolves to the beautified XSD schema as a string.
+ * @throws {TypeError} - If data is not a Dataset or DatasetCore or not text rdf that can be converted to a Dataset.
  * @throws {Error} If the ConceptScheme does not have an identifier, the identifier is not a valid NCName,
  *                 or the URN does not match the required pattern.
  */
 async function xsd_composer(rdf_dataset, urn) {
+    if (typeof rdf_dataset !== 'object' || !(rdf_dataset && 'match' in rdf_dataset && 'add' in rdf_dataset) ) {
+        if (!('add' in rdf.dataset(new Parser({ format: 'N-Triples' }).parse(rdf_dataset)))) {
+            throw new TypeError('Invalid input: data must be a DatasetCore.');
+        }
+    }
     let my_json = await jsonld.fromRDF(rdf_dataset);
     identifier_present(my_json)
     has_correct_urn_pattern(urn)

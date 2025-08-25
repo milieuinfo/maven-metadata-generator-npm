@@ -47,28 +47,34 @@ async function n3_writer(n3writer, file) {
 
 
 /**
+ * Writes RDF data to a Parquet file using provided options.
+ * Converts the RDF dataset to JSON-LD with a given frame, then serializes the result to Parquet format.
  * Writes an XSD file generated from the given RDF dataset and options.
+ *
  *
  * @async
  * @function xsd_writer
- * @param {any} rdf_dataset - The RDF dataset to be transformed into XSD.
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} rdf_dataset - RDF input as a dataset to be transformed into XSD.
  * @param {Object} xsdOptions - Options for XSD generation.
  * @param {string} xsdOptions.file - The file path where the generated XSD will be written
  * @param {string} xsdOptions.urn - The URN to be used for XSD composition.
+ * @throws {TypeError} - If rdf_dataset is not a Dataset or DatasetCore.
  * @throws {Error} If the urn is missing.
  * @throws {Error} If the output file is missing.
  * @returns {Promise<void>} A promise that resolves when the file is written.
  */
 async function xsd_writer(rdf_dataset, xsdOptions) {
+    if (typeof rdf_dataset !== 'object' || !(rdf_dataset && 'match' in rdf_dataset && 'add' in rdf_dataset)) {
+        throw new TypeError('Invalid input: rdf_dataset must be a DatasetCore.');
+    }
     if (!xsdOptions.file ) {
         throw new Error('Invalid options: no specified output.');
     }
-    if (!jsonldOptions.urn) {
+    if (!xsdOptions.urn) {
         throw new Error('Invalid options: no specified urn.');
     }
     ensureDirSync(xsdOptions.file)
     try {
-
         fs.writeFileSync(xsdOptions.file, await xsd_composer(rdf_dataset, xsdOptions.urn), 'utf8' );
         console.log(`Xsd enum file written to ${xsdOptions.file}`);
     }
@@ -80,16 +86,23 @@ async function xsd_writer(rdf_dataset, xsdOptions) {
 
 
 /**
+ * Writes RDF data to a jsonld file using provided options.
+ * Converts the RDF dataset to JSON-LD with a given frame, then serializes it.
+ *
  * @async
  * @function jsonld_writer
- * @param {string} data - RDF input as string
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} data - RDF input as a dataset.
  * @param {{ file: string, frame: Frame }} jsonldOptions
  * @throws {Error} If input is invalid or extraction fails.
  * @throws {Error} If no output file is specified in jsonldOptions.
  * @throws {TypeError} If the frame is invalid or missing a @context property.
+ * @throws {TypeError} - If data is not a Dataset or DatasetCore.
  * @returns {Promise<void>} A promise that resolves when the jsonld file has been written.
  */
 async function jsonld_writer(data, jsonldOptions) {
+    if (typeof data !== 'object' || !(data && 'match' in data && 'add' in data)) {
+        throw new TypeError('Invalid input: data must be a DatasetCore.');
+    }
     if (!jsonldOptions.file ) {
         throw new Error('Invalid options: no specified output.');
     }
@@ -113,17 +126,24 @@ async function jsonld_writer(data, jsonldOptions) {
 }
 
 /**
+ * Writes RDF data to a json file using provided options.
+ * Converts the RDF dataset to JSON-LD with a given frame, then serializes the result to json format.
+ *
  * @async
  * @function json_writer
- * @param {string} data - RDF input as string
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} data - RDF input as a dataset.
  * @param {{ file: string, frame: Frame }} jsonOptions
  * @param {string} [jsonPath='$.graph[*]'] - Optional JSONPath expression to extract array.
  * @throws {Error} If input is invalid or extraction fails.
  * @throws {Error} If no output file is specified in jsonOptions.
+ * @throws {TypeError} - If data is not a Dataset or DatasetCore.
  * @throws {TypeError} If the frame is invalid or missing a @context property.
  * @returns {Promise<void>} A promise that resolves when the json file has been written.
  */
 async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
+    if (typeof data !== 'object' || !(data && 'match' in data && 'add' in data)) {
+        throw new TypeError('Invalid input: data must be a DatasetCore.');
+    }
     if (!jsonOptions.file ) {
         throw new Error('Invalid options: no specified output.');
     }
@@ -148,16 +168,23 @@ async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
 }
 
 /**
+ * Writes RDF data to a CSV file using provided options.
+ * Converts the RDF dataset to JSON-LD with a given frame, then serializes the result to CSV format.
+ *
  * @async
  * @function table_writer
- * @param {string} data - RDF input as string
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} data - RDF input as a dataset.
  * @param {{ file: string, frame: Frame }} csvOptions
  * @throws {Error} If input is invalid or extraction fails.
  * @throws {Error} If no output file is specified in csvOptions.
+ * @throws {TypeError} - If data is not a Dataset or DatasetCore.
  * @throws {TypeError} If the frame is invalid or missing a @context property.
  * @returns {Promise<void>} A promise that resolves when the CSV file has been written.
  */
 async function table_writer(data, csvOptions) {
+    if (typeof data !== 'object' || !(data && 'match' in data && 'add' in data)) {
+        throw new TypeError('Invalid input: data must be a DatasetCore.');
+    }
     if (!csvOptions.file ) {
         throw new Error('Invalid options: no specified output.');
     }
@@ -210,18 +237,22 @@ function xlsx_writer(excelOptions) {
 /**
  * Writes RDF data to a Parquet file using provided options.
  * Converts the RDF dataset to JSON-LD with a given frame, then serializes the result to Parquet format.
+ *
  * @async
  * @function parquet_writer
- * @param {Dataset} data - The RDF dataset to serialize.
+ * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} data - The RDF dataset to serialize.
  * @param {Object} parquetOptions - Options for Parquet serialization.
  * @param {string} parquetOptions.file - Path to the Parquet output file.
  * @param {Object} parquetOptions.frame - JSON-LD frame to apply for shaping the data.
  * @throws {Error} If no output file is specified in parquetOptions.
  * @throws {TypeError} If the frame is invalid or missing a @context property.
+ * @throws {TypeError} - If data is not a Dataset or DatasetCore.
  * @returns {Promise<void>} A promise that resolves when the Parquet file has been written.
  */
 async function parquet_writer(data, parquetOptions) {
-
+    if (typeof data !== 'object' || !(data && 'match' in data && 'add' in data)) {
+        throw new TypeError('Invalid input: data must be a DatasetCore.');
+    }
     if (!parquetOptions.file ) {
         throw new Error('Invalid options: no specified output.');
     }
