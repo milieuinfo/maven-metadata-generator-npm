@@ -243,14 +243,18 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
  * @property {Object} contextPrefixes - @context with prefixes included
  * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
  * @Property {Object} prefixes
- *
+ * */
+
+/**
  * @typedef {Object} OutputOptions
  * @property {string} turtlePath
  * @property {{ file: string, frame: Frame }} jsonOptions
  * @property {{ file: string, frame: Frame }} jsonldOptions
  * @property {string} ntriplesPath
  * @property {{ file: string, frame: Frame }} csvOptions
- *
+ * */
+
+/**
  * @param {Source} source
  * @param {string} rdf - RDF input as string
  * @param {OutputOptions} options
@@ -303,19 +307,9 @@ async function output(
             }
         });
     });
-
     // Validate the dataset with provided SHACL shapes
-    const { report, writerOptions } = await validate(source.shapesDataset, dataset)
-    if (!(report.conforms)) {
-        console.error("Validation failed.");
-        // Validation report as file
-        cleanUpDir('../validation/')
-        await parquet_writer(report.dataset, {file : '../validation/validation_result.parquet', frame: writerOptions.frame});
-        await json_writer(report.dataset, {file : '../validation/validation_result.json', frame: writerOptions.frame});
-        return;
-    } else {
-        console.error("Validation succeeded.");
-    }
+    const report = await validate(source.shapesDataset, dataset)
+    if (!(report.conforms)){ return}
 
     try {
         // Write Turtle serialization to file, if requested

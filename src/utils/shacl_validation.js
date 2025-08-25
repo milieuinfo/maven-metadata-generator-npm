@@ -1,5 +1,7 @@
 import rdf from '@zazuko/env-node'
 import SHACLValidator from 'rdf-validate-shacl'
+import {cleanUpDir} from "./functions.js";
+import {json_writer, parquet_writer} from "./writers.js";
 
 
 const writerOptions = {
@@ -58,12 +60,16 @@ const writerOptions = {
  * @function validate
  * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} shapesDataset - SHACL shapes for validating the RDF
  * @param {import('@rdfjs/types').DatasetCore | import('@rdfjs/types').Dataset} dataSet - RDF input as a dataset
- * @returns {Promise<{report: ValidationReport, writerOptions: object}>}
+ * @param {{ parquetFile: string, jsonFile: string }} logFiles - Paths for writing the log files
+ * @returns {SHACLValidator.ValidationReport}  report
  * @throws {Error} - If Dataset validation fails.
  * @throws {TypeError} - If shapesDataset is not a Dataset or DatasetCore.
  * @throws {TypeError} - If dataSet is not a Dataset or DatasetCore.
  */
-async function validate(shapesDataset, dataSet) {
+async function validate(shapesDataset,
+                        dataSet, logFiles =
+                        { parquetFile : '../validation/validation_result.parquet',
+                            jsonFile : '../validation/validation_result.json' }) {
     if (typeof shapesDataset !== 'object' || !(shapesDataset && 'match' in shapesDataset && 'add' in shapesDataset)) {
         throw new TypeError('Invalid input: shapesDataset must be a DatasetCore.');
     }
@@ -73,11 +79,22 @@ async function validate(shapesDataset, dataSet) {
     const validator = new SHACLValidator(shapesDataset, { factory: rdf });
     try {
         const report = await validator.validate(dataSet);
-        return { report, writerOptions };
+        if (!(report.conforms)) {
+            console.error("Validation failed.");
+            // Validation report as file
+            cleanUpDir('../validation/')
+            await parquet_writer(report.dataset, {file : logFiles.parquetFile, frame: writerOptions.frame});
+            await json_writer(report.dataset, {file : logFiles.jsonFile, frame: writerOptions.frame});
+        } else {
+            console.error("Validation succeeded.");
+        }
+        return report
+
     } catch (err) {
         throw new Error(`Dataset validation failed: ${err.message}`);
     }
 }
+
 
 export default validate;
 

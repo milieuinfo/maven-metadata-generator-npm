@@ -7,11 +7,8 @@ import fs from "fs";
 import {xsd_composer} from './xsd_composer.js';
 
 
-
-
-//
 /**
- * Writes an RDF file.
+ * Writes a RDF file.
  * Promisify N3 Writer's end method for clean async/await usage
  *
  * @async
@@ -39,8 +36,6 @@ async function n3_writer(n3writer, file) {
         console.log(e.message);
     }
 }
-
-
 
 
 /**

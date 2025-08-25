@@ -5,7 +5,13 @@ import N3 from 'n3';
 import rdfDataset from "@rdfjs/dataset";
 import fs from "fs";
 import rdf from "@zazuko/env-node";
-import { json_writer, parquet_writer } from '../../utils/writers.js';
+
+
+const logFiles =
+    {
+        jsonFile : 'src/test/result/validation_result.json',
+        parquetFile : 'src/test/result/validation_result.parquet'
+    }
 
 
 describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@rdfjs/dataset"', async () => {
@@ -50,12 +56,12 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         });
 
         it('should validate skos rdf with the appropriate shacl file', async () => {
-            const {report} = await validate(shapesDataset, dataset)
+            const report = await validate(shapesDataset, dataset, logFiles)
             const valid = report.conforms
             assert.strictEqual(valid, true);
         });
         test('should not validate skos rdf with the appropriate shacl file', async () => {
-            const {report} = await validate(shapesDataset, skosrandom200dataset)
+            const report = await validate(shapesDataset, skosrandom200dataset, logFiles)
             const valid = report.conforms
             assert.strictEqual(valid, false);
         });
@@ -63,7 +69,7 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         it('should throw an error for invalid input', async function () {
             await assert.rejects(
                 async () => {
-                    await validate(shapesDataset, true);
+                    await validate(shapesDataset, true, logFiles);
                 },
                 TypeError, 'Invalid input: dataSet must be a DatasetCore.'
             );
@@ -71,7 +77,7 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         it('should throw an error for invalid input for a wrong object', async function () {
             await assert.rejects(
                 async () => {
-                    await validate(shapesDataset, {test: 1});
+                    await validate(shapesDataset, {test: 1}, logFiles);
                 },
                 TypeError, 'Invalid input: dataSet must be a DatasetCore.'
             );
@@ -79,7 +85,7 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         it('should throw an error for invalid input for a string', async function () {
             await assert.rejects(
                 async () => {
-                    await validate('een string', dataset);
+                    await validate('een string', dataset, logFiles);
                 },
                 TypeError, 'Invalid input: shapesDataset must be a DatasetCore.'
             );
@@ -87,7 +93,7 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         it('should throw an error for invalid input for a wrong object', async function () {
             await assert.rejects(
                 async () => {
-                    await validate( {test: 1}, dataset);
+                    await validate( {test: 1}, dataset, logFiles);
                 },
                 TypeError, 'Invalid input: shapesDataset must be a DatasetCore.'
             );
@@ -101,41 +107,29 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         const parameter_norm = dataset.filter(q => q.subject.value === "https://data.omgeving.vlaanderen.be/id/concept/luchtzuiveringssysteem/parameter_norm/4")
 
         it('should not validate a skos concept without the definition of the scheme', async () => {
-            const {report} = await validate(shapesDataset, parameter_norm)
+            const report = await validate(shapesDataset, parameter_norm, logFiles)
             const valid = report.conforms
             assert.strictEqual(valid, false);
         });
         it('should validate skos rdf with the appropriate shacl file', async () => {
-            const {report} = await validate(shapesDataset, dataset)
+            const report = await validate(shapesDataset, dataset, logFiles)
             const valid = report.conforms
             assert.strictEqual(valid, true);
         });
         test('should not validate skos rdf with the appropriate shacl file', async () => {
-            const {report} = await validate(shapesDataset, skosrandom200dataset)
+            const report = await validate(shapesDataset, skosrandom200dataset, logFiles)
             const valid = report.conforms
             assert.strictEqual(valid, false);
         });
         test('should write a report file when the rdf is not valid', async () => {
-            const {report, writerOptions} = await validate(shapesDataset, parameter_norm)
-            await fs.rmSync("src/test/result/validation_result.json", {force: true});
-            await fs.rmSync("src/test/result/validation_result.parquet", {force: true});
-            assert(!fs.existsSync("src/test/result/validation_result.json"))
-            assert(!fs.existsSync("src/test/result/validation_result.parquet"))
-            await json_writer(report.dataset, {
-                file: 'src/test/result/validation_result.json',
-                frame: writerOptions.frame
-            });
-            await parquet_writer(report.dataset, {
-                file: 'src/test/result/validation_result.parquet',
-                frame: writerOptions.frame
-            });
+            await validate(shapesDataset, parameter_norm, logFiles)
             assert(fs.existsSync("src/test/result/validation_result.json"))
             assert(fs.existsSync("src/test/result/validation_result.parquet"))
         });
         it('should throw an error for invalid input for a string', async function () {
             await assert.rejects(
                 async () => {
-                    await validate(shapesDataset, 'een string');
+                    await validate(shapesDataset, 'een string', logFiles);
                 },
                 TypeError, 'Invalid input: dataSet must be a DatasetCore.'
             );
@@ -143,7 +137,7 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         it('should throw an error for invalid input for a wrong object', async function () {
             await assert.rejects(
                 async () => {
-                    await validate(shapesDataset, {test: 1});
+                    await validate(shapesDataset, {test: 1}, logFiles);
                 },
                 TypeError, 'Invalid input: dataSet must be a DatasetCore.'
             );
@@ -151,7 +145,7 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         it('should throw an error for invalid input for a string', async function () {
             await assert.rejects(
                 async () => {
-                    await validate('een string', dataset);
+                    await validate('een string', dataset, logFiles);
                 },
                 TypeError, 'Invalid input: shapesDataset must be a DatasetCore.'
             );
@@ -159,7 +153,7 @@ describe('Validate Datasets: rdf from "@zazuko/env-node" vs. rdfDataset from "@r
         it('should throw an error for invalid input for a wrong object', async function () {
             await assert.rejects(
                 async () => {
-                    await validate( {test: 1}, dataset);
+                    await validate( {test: 1}, dataset, logFiles);
                 },
                 TypeError, 'Invalid input: shapesDataset must be a DatasetCore.'
             );

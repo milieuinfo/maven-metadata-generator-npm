@@ -7,8 +7,11 @@ import fs from "fs";
 import path from "path";
 
 
-
-// Utility to ensure a directory exists
+/**
+ * Utility to ensure a directory exists
+ * @function ensureDirSync
+ * @param {string} filePath - filepath of a file for which a directory should be created.
+ */
 function ensureDirSync(filePath) {
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) {
@@ -16,6 +19,11 @@ function ensureDirSync(filePath) {
     }
 }
 
+/**
+ * Utility to ensure a directory with its content is removed
+ * @function ensureDirSync
+ * @param {string} dir - a path for a directory that should be removed.
+ */
 function cleanUpDir(dir) {
     if (fs.existsSync(dir)) {
         fs.rmSync(dir, {recursive: true, force: true});
@@ -26,6 +34,7 @@ function cleanUpDir(dir) {
  * Applies N3 reasoning to a JSON-LD structure using provided rules.
  * Returns RDF statements in N-Triples format.
  * @async
+ * @function n3_reasoning
  * @param {jsonld.NodeObject} json_ld - The JSON-LD input data.
  * @param {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
  * @returns {Promise<string>} - The resulting N-Triples output.
