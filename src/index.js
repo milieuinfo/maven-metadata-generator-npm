@@ -1,14 +1,12 @@
 'use strict';
 
 import N3 from 'n3';
-import fs from "fs";
 import rdfDataset from "@rdfjs/dataset";
 import validate from './utils/shacl_validation.js';
-import path from "path";
 import csv from 'csvtojson';
 import {construct_dcat} from './utils/metadata.js';
-import {separateString, to_be_metadated, version_from_uri, n3_reasoning} from './utils/functions.js';
-import {json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer } from './utils/writers.js';
+import {separateString, to_be_metadated, version_from_uri, n3_reasoning, cleanUpDir} from './utils/functions.js';
+import {json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer, n3_writer } from './utils/writers.js';
 import {deploy_latest} from './utils/deploy.js';
 
 
@@ -133,10 +131,10 @@ async function generate_skos(options, skosSource ) {
  * @throws {Error} If the remote API request fails or returns an error status.
  */
 async function create_metadata(
-        metadataSource,
-        metadataOptions,
-        datasetOptions,
-        catalogOptions) {
+    metadataSource,
+    metadataOptions,
+    datasetOptions,
+    catalogOptions) {
     console.log('metadata generation: get previous versions');
     const url = `https://repo.omgeving.vlaanderen.be/artifactory/api/search/gavc?g=${metadataOptions.groupId}&a=${metadataOptions.artifactId}&classifier=sources&repos=release`;
 
@@ -194,7 +192,7 @@ async function create_metadata(
  */
 
 /**
-* @async
+ * @async
  * @param {Array<string>} uris - Array of artifact URIs to process.
  * @param {MetadataSource} metadataSource - Source definition with SHACL shapes, prefixes, and rules for reasoning.
  * @param {MetadataOptions} metadataOptions - Metadata options, must include next_release_version, startVersion, groupId, and artifactId.
@@ -230,9 +228,7 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
     const all_versions_nt = await n3_reasoning(construct_dcat(versions), metadataSource.rules);
 
     // Clean up temp directory if it exists
-    if (fs.existsSync('../temp/')) {
-        fs.rmSync('../temp/', { recursive: true, force: true });
-    }
+    cleanUpDir('../temp/')
 
     output(metadataSource, latest_version_nt, {"turtlePath": datasetOptions.turtlePath, "jsonldOptions": {"file": datasetOptions.jsonldOptions.file, "frame": datasetOptions.jsonldOptions.frame}});
     output(metadataSource, all_versions_nt, {"turtlePath": catalogOptions.turtlePath, "jsonldOptions": {"file": catalogOptions.jsonldOptions.file, "frame": catalogOptions.jsonldOptions.frame}});
@@ -247,18 +243,14 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
  * @property {Object} contextPrefixes - @context with prefixes included
  * @property {Array<string>} rules  -  Array of Paths of Input N3 files for Notation3 reasoning
  * @Property {Object} prefixes
- */
-
-/**
+ *
  * @typedef {Object} OutputOptions
  * @property {string} turtlePath
  * @property {{ file: string, frame: Frame }} jsonOptions
  * @property {{ file: string, frame: Frame }} jsonldOptions
  * @property {string} ntriplesPath
  * @property {{ file: string, frame: Frame }} csvOptions
- */
-
-/**
+ *
  * @param {Source} source
  * @param {string} rdf - RDF input as string
  * @param {OutputOptions} options
@@ -317,29 +309,22 @@ async function output(
     if (!(report.conforms)) {
         console.error("Validation failed.");
         // Validation report as file
-        if (fs.existsSync('../validation/')) {
-            fs.rmSync('../validation/', { recursive: true, force: true });
-        }
-        _ensureDirSync('../validation/validation_result.parquet')
+        cleanUpDir('../validation/')
         await parquet_writer(report.dataset, {file : '../validation/validation_result.parquet', frame: writerOptions.frame});
         await json_writer(report.dataset, {file : '../validation/validation_result.json', frame: writerOptions.frame});
         return;
+    } else {
+        console.error("Validation succeeded.");
     }
 
     try {
         // Write Turtle serialization to file, if requested
         if (options.turtlePath) {
-            _ensureDirSync(options.turtlePath); // Ensure directory exists
-            const ttlResult = await _writerEndAsync(ttl_writer); // Get Turtle as string
-            await fs.promises.writeFile(options.turtlePath, ttlResult); // Write to file asynchronously
-            console.log(`Turtle file written to ${options.turtlePath}`);
+            await n3_writer(ttl_writer, options.turtlePath)
         }
         // Write N-Triples serialization, if requested
         if (options.ntriplesPath) {
-            _ensureDirSync(options.ntriplesPath);
-            const ntResult = await _writerEndAsync(nt_writer);
-            await fs.promises.writeFile(options.ntriplesPath, ntResult);
-            console.log(`N-Triples file written to ${options.ntriplesPath}`);
+            await n3_writer(nt_writer, options.ntriplesPath)
         }
         // Write JSON-LD, if configured
         if (options.jsonldOptions) {
@@ -370,23 +355,6 @@ async function output(
         console.error("Output error:", err);
     }
 
-    // Utility to ensure a directory exists
-    function _ensureDirSync(filePath) {
-        const dir = path.dirname(filePath);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-    }
-
-    // Promisify N3 Writer's end method for clean async/await usage
-    function _writerEndAsync(writer) {
-        return new Promise((resolve, reject) => {
-            writer.end((err, result) => {
-                if (err) return reject(err);
-                resolve(result);
-            });
-        });
-    }
 }
 
 export { generate_skos, create_metadata, deploy_latest };

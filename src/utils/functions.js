@@ -4,6 +4,23 @@ import jp from "jsonpath";
 import jsonld from "jsonld";
 import {RoxiReasoner} from "roxi-js";
 import fs from "fs";
+import path from "path";
+
+
+
+// Utility to ensure a directory exists
+function ensureDirSync(filePath) {
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+}
+
+function cleanUpDir(dir) {
+    if (fs.existsSync(dir)) {
+        fs.rmSync(dir, {recursive: true, force: true});
+    }
+}
 
 /**
  * Applies N3 reasoning to a JSON-LD structure using provided rules.
@@ -189,4 +206,4 @@ const sortLines = str => Array.from(new Set(str.split(/\r?\n/))).sort().join('\n
 /**
  * Exported functions for use in other modules.
  */
-export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, version_from_uri, is_jar, jsonld_to_table, to_be_metadated, rdf_to_jsonld, n3_reasoning };
+export { separateString, joinArray, sortLines, select_latest_jar, compareSemanticVersions, version_from_url, version_from_uri, is_jar, jsonld_to_table, to_be_metadated, rdf_to_jsonld, n3_reasoning, ensureDirSync, cleanUpDir };

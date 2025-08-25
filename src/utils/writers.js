@@ -2,9 +2,43 @@ import  { json2csv }  from 'json-2-csv';
 import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import jp from "jsonpath";
 import {parquetSourcesFromJsonld, parquetWriter} from './parquet_writer.js';
-import {jsonld_to_table, rdf_to_jsonld} from './functions.js';
+import {jsonld_to_table, rdf_to_jsonld, ensureDirSync} from './functions.js';
 import fs from "fs";
 import {xsd_composer} from './xsd_composer.js';
+
+
+
+
+//
+/**
+ * Writes an RDF file.
+ * Promisify N3 Writer's end method for clean async/await usage
+ *
+ * @async
+ * @function n3_writer
+ * @param {import('N3').Writer } n3writer - N3 Writer.
+ * @param {string} file - The file path where the generated XSD will be written
+ * @returns {Promise<void>} A promise that resolves when the file is written.
+ */
+async function n3_writer(n3writer, file) {
+    function _writerEndAsync(writer) {
+        return new Promise((resolve, reject) => {
+            writer.end((err, result) => {
+                if (err) return reject(err);
+                resolve(result);
+            });
+        });
+    }
+    try {
+        ensureDirSync(file)
+        const rdfResult = await _writerEndAsync(n3writer); // Get rdf-serialization as string
+        await fs.promises.writeFile(file, rdfResult); // Write to file asynchronously
+        console.log(`Rdf file written to ${file}`);
+    }
+    catch(e) {
+        console.log(e.message);
+    }
+}
 
 
 
@@ -19,10 +53,10 @@ import {xsd_composer} from './xsd_composer.js';
  * @param {string} xsdOptions.file - The file path where the generated XSD will be written
  * @param {string} xsdOptions.urn - The URN to be used for XSD composition.
  * @returns {Promise<void>} A promise that resolves when the file is written.
- * @throws Will log an error message to the console if writing fails.
  */
 async function xsd_writer(rdf_dataset, xsdOptions) {
     try {
+
         fs.writeFileSync(xsdOptions.file, await xsd_composer(rdf_dataset, xsdOptions.urn), 'utf8' );
         console.log(`Xsd enum file written to ${xsdOptions.file}`);
     }
@@ -48,7 +82,7 @@ async function jsonld_writer(data, jsonldOptions) {
     }
     try {
         await fs.promises.writeFile(
-            jsonldOptions.file, 
+            jsonldOptions.file,
             JSON.stringify(jsonld, null, 4)
         );
         console.log(`Jsonld file written to ${jsonldOptions.file}`);
@@ -79,7 +113,7 @@ async function json_writer(data, jsonOptions, jsonPath='$.graph[*]') {
                 null, 4));
         console.log(`Json file written to ${jsonOptions.file}`);
     } catch (e) {
-            console.error(e.toString());
+        console.error(e.toString());
     }
 }
 
@@ -151,4 +185,4 @@ async function parquet_writer(data, parquetOptions) {
     }
 }
 
-export { json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer };
+export { json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer, n3_writer };
