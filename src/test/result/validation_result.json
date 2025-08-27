@@ -18,5 +18,14 @@
         "sourceConstraintComponent": "http://www.w3.org/ns/shacl#ClassConstraintComponent",
         "sourceShape": "https://data.omgeving.vlaanderen.be/id/propertyshape/topConceptOf",
         "value": "https://data.omgeving.vlaanderen.be/id/conceptscheme/lzs-param-norm"
+    },
+    {
+        "@id": "report",
+        "_type": "http://www.w3.org/ns/shacl#ValidationReport",
+        "conforms": "false",
+        "result": [
+            "b577",
+            "b578"
+        ]
     }
 ]
