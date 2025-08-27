@@ -36,6 +36,10 @@ const writerOptions = {
                 "@id": "http://www.w3.org/ns/shacl#resultSeverity",
                 "@type": "@id"
             },
+            "inversePath": {
+                "@id": "http://www.w3.org/ns/shacl#inversePath",
+                "@type": "@id"
+            },
             "sourceConstraintComponent": {
                 "@id": "http://www.w3.org/ns/shacl#sourceConstraintComponent",
                 "@type": "@id"

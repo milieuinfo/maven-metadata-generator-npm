@@ -7,6 +7,7 @@ import jp from "jsonpath";
 
 /**
  * @param {Array<Object>} array
+ * @throws {TypeError} If input is not an array.
  * @return {ParquetSchema}
  */
 function inferSchema(array){
@@ -21,8 +22,13 @@ function inferSchema(array){
     }
     for (const row of array) {
         for (const key of Object.keys(schemaDefinition)) {
-            if (row[key] === undefined) {
+            if (row[key] === undefined || row[key] === null)  {
                 schemaDefinition[key]['optional'] = true
+            // } else if (Array.isArray(row[key])) {
+            //     throw new TypeError("Todo: handle nested objects ");
+            } else if (!Array.isArray(row[key]) && typeof row[key] === "object") {
+                const s = inferSchema([row[key]])
+                schemaDefinition[key]['fields'] = s.schema
             } else _evaluate_value(row[key], key, schemaDefinition);
         }
     }
