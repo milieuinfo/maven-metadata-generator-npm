@@ -53,7 +53,11 @@ const writerOptions = {
                 "@type": "@id"
             }
         },
-        "@type": ["http://www.w3.org/ns/shacl#ValidationResult"],
+        "@type": ["http://www.w3.org/ns/shacl#ValidationResult", "http://www.w3.org/ns/shacl#ValidationReport"],
+        "result": {
+            "@embed": "@never",
+            "@omitDefault": true
+        }
     }
 }
 
