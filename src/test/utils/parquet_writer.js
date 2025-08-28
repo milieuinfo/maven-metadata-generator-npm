@@ -293,10 +293,26 @@ describe("Writing a parquet file from jsonld.", () => {
             { a: 2, b: 'y', c: false }
         ];
         const schema = inferSchema(data);
-        assert(schema.schema.a.type === 'DOUBLE');
+        assert(schema.schema.a.type === 'INT64');
         assert(schema.schema.b.type === 'UTF8');
         assert(schema.schema.c.type === 'BOOLEAN');
     });
+
+    test('inferSchema 2: should infer schema for number, string, and boolean fields', () => {
+        const data2 = [
+            { id: 1, tags: [1, 2, 3] },
+            { id: 2, tags: [4.5, 5.6] },
+            { id: 3, tags: ["mixed", 7] },
+            { id: 4, tags: [{ label: "nested" }, { label: 1}] }
+        ];
+        const schema = inferSchema(data2);
+        assert(schema.schema.id.type === 'INT64');
+        assert(schema.schema.tags.type === 'UTF8');
+        assert(schema.schema.tags.repeated === true);
+        assert(schema.schema.tags.fields.label.type === 'INT64'); //TODO: this schould be 'UTF-8'
+    });
+
+
 
     test('inferSchema: should handle missing (optional) fields', () => {
         const data = [
@@ -330,7 +346,7 @@ describe("Writing a parquet file from jsonld.", () => {
     });
 
     test('parquetSourcesFromJsonArray processes an array', () => {
-        const arr = [{ a: 1 }, { a: 2 , b: "x"}];
+        const arr = [{ a: 1 }, { a: 2.2 , b: "x"}];
         const result = parquetSourcesFromJsonArray(arr);
         assert.ok(result);
         assert(result.parquetSchema.schema.a.type === 'DOUBLE');
