@@ -19,6 +19,14 @@ import jp from "jsonpath";
  * @param {Array<Object>} array - Input data as array of objects.
  * @throws {TypeError} If input is not an array.
  * @returns {parquet.ParquetSchema} - Inferred Parquet schema.
+ *
+ * @example
+ * const data = [
+ *   { id: 1, tags: ["foo", "bar"] },
+ *   { id: 2, tags: ["baz"] }
+ * ];
+ * const schema = inferSchema(data);
+ * console.log(schema);
  */
 function inferSchema(array) {
     if (!Array.isArray(array)) {
@@ -132,7 +140,7 @@ function inferSchema(array) {
  * Normalize values in an array of objects, coercing stringified numbers
  * and booleans into proper types. Leaves objects/arrays intact.
  *
- * Example:
+ * Example conversions:
  *  "42"   → 42
  *  "true" → true
  *  "foo"  → "foo"
@@ -140,6 +148,14 @@ function inferSchema(array) {
  * @param {Array<Object>} array - Input data as array of objects.
  * @returns {Array<Object>} - New array with typed values.
  * @throws {TypeError} If input is not an array of objects.
+ *
+ * @example
+ * const data = [
+ *   { age: "42", active: "true" },
+ *   { age: "7.5", active: "false" }
+ * ];
+ * const typed = typeArray(data);
+ * // → [ { age: 42, active: true }, { age: 7.5, active: false } ]
  */
 function typeArray(array) {
     if (!Array.isArray(array)) {
@@ -178,6 +194,16 @@ function typeArray(array) {
  * @param {Array<Object>} array - Input JSON records.
  * @returns {{ typedArray: Array<Object>, parquetSchema: parquet.ParquetSchema }}
  * @throws {TypeError|Error} If input is invalid.
+ *
+ * @example
+ * const data = [
+ *   { name: "Alice", age: "30" },
+ *   { name: "Bob", age: 25 }
+ * ];
+ * const { typedArray, parquetSchema } = parquetSourcesFromJsonArray(data);
+ * console.log(typedArray);
+ * // → [ { name: "Alice", age: 30 }, { name: "Bob", age: 25 } ]
+ * console.log(parquetSchema);
  */
 function parquetSourcesFromJsonArray(array) {
     if (!Array.isArray(array)) {
@@ -200,6 +226,17 @@ function parquetSourcesFromJsonArray(array) {
  * @param {string} [jsonPath='$.graph[*]'] - JSONPath expression to select records.
  * @returns {{ typedArray: Array<Object>, parquetSchema: parquet.ParquetSchema }}
  * @throws {Error|TypeError} If input is invalid or extraction fails.
+ *
+ * @example
+ * const jsonld = {
+ *   "@context": "https://schema.org",
+ *   "graph": [
+ *     { "@id": "1", name: "Alice", age: "30" },
+ *     { "@id": "2", name: "Bob", age: 25 }
+ *   ]
+ * };
+ * const { typedArray, parquetSchema } = parquetSourcesFromJsonld(jsonld);
+ * console.log(typedArray);
  */
 function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
     if (!json_ld || typeof json_ld !== 'object') {
@@ -235,6 +272,14 @@ function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
  *        Object with schema + rows (from parquetSourcesFromJsonArray/Jsonld).
  * @param {string} parquetFilePath - Destination file path.
  * @returns {Promise<void>} - Resolves when file is written.
+ *
+ * @example
+ * const data = [
+ *   { id: 1, name: "Alice" },
+ *   { id: 2, name: "Bob" }
+ * ];
+ * const sources = parquetSourcesFromJsonArray(data);
+ * await parquetWriter(sources, "./output.parquet");
  */
 async function parquetWriter(parquetSources, parquetFilePath) {
     const writer = await parquet.ParquetWriter.openFile(parquetSources.parquetSchema, parquetFilePath);
