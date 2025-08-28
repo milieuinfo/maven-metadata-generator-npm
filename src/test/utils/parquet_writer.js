@@ -14,6 +14,38 @@ import jp from "jsonpath";
 
 
 
+const nested_array2 = [
+    {
+        "@id": "b109",
+        "_type": "http://www.w3.org/ns/shacl#ValidationResult",
+        "focusNode": "S2",
+        "resultMessage": "More than 1 values",
+        "resultPath": {
+            "@id": "b26",
+            "inversePath": "http://www.w3.org/2004/02/skos/core#notation"
+        },
+        "resultSeverity": "http://www.w3.org/ns/shacl#Violation",
+        "sourceConstraintComponent": "http://www.w3.org/ns/shacl#MaxCountConstraintComponent",
+        "sourceShape": "https://data.omgeving.vlaanderen.be/id/propertyshape/unique_notation"
+    },
+    {
+        "@id": "b115",
+        "_type": "http://www.w3.org/ns/shacl#ValidationResult",
+        "focusNode": "S3",
+        "resultMessage": "More than 1 values",
+        "resultPath": [{
+            "@id": "b26",
+            "inversePath": "http://www.w3.org/2004/02/skos/core#notation"
+        },{
+            "@id": "b27",
+            "inversePath": "http://www.w3.org#something"
+        }],
+        "resultSeverity": "http://www.w3.org/ns/shacl#Violation",
+        "sourceConstraintComponent": "http://www.w3.org/ns/shacl#MaxCountConstraintComponent",
+        "sourceShape": "https://data.omgeving.vlaanderen.be/id/propertyshape/unique_notation"
+    }
+]
+
 const nested_array = [
     {
         "@id": "b109",
@@ -309,6 +341,12 @@ describe("Writing a parquet file from jsonld.", () => {
         const typed_array = typeArray(nested_array);
         const schema = inferSchema(typed_array);
         await parquetWriter({parquetSchema: schema, typedArray: typed_array}, "src/test/result/test_nested.parquet")
+    });
+
+    test('inferSchema: should handle recursive nested objects', async() => {
+        const typed_array2 = typeArray(nested_array2);
+        const schema2 = inferSchema(typed_array2);
+        await parquetWriter({parquetSchema: schema2, typedArray: typed_array2}, "src/test/result/test_nested_array.parquet")
     });
 
 

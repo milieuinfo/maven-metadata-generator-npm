@@ -24,8 +24,6 @@ function inferSchema(array){
         for (const key of Object.keys(schemaDefinition)) {
             if (row[key] === undefined || row[key] === null)  {
                 schemaDefinition[key]['optional'] = true
-            // } else if (Array.isArray(row[key])) {
-            //     throw new TypeError("Todo: handle nested objects ");
             } else if (!Array.isArray(row[key]) && typeof row[key] === "object") {
                 const s = inferSchema([row[key]])
                 schemaDefinition[key]['fields'] = s.schema
@@ -39,7 +37,10 @@ function inferSchema(array){
         if (Array.isArray(val)) {
             schemaDefinition[key]['repeated'] = true
             for (const element of val) {
-                _evaluate_value(element, key, schemaDefinition)
+                if (!Array.isArray(element) && typeof element === "object") {
+                    const s = inferSchema([element])
+                    schemaDefinition[key]['fields'] = s.schema
+                } else _evaluate_value(element, key, schemaDefinition)
             }
         } else if (typeof val === 'number') {
             schemaDefinition[key]['type'] = 'DOUBLE'
