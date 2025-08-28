@@ -22,35 +22,77 @@ function inferSchema(array){
     }
     for (const row of array) {
         for (const key of Object.keys(schemaDefinition)) {
-            if (row[key] === undefined || row[key] === null)  {
-                schemaDefinition[key]['optional'] = true
-            } else if (!Array.isArray(row[key]) && typeof row[key] === "object") {
-                const s = inferSchema([row[key]])
-                schemaDefinition[key]['fields'] = s.schema
-            } else _evaluate_value(row[key], key, schemaDefinition);
+            const value = row[key];
+            switch (getValueKind(value)) {
+                case "null":
+                case "undefined":
+                    schemaDefinition[key].optional = true;
+                    break;
+                case "object": {
+                    const s = inferSchema([value]);
+                    schemaDefinition[key].fields = s.schema;
+                    break;
+                }
+                case "array": {
+                    schemaDefinition[key].repeated = true;
+                    for (const element of value) {
+                        if (getValueKind(element) === "object") {
+                            const s = inferSchema([element]);
+                            schemaDefinition[key].fields = s.schema;
+                        } else {
+                            _evaluate_value(element, key, schemaDefinition);
+                        }
+                    }
+                    break;
+                }
+                default:
+                    _evaluate_value(value, key, schemaDefinition);
+            }
         }
     }
 
     return new parquet.ParquetSchema(schemaDefinition) ;
 
-    function _evaluate_value(val, key, schemaDefinition){
+    function _evaluate_value(val, key, schemaDefinition) {
         if (Array.isArray(val)) {
-            schemaDefinition[key]['repeated'] = true
+            schemaDefinition[key].repeated = true;
+
             for (const element of val) {
-                if (!Array.isArray(element) && typeof element === "object") {
-                    const s = inferSchema([element])
-                    schemaDefinition[key]['fields'] = s.schema
-                } else _evaluate_value(element, key, schemaDefinition)
+                if (getValueKind(element) === "object") {
+                    // Array of objects → recurse
+                    const s = inferSchema([element]);
+                    schemaDefinition[key].fields = s.schema;
+                } else {
+                    _evaluate_value(element, key, schemaDefinition);
+                }
             }
         } else if (typeof val === 'number') {
-            schemaDefinition[key]['type'] = 'DOUBLE'
+            const numericType = Number.isInteger(val) ? 'INT64' : 'DOUBLE';
+            schemaDefinition[key].type = resolveType(schemaDefinition[key].type, numericType);
         } else if (typeof val === 'boolean') {
-            schemaDefinition[key]['type'] = 'BOOLEAN'
+            schemaDefinition[key].type = resolveType(schemaDefinition[key].type, 'BOOLEAN');
         } else if (typeof val === 'string') {
-            schemaDefinition[key]['type'] = 'UTF8'
+            schemaDefinition[key].type = resolveType(schemaDefinition[key].type, 'UTF8');
         }
     }
+
 }
+
+function getValueKind(value) {
+    if (value === null) return "null";
+    if (Array.isArray(value)) return "array";
+    if (typeof value === "object") return "object";
+    return typeof value;
+}
+
+function resolveType(existing, incoming) {
+    const typeOrder = ["BOOLEAN", "INT64", "DOUBLE", "UTF8"];
+    if (!existing) return incoming;
+    const existingIdx = typeOrder.indexOf(existing);
+    const incomingIdx = typeOrder.indexOf(incoming);
+    return typeOrder[Math.max(existingIdx, incomingIdx)];
+}
+
 
 
 /**
