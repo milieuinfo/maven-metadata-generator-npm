@@ -351,7 +351,7 @@ async function output(
 
 }
 
-export { generate_skos, create_metadata, deploy_latest };
+export { generate_skos, create_metadata, deploy_latest, output };
 
 
 
