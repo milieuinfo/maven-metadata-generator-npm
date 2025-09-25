@@ -1,0 +1,77 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix dctype: <http://purl.org/dc/dcmitype/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sdo: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+{ ?x a dcat:Catalog } => { ?x a dcat:Dataset } .
+{ ?x a dcat:DataService } => { ?x a dcat:Resource } .
+{ ?x a dcat:DataService } => { ?x a dctype:Service } .
+{ ?x a dcat:DatasetSeries } => { ?x a dcat:Dataset } .
+{ ?x a dcat:Dataset } => { ?x a dcat:Resource } .
+{ ?x a dcat:Role } => { ?x a skos:Concept } .
+{ ?x dcat:accessService ?y } => { ?y a dcat:DataService } .
+{ ?x dcat:accessURL ?y } => { ?y a rdfs:Resource } .
+{ ?x dcat:bbox ?y } => { ?x a dct:Location } .
+{ ?x dcat:catalog ?y } => { ?x a dcat:Catalog } .
+{ ?x dcat:catalog ?y } => { ?x dcat:resource ?y  } .
+{ ?x dcat:catalog ?y } => { ?y a dcat:Catalog } .
+{ ?x dcat:centroid ?y } => { ?x a dct:Location } .
+{ ?x dcat:compressFormat ?y } => { ?x dct:format ?y  } .
+{ ?x dcat:compressFormat ?y } => { ?y a dct:MediaType } .
+{ ?x dcat:contactPoint ?y } => { ?y a vcard:Kind } .
+{ ?x dcat:dataset ?y } => { ?x a dcat:Catalog } .
+{ ?x dcat:dataset ?y } => { ?x dcat:resource ?y  } .
+{ ?x dcat:dataset ?y } => { ?y a dcat:Dataset } .
+{ ?x dcat:distribution ?y } => { ?x a dcat:Dataset } .
+{ ?x dcat:distribution ?y } => { ?x dct:relation ?y  } .
+{ ?x dcat:downloadURL ?y } => { ?y a rdfs:Resource } .
+{ ?x dcat:endDate ?y } => { ?x a dct:PeriodOfTime } .
+{ ?x dcat:endpointDescription ?y } => { ?x a dcat:DataService } .
+{ ?x dcat:endpointURL ?y } => { ?x a dcat:DataService } .
+{ ?x dcat:endpointURL ?y } => { ?y a rdfs:Resource } .
+{ ?x dcat:first ?y } => { ?x xhtml:first ?y  } .
+{ ?x dcat:hadRole ?y } => { ?y a dcat:Role } .
+{ ?x dcat:hasCurrentVersion ?y } => { ?x dcat:hasVersion ?y  } .
+{ ?x dcat:hasVersion ?y } => { ?x dct:hasVersion ?y  } .
+{ ?x dcat:hasVersion ?y } => { ?x prov:generalizationOf ?y  } .
+{ ?x dcat:inCatalog ?y } => { ?y dcat:resource ?x } .
+{ ?x dcat:inSeries ?y } => { ?x dct:isPartOf ?y  } .
+{ ?x dcat:isDistributionOf ?y } => { ?y dcat:distribution ?x } .
+{ ?x dcat:isVersionOf ?y } => { ?y dcat:hasVersion ?x } .
+{ ?x dcat:landingPage ?y } => { ?x foaf:page ?y  } .
+{ ?x dcat:landingPage ?y } => { ?y a foaf:Document } .
+{ ?x dcat:last ?y } => { ?x xhtml:last ?y  } .
+{ ?x dcat:mediaType ?y } => { ?x dct:format ?y  } .
+{ ?x dcat:mediaType ?y } => { ?y a dct:MediaType } .
+{ ?x dcat:nextVersion ?y } => { ?y dcat:previousVersion ?x } .
+{ ?x dcat:next ?y } => { ?y dcat:prev ?x } .
+{ ?x dcat:packageFormat ?y } => { ?x dct:format ?y  } .
+{ ?x dcat:packageFormat ?y } => { ?y a dct:MediaType } .
+{ ?x dcat:previousVersion ?y } => { ?x prov:wasRevisionOf ?y  } .
+{ ?x dcat:prev ?y } => { ?x xhtml:prev ?y  } .
+{ ?x dcat:qualifiedRelation ?y } => { ?x a dcat:Resource } .
+{ ?x dcat:qualifiedRelation ?y } => { ?y a dcat:Relationship } .
+{ ?x dcat:record ?y } => { ?x a dcat:Catalog } .
+{ ?x dcat:record ?y } => { ?y a dcat:CatalogRecord } .
+{ ?x dcat:resource ?y } => { ?x a dcat:Catalog } .
+{ ?x dcat:resource ?y } => { ?x dct:hasPart ?y  } .
+{ ?x dcat:resource ?y } => { ?y a dcat:Resource } .
+{ ?x dcat:seriesMember ?y } => { ?y dcat:inSeries ?x } .
+{ ?x dcat:servesDataset ?y } => { ?x a dcat:DataService } .
+{ ?x dcat:servesDataset ?y } => { ?y a dcat:Dataset } .
+{ ?x dcat:service ?y } => { ?x a dcat:Catalog } .
+{ ?x dcat:service ?y } => { ?x dcat:resource ?y  } .
+{ ?x dcat:service ?y } => { ?y a dcat:DataService } .
+{ ?x dcat:startDate ?y } => { ?x a dct:PeriodOfTime } .
+{ ?x dcat:themeTaxonomy ?y } => { ?x a dcat:Catalog } .
+{ ?x dcat:themeTaxonomy ?y } => { ?y a rdfs:Resource } .
+{ ?x dcat:theme ?y } => { ?x dct:subject ?y  } .
+
