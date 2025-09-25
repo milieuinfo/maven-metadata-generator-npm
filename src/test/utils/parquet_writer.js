@@ -15,6 +15,7 @@ import parquet from 'parquetjs-lite';
 
 
 
+
 const nested_array2 = [
     {
         "@id": "b109",
@@ -497,6 +498,46 @@ describe("Writing a parquet file from jsonld.", () => {
 
         console.log("Nested round-trip Parquet verification successful!");
     });
+
+    test('Test parquet armos', async () => {
+
+        const parquetPath = "src/test/sources/dataleverancier_1.0.0.parquet";
+
+        // 6. Read Parquet file back
+        const reader = await parquet.ParquetReader.openFile(parquetPath);
+        const cursor = reader.getCursor();
+        const readRows = [];
+        let row = null;
+        while ((row = await cursor.next())) {
+            readRows.push(row);
+        }
+        await reader.close();
+
+        // 7. Normalize nested arrays of objects
+        // parquetjs-lite sometimes flattens repeated nested fields
+        const normalize = arr => arr.map(r => {
+            const newRow = { ...r };
+            if (Array.isArray(newRow.resultPath) && newRow.resultPath.length > 0) {
+                newRow.resultPath = newRow.resultPath.map(p => {
+                    // convert numeric strings back to number if needed
+                    const normalized = { ...p };
+                    for (const key in normalized) {
+                        if (!isNaN(normalized[key])) normalized[key] = Number(normalized[key]);
+                    }
+                    return normalized;
+                });
+            }
+            return newRow;
+        });
+
+        const normalizedTyped = normalize(typedArray);
+        const normalizedRead = normalize(readRows);
+
+
+        console.log("Nested round-trip Parquet verification successful!");
+    });
+
+
 
 
 });
