@@ -62,8 +62,8 @@ ons:catalog a                sh:NodeShape ;
     sh:name          "vormvereisten voor de catalogus van codelijsten"@nl ;
     sh:description   "De shacl/ontologie die de vormvereisten voor een catalogus beschrijft"@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-    sh:property      omg_ps:dcterms_hasPart, omg_ps:rdfs_member, omg_ps:dcat_dataset, omg_ps:rdf_type, omg_ps:rdfs_label, omg_ps:dcterms_title,
-                         omg_ps:dcat_service, omg_ps:dcterms_description ;
+    sh:property      omg_ps:dcterms_hasPart, omg_ps:dcat_dataset, omg_ps:rdf_type, omg_ps:rdfs_label, omg_ps:dcterms_title,
+                         omg_ps:dcat_service, omg_ps:dcterms_description, omg_ps:dcat_resource ;
     sh:closed true ;
     sh:targetClass   dcat:Catalog .
 
@@ -393,24 +393,37 @@ omg_ps:dcat_dataset
     sh:name          "heeft dataset"@nl ;
     sh:description   "De relatie tussen een dcat:Catalog en een dcat:Dataset."@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-#sh:class         dcat:Dataset ;
     sh:or (dcat:Dataset void:Dataset rdfs:Resource dcat:Resource) ;
     sh:minCount      1 ;
     sh:nodeKind      sh:IRI ;
     sh:path          dcat:dataset .
 
-
-omg_ps:rdfs_member
+# nieuw in dcat3
+omg_ps:dcat_resource
     a                sh:PropertyShape ;
-    rdfs:label       "heeft lid"@nl ;
-    sh:name          "heeft lid"@nl ;
-    sh:description   "De relatie tussen een groep en een lid."@nl ;
+    rdfs:label       "heeft dataset of dataservice"@nl ;
+    sh:name          "heeft dataset of dataservice"@nl ;
+    sh:description   "Een superproperty van dcat:dataset en dcat:service"@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
-#sh:class         dcat:Dataset ;
-    sh:or (dcat:Dataset void:Dataset rdfs:Resource dcat:Resource) ;
+    sh:or (dcat:Dataset void:Dataset rdfs:Resource dcat:Resource <http://purl.org/dc/dcmitype/Service> dcat:DataService ) ;
     sh:minCount      1 ;
     sh:nodeKind      sh:IRI ;
-    sh:path           rdfs:member .
+    sh:path          dcat:resource .
+
+
+
+# Niet meer in dcat 3
+#omg_ps:rdfs_member
+#    a                sh:PropertyShape ;
+#    rdfs:label       "heeft lid"@nl ;
+#    sh:name          "heeft lid"@nl ;
+#    sh:description   "De relatie tussen een groep en een lid."@nl ;
+#    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+##sh:class         dcat:Dataset ;
+#    sh:or (dcat:Dataset void:Dataset rdfs:Resource dcat:Resource) ;
+#    sh:minCount      1 ;
+#    sh:nodeKind      sh:IRI ;
+#    sh:path           rdfs:member .
 
 omg_ps:dcterms_hasPart
     a                sh:PropertyShape ;
