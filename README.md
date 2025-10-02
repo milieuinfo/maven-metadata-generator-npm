@@ -7,7 +7,7 @@ This project provides a Node.js-based tool for generating SKOS or other controll
 
 ## Overview
 
-Many data-driven projects manage controlled vocabulary lists (e.g., SKOS) in CSV format and generate RDF exports for publication or integration. This metadata generator assists in automating the creation of Maven metadata (such as `maven-metadata.xml` or similar artifacts) during the build process, ensuring that releases contain accurate, up-to-date metadata.
+Many data-driven projects manage controlled vocabulary lists (e.g., SKOS) in CSV format and generate RDF exports for publication or integration. This metadata generator assists in automating the creation of dcat metadata during the build process, ensuring that releases contain accurate, up-to-date metadata.
 
 The generator is built to be integrated into Maven builds using the [frontend-maven-plugin](https://github.com/eirslett/frontend-maven-plugin) by Eirslett. This allows you to run the metadata generator as part of your Maven lifecycle using Node.js.
 
@@ -20,16 +20,16 @@ The generator is built to be integrated into Maven builds using the [frontend-ma
 
 ## Installation
 
+Add scoped package repository to the .npmrc:
+```
+registry=https://registry.npmjs.org/
+@milieuinfo:registry=https://repo.omgeving.vlaanderen.be/artifactory/api/npm/acd-npm/
+```
+
 In your code list project, add this package as an npm dependency:
 
 ```sh
-npm install --save-dev maven-metadata-generator-npm
-```
-
-Or, if you use Yarn:
-
-```sh
-yarn add --dev maven-metadata-generator-npm
+npm install @milieuinfo/maven-metadata-generator-npm
 ```
 
 ## Usage
@@ -47,7 +47,7 @@ Add a dependency to your `package.json`:
     "csv-parser": "^3.2.0",
     "dotenv": "^16.4.5",
     "js-yaml": "^4.1.0",
-    "maven-metadata-generator-npm": "^0.3.26"
+    "@milieuinfo/maven-metadata-generator-npm": "^0.4.1"
   }
 }
 ```
