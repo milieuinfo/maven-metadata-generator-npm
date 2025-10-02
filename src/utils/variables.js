@@ -5,7 +5,7 @@ import rdf from "@zazuko/env-node";
 import convert from "xml-js";
 import jp from "jsonpath";
 
-const this_config = yaml.load(fs.readFileSync(process.cwd() + '/../node_modules/maven-metadata-generator-npm/src/config/config.yml', 'utf8'));
+const this_config = yaml.load(fs.readFileSync(process.cwd() + '/../node_modules/@milieuinfo/maven-metadata-generator-npm/src/config/config.yml', 'utf8'));
 
 const config = yaml.load(fs.readFileSync('./source/config.yml', 'utf8'));
 
