@@ -47,7 +47,7 @@ Add a dependency to your `package.json`:
     "csv-parser": "^3.2.0",
     "dotenv": "^16.4.5",
     "js-yaml": "^4.1.0",
-    "@milieuinfo/maven-metadata-generator-npm": "^0.4.1"
+    "@milieuinfo/maven-metadata-generator-npm": "^0.4.3"
   }
 }
 ```
