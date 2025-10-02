@@ -3,6 +3,7 @@ dcat:
     skos_rules: /../node_modules/@milieuinfo/maven-metadata-generator-npm/src/n3/skos-rules.n3
     dcterms_rules: /../node_modules/@milieuinfo/maven-metadata-generator-npm/src/n3/dcterms-rules.n3
     dcat_rules : /../node_modules/@milieuinfo/maven-metadata-generator-npm/src/n3/dcat3-rules.n3
+    dcat_extra_rules : /../node_modules/@milieuinfo/maven-metadata-generator-npm/src/n3/dcat3-extra-rules.n3
     foaf_rules : /../node_modules/@milieuinfo/maven-metadata-generator-npm/src/n3/foaf-rules.n3
     void_rules : /../node_modules/@milieuinfo/maven-metadata-generator-npm/src/n3/void-rules.n3
     rdf_rules: /../node_modules/@milieuinfo/maven-metadata-generator-npm/src/n3/rdf-rules.n3

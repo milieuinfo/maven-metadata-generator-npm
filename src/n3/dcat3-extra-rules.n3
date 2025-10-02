@@ -1,0 +1,6 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+
+{ ?x dcat:theme ?y } => { ?y a skos:Concept  } .
+
