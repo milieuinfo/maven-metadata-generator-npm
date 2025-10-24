@@ -561,7 +561,6 @@ omg_ps:dc_identifier
     sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
-    sh:minCount 1 ;
     sh:datatype      xsd:string ;
     sh:nodeKind      sh:Literal ;
     sh:path  dc:identifier .
@@ -701,7 +700,6 @@ omg_ps:dcterms_language
     sh:description ""@nl ;
     rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
     sh:maxCount 1 ;
-    sh:minCount 1 ;
     sh:nodeKind  sh:IRI ;
     sh:class dcterms:LinguisticSystem;
     sh:path  dcterms:language .
