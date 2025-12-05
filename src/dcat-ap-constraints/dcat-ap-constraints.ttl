@@ -78,7 +78,7 @@ ons:dataset a                sh:NodeShape ;
                         omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_hasVersion,omg_ps:dcterms_identifier,
                         omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,omg_ps:dcterms_rightsHolder,
                         omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page, omg_ps:dcterms_provenance,
-                        omg_ps:rdfs_label,omg_ps:void_rootResource, omg_ps:ssd_defaultGraph ;
+                        omg_ps:rdfs_label,omg_ps:void_rootResource, omg_ps:ssd_defaultGraph , omg_ps:dcat_keyword;
     sh:closed true ;
     sh:targetSubjectsOf dcterms:hasVersion .
 
@@ -94,7 +94,7 @@ ons:dataset_version a                sh:NodeShape ;
                       omg_ps:dcterms_accrualPeriodicity,omg_ps:dcterms_alternative,omg_ps:dcterms_description,omg_ps:dcterms_identifier,
                       omg_ps:dcterms_issued,omg_ps:dcterms_isVersionOf,omg_ps:dcterms_language,omg_ps:dcterms_license,omg_ps:dcterms_publisher,
                       omg_ps:dcterms_rightsHolder,omg_ps:dcterms_spatial,omg_ps:dcterms_temporal,omg_ps:dcterms_title,omg_ps:foaf_page, omg_ps:dcterms_provenance,
-                      omg_ps:owl_versionInfo,omg_ps:rdfs_label,omg_ps:void_rootResource ;
+                      omg_ps:owl_versionInfo,omg_ps:rdfs_label,omg_ps:void_rootResource, omg_ps:dcat_keyword ;
     sh:targetSubjectsOf dcterms:isVersionOf  .
 
 ons:package a  sh:NodeShape ;
@@ -773,6 +773,17 @@ omg_ps:dcterms_subject
     sh:nodeKind  sh:IRI ;
     sh:class rdfs:Resource;
     sh:path  dcterms:subject .
+
+omg_ps:dcat_keyword
+    a sh:PropertyShape ;
+    rdfs:label  ""@nl ;
+    sh:name ""@nl ;
+    sh:description ""@nl ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:datatype      rdf:langString ;
+    sh:languageIn    ( "nl" "en" ) ;
+    sh:nodeKind      sh:Literal ;
+    sh:path  dcat:keyword .
 
 omg_ps:dcterms_title
     a sh:PropertyShape ;
