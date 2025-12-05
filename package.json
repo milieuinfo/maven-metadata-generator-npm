@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@milieuinfo/maven-metadata-generator-npm",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "",
   "main": "src/index.js",
   "scripts": {
