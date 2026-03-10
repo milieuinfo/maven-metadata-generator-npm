@@ -55,27 +55,19 @@ async function generate_skos(options, skosSource ) {
         throw new Error('Invalid options: no specified output.');
     }
     console.log("skos generation: csv to jsonld");
-    await csv({
-        ignoreEmpty:true,
-        flatKeys:true
-    })
-        .fromFile(skosSource.sourcePath)
-        .then((jsonObj)=>{
-            var new_json = [];
-            for(var i = 0; i < jsonObj.length; i++){
-                const object = {};
-                Object.keys(jsonObj[i]).forEach(function(key) {
-                    object[key] = separateString(jsonObj[i][key]);
-                })
-                new_json.push(object)
-            }
-            let jsonld = {"@graph": new_json, "@context": skosSource.contextPrefixes};
-            console.log("1: Csv to Jsonld");
-            (async () => {
-                const nt_rdf = await n3_reasoning(jsonld, skosSource.rules)
-                output(skosSource, nt_rdf, options)
-            })()
-        })
+    const sourcePaths = skosSource.sourcePaths ?? [skosSource.sourcePath];
+    const csvOptions = { ignoreEmpty: true, flatKeys: true };
+    const csvResults = await Promise.all(sourcePaths.map(p => csv(csvOptions).fromFile(p)));
+    const mergedJson = csvResults.flat();
+    const new_json = mergedJson.map(row => {
+        const object = {};
+        Object.keys(row).forEach(key => { object[key] = separateString(row[key]); });
+        return object;
+    });
+    let jsonld = {"@graph": new_json, "@context": skosSource.contextPrefixes};
+    console.log("1: Csv to Jsonld");
+    const nt_rdf = await n3_reasoning(jsonld, skosSource.rules);
+    await output(skosSource, nt_rdf, options);
 }
 
 
