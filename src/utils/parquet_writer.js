@@ -174,8 +174,8 @@ function typeArray(array) {
 
     function _typeJson(original) {
         if (typeof original === 'string') {
-            if (!Number.isNaN(parseFloat(original))) {
-                return parseFloat(original);
+            if (!Number.isNaN(Number(original)) && original.trim() !== '') {
+                return Number(original);
             } else if (original.toLowerCase() === 'true') {
                 return true;
             } else if (original.toLowerCase() === 'false') {
