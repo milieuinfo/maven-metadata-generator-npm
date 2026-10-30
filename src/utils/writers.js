@@ -1,5 +1,4 @@
 import  { json2csv }  from 'json-2-csv';
-import {convertCsvToXlsx} from '@aternus/csv-to-xlsx';
 import jp from "jsonpath";
 import {parquetSourcesFromJsonld, parquetWriter} from './parquet_writer.js';
 import {jsonld_to_table, rdf_to_jsonld, ensureDirSync} from './functions.js';
@@ -209,32 +208,6 @@ async function table_writer(data, csvOptions) {
 }
 
 /**
- * @function xlsx_writer
- * @param {{ file: string, sourcefile: string, sheetName: string }} excelOptions  - { file: string, sourcefile: string, sheetName: string } for excel output based on csv sourcefile
- * @throws {Error} If the input is missing.
- * @throws {Error} If the output is missing.
- * @throws {Error} If the sheetName is missing.
- */
-function xlsx_writer(excelOptions) {
-    if (!excelOptions.file ) {
-        throw new Error('Invalid options: no specified output.');
-    }
-    if (!excelOptions.sourcefile) {
-        throw new Error('Invalid options: no specified inputput.')
-    }
-    if (!excelOptions.sheetName) {
-        throw new Error('Invalid options: no specified sheetName.')
-    }
-    ensureDirSync(excelOptions.file)
-    try {
-        convertCsvToXlsx(excelOptions.sourcefile, excelOptions.file, { sheetName : excelOptions.sheetName , overwrite : true });
-        console.log(`Excel file written to ${excelOptions.file}`);
-    } catch (e) {
-        console.error(e.toString());
-    }
-}
-
-/**
  * Writes RDF data to a Parquet file using provided options.
  * Converts the RDF dataset to JSON-LD with a given frame, then serializes the result to Parquet format.
  *
@@ -268,4 +241,4 @@ async function parquet_writer(data, parquetOptions) {
     }
 }
 
-export { json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer, n3_writer };
+export { json_writer, jsonld_writer, table_writer, parquet_writer, xsd_writer, n3_writer };

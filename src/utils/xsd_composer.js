@@ -2,7 +2,7 @@ import jsonld from "jsonld";
 import jp from "jsonpath";
 import XMLWriter from "xml-writer";
 import XmlBeautify from "xml-beautify";
-import {DOMParser} from "xmldom";
+import {DOMParser} from "@xmldom/xmldom";
 import {RoxiReasoner} from "roxi-js";
 import rdf from '@rdfjs/dataset';
 import { Parser } from 'n3';

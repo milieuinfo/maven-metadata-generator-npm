@@ -6,7 +6,7 @@ import validate from './utils/shacl_validation.js';
 import csv from 'csvtojson';
 import {construct_dcat} from './utils/metadata.js';
 import {separateString, to_be_metadated, version_from_uri, n3_reasoning, cleanUpDir} from './utils/functions.js';
-import {json_writer, jsonld_writer, table_writer, xlsx_writer, parquet_writer, xsd_writer, n3_writer } from './utils/writers.js';
+import {json_writer, jsonld_writer, table_writer, parquet_writer, xsd_writer, n3_writer } from './utils/writers.js';
 import {deploy_latest} from './utils/deploy.js';
 
 
@@ -15,7 +15,6 @@ import {deploy_latest} from './utils/deploy.js';
  * @property {string} turtlePath - Output path for Turtle serialization
  * @property {{ file: string, frame: Frame }} jsonOptions - { file: string, frame: JsonLdObj } for JSON output
  * @property {{ file: string, frame: Frame }} jsonldOptions  - { file: string, frame: JsonLdObj } for JSON-LD output
- * @property {{ file: string, sourcefile: string, sheetName: string }} excelOptions  - { file: string, sourcefile: string, sheetName: string } for excel output based on csv sourcefile
  * @property {string} ntriplesPath - Output path for N-Triples serialization
  * @property {{ file: string, urn: string }} xsdOptions - { file: string, urn: string } The file path where the generated XSD will be written. xsdOptions.urn - The URN to be used for XSD composition.
  * @property {{ file: string, frame: Frame }} csvOptions - { file: string, frame: JsonLdObj } for CSV output
@@ -316,13 +315,9 @@ async function output(
         if (options.jsonldOptions) {
             await jsonld_writer(dataset, options.jsonldOptions);
         }
-        // Write CSV and optionally XLSX, if configured
+        // Write CSV, if configured
         if (options.csvOptions) {
             await table_writer(dataset, options.csvOptions);
-            //TODO write excel from csv-string
-            if (options.excelOptions) {
-                await xlsx_writer(options.excelOptions);
-            }
         }
         // Write XSD, if requested
         if (options.xsdOptions) {

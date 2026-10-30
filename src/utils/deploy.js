@@ -1,6 +1,5 @@
 import {artifactId, groupId, config} from "./variables.js";
 import fs from "fs";
-import request from "request";
 import jp from 'jsonpath';
 import path from "path";
 import AdmZip from "adm-zip";
@@ -73,22 +72,21 @@ async function unzip(fileUrl, omgeving) {
     const response = await fetch(fileUrl);
     const _json = await response.json();
 
-    request.get({url: jp.query(_json, '$.downloadUri')[0], encoding: null}, (err, res, body) => {
-        var zip = new AdmZip(body);
-        var zipEntries = zip.getEntries();
-        console.log('Unpack turtle files from jar')
-        zipEntries.forEach((entry) => {
-            if (itemsProcessed < zipEntries.length) {
-                itemsProcessed++;
-                if (entry.entryName.match(/\.ttl$/i)) {
-                    zip.extractEntryTo(entry, dir)
-                }
+    const jar = await fetch(jp.query(_json, '$.downloadUri')[0]);
+    var zip = new AdmZip(Buffer.from(await jar.arrayBuffer()));
+    var zipEntries = zip.getEntries();
+    console.log('Unpack turtle files from jar')
+    zipEntries.forEach((entry) => {
+        if (itemsProcessed < zipEntries.length) {
+            itemsProcessed++;
+            if (entry.entryName.match(/\.ttl$/i)) {
+                zip.extractEntryTo(entry, dir)
             }
-            if (itemsProcessed === zipEntries.length) {
-                merge(dir, omgeving)
-            }
-        })
-    });
+        }
+        if (itemsProcessed === zipEntries.length) {
+            merge(dir, omgeving)
+        }
+    })
 }
 
 async function merge(dir, omgeving) {

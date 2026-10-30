@@ -14,6 +14,11 @@
   "publishConfig": {
     "registry": "https://repo.omgeving.vlaanderen.be/artifactory/api/npm/acd-npm/"
   },
+  "pnpm": {
+    "overrides": {
+      "underscore": "1.13.8"
+    }
+  },
   "keywords": [
     "milieuinfo",
     "metadata",
@@ -29,38 +34,33 @@
   "author": "Vlaamse Overheid, Departement omgeving",
   "license": "MIT",
   "dependencies": {
-    "@aternus/csv-to-xlsx": "^2.1.2",
-    "@rdfjs/dataset": "^2.0.2",
+    "@rdfjs/dataset": "^2.0.3",
+    "@xmldom/xmldom": "^0.9.12",
     "@zazuko/env-node": "1.0.2",
-    "adm-zip": "^0.5.12",
-    "csvtojson": "^2.0.12",
-    "file-system": "^1.2.2",
+    "adm-zip": "^0.6.1",
+    "csvtojson": "^2.0.14",
     "glob": "^11.1.0",
-    "js-yaml": "4.1.1",
-    "json-2-csv": "^5.0.1",
-    "jsonld": "8.3.1",
-    "jsonpath": "1.1.1",
-    "mocha": "^11.1.0",
-    "n3": "^1.17.2",
+    "js-yaml": "4.3.2",
+    "json-2-csv": "^5.6.0",
+    "jsonld": "9.0.0",
+    "jsonpath": "1.3.0",
+    "n3": "^1.26.0",
     "node-fetch": "^3.3.2",
-    "package.json": "^0.0.0",
     "parquetjs-lite": "^0.8.7",
-    "rdf-validate-shacl": "^0.5.3",
-    "request": "2.88.2",
+    "rdf-validate-shacl": "^0.5.10",
     "roxi-js": "0.1.3",
     "xml-beautify": "^1.2.3",
     "xml-js": "1.6.11",
-    "xml-writer": "^1.7.0",
-    "xmldom": "^0.6.0"
+    "xml-writer": "^1.7.0"
   },
   "volta": {
     "node": "22.13.0",
     "pnpm": "9.15.9"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-commonjs": "^25.0.8",
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "rollup": "^4.12.0"
+    "@rollup/plugin-node-resolve": "^15.3.1",
+    "rollup": "^4.66.0"
   }
 }

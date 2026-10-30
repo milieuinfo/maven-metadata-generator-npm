@@ -1,6 +1,6 @@
 [
     {
-        "@id": "b577",
+        "@id": "_:b0",
         "_type": "http://www.w3.org/ns/shacl#ValidationResult",
         "focusNode": "https://data.omgeving.vlaanderen.be/id/concept/luchtzuiveringssysteem/parameter_norm/4",
         "resultPath": "http://www.w3.org/2004/02/skos/core#inScheme",
@@ -10,7 +10,7 @@
         "value": "https://data.omgeving.vlaanderen.be/id/conceptscheme/lzs-param-norm"
     },
     {
-        "@id": "b578",
+        "@id": "_:b1",
         "_type": "http://www.w3.org/ns/shacl#ValidationResult",
         "focusNode": "https://data.omgeving.vlaanderen.be/id/concept/luchtzuiveringssysteem/parameter_norm/4",
         "resultPath": "http://www.w3.org/2004/02/skos/core#topConceptOf",
@@ -20,12 +20,11 @@
         "value": "https://data.omgeving.vlaanderen.be/id/conceptscheme/lzs-param-norm"
     },
     {
-        "@id": "report",
         "_type": "http://www.w3.org/ns/shacl#ValidationReport",
         "conforms": "false",
         "result": [
-            "b577",
-            "b578"
+            "_:b0",
+            "_:b1"
         ]
     }
 ]
