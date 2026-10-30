@@ -94,7 +94,7 @@ async function validate(shapesDataset,
             await parquet_writer(report.dataset, {file : logFiles.parquetFile, frame: writerOptions.frame});
             await json_writer(report.dataset, {file : logFiles.jsonFile, frame: writerOptions.frame});
         } else {
-            console.error("Validation succeeded.");
+            console.log("Validation succeeded.");
         }
         return report
 
