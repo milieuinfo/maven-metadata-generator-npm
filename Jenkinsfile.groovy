@@ -52,7 +52,7 @@ pipeline {
 						def currentVersion = readJSON(file: 'package.json').version
 						if (versions.isRelease()) {
 							def version = versions.bump(currentVersion)
-							git.validateTag("v${version}")
+							git.validateTag(version)
 							env.VERSION = version
 						}
 					} else {
