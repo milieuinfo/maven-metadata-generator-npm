@@ -1,0 +1,94 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
+@prefix xkos: <http://rdf-vocabulary.ddialliance.org/xkos#> .
+@prefix iso-thes: <http://purl.org/iso25964/skos-thes#> .
+
+# Rules derived from the XKOS ontology, version 1.2 (2019-05-01).
+# Super-properties of SKOS properties (skos:note, skos:broaderTransitive, ...) follow from skos-rules.n3.
+
+# Classes
+
+{ ?x a xkos:ClassificationLevel } => { ?x a skos:Collection } .
+
+# Sub-properties
+
+{ ?x xkos:inclusionNote ?y } => { ?x skos:scopeNote ?y } .
+{ ?x xkos:coreContentNote ?y } => { ?x xkos:inclusionNote ?y } .
+{ ?x xkos:additionalContentNote ?y } => { ?x xkos:inclusionNote ?y } .
+{ ?x xkos:exclusionNote ?y } => { ?x skos:scopeNote ?y } .
+{ ?x xkos:caseLaw ?y } => { ?x skos:note ?y } .
+{ ?x xkos:supersedes ?y } => { ?x xkos:follows ?y } .
+{ ?x xkos:coversExhaustively ?y } => { ?x xkos:covers ?y } .
+{ ?x xkos:coversMutuallyExclusively ?y } => { ?x xkos:covers ?y } .
+{ ?x xkos:causal ?y } => { ?x skos:related ?y } .
+{ ?x xkos:causes ?y } => { ?x xkos:causal ?y } .
+{ ?x xkos:causedBy ?y } => { ?x xkos:causal ?y } .
+{ ?x xkos:sequential ?y } => { ?x skos:related ?y } .
+{ ?x xkos:precedes ?y } => { ?x xkos:sequential ?y } .
+{ ?x xkos:previous ?y } => { ?x xkos:precedes ?y } .
+{ ?x xkos:succeeds ?y } => { ?x xkos:sequential ?y } .
+{ ?x xkos:next ?y } => { ?x xkos:succeeds ?y } .
+{ ?x xkos:temporal ?y } => { ?x xkos:sequential ?y } .
+{ ?x xkos:before ?y } => { ?x xkos:temporal ?y } .
+{ ?x xkos:after ?y } => { ?x xkos:temporal ?y } .
+{ ?x xkos:disjoint ?y } => { ?x skos:related ?y } .
+{ ?x xkos:isPartOf ?y } => { ?x skos:broader ?y } .
+{ ?x xkos:hasPart ?y } => { ?x skos:narrower ?y } .
+{ ?x xkos:specializes ?y } => { ?x skos:broader ?y } .
+{ ?x xkos:generalizes ?y } => { ?x skos:narrower ?y } .
+
+# Transitive properties
+
+{ ?x xkos:precedes ?y . ?y xkos:precedes ?z } => { ?x xkos:precedes ?z } .
+{ ?x xkos:succeeds ?y . ?y xkos:succeeds ?z } => { ?x xkos:succeeds ?z } .
+{ ?x xkos:before ?y . ?y xkos:before ?z } => { ?x xkos:before ?z } .
+{ ?x xkos:after ?y . ?y xkos:after ?z } => { ?x xkos:after ?z } .
+
+# Inverse properties
+
+{ ?x xkos:isPartOf ?y } => { ?y xkos:hasPart ?x } .
+{ ?x xkos:hasPart ?y } => { ?y xkos:isPartOf ?x } .
+{ ?x xkos:specializes ?y } => { ?y xkos:generalizes ?x } .
+{ ?x xkos:generalizes ?y } => { ?y xkos:specializes ?x } .
+
+# Equivalent properties
+
+{ ?x xkos:isPartOf ?y } => { ?x iso-thes:broaderPartitive ?y } .
+{ ?x iso-thes:broaderPartitive ?y } => { ?x xkos:isPartOf ?y } .
+{ ?x xkos:hasPart ?y } => { ?x iso-thes:narrowerPartitive ?y } .
+{ ?x iso-thes:narrowerPartitive ?y } => { ?x xkos:hasPart ?y } .
+{ ?x xkos:specializes ?y } => { ?x iso-thes:broaderGeneric ?y } .
+{ ?x iso-thes:broaderGeneric ?y } => { ?x xkos:specializes ?y } .
+{ ?x xkos:generalizes ?y } => { ?x iso-thes:narrowerGeneric ?y } .
+{ ?x iso-thes:narrowerGeneric ?y } => { ?x xkos:generalizes ?y } .
+
+# Domains
+
+{ ?x xkos:plainText ?y } => { ?x a xkos:ExplanatoryNote } .
+{ ?x xkos:numberOfLevels ?y } => { ?x a skos:ConceptScheme } .
+{ ?x xkos:depth ?y } => { ?x a xkos:ClassificationLevel } .
+{ ?x xkos:maxLength ?y } => { ?x a skosxl:Label } .
+{ ?x xkos:notationPattern ?y } => { ?x a xkos:ClassificationLevel } .
+{ ?x xkos:levels ?y } => { ?x a skos:ConceptScheme } .
+{ ?x xkos:madeOf ?y } => { ?x a xkos:Correspondence } .
+{ ?x xkos:sourceConcept ?y } => { ?x a xkos:ConceptAssociation } .
+{ ?x xkos:targetConcept ?y } => { ?x a xkos:ConceptAssociation } .
+{ ?x xkos:compares ?y } => { ?x a xkos:Correspondence } .
+{ ?x xkos:follows ?y } => { ?x a skos:ConceptScheme } .
+{ ?x xkos:variant ?y } => { ?x a skos:ConceptScheme } .
+{ ?x xkos:belongsTo ?y } => { ?x a skos:ConceptScheme } .
+{ ?x xkos:organizedBy ?y } => { ?x a xkos:ClassificationLevel } .
+
+# Ranges
+
+{ ?x xkos:levels ?y } => { ?y a rdf:List } .
+{ ?x xkos:madeOf ?y } => { ?y a xkos:ConceptAssociation } .
+{ ?x xkos:sourceConcept ?y } => { ?y a skos:Concept } .
+{ ?x xkos:targetConcept ?y } => { ?y a skos:Concept } .
+{ ?x xkos:compares ?y } => { ?y a skos:ConceptScheme } .
+{ ?x xkos:follows ?y } => { ?y a skos:ConceptScheme } .
+{ ?x xkos:variant ?y } => { ?y a skos:ConceptScheme } .
+{ ?x xkos:organizedBy ?y } => { ?y a skos:Concept } .
+{ ?x xkos:covers ?y } => { ?y a skos:Concept } .
+{ ?x xkos:classifiedUnder ?y } => { ?y a skos:Concept } .
