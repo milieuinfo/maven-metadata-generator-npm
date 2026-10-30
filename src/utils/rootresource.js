@@ -1,4 +1,4 @@
-import {RoxiReasoner} from "roxi-js";
+import {Parser, Store, DataFactory} from "n3";
 import fs from "fs";
 
 
@@ -11,14 +11,13 @@ import fs from "fs";
 function getSchemas(file_path) {
     let schemas = []
 
-    var query = `SELECT ?schema where {?schema a <http://www.w3.org/2004/02/skos/core#ConceptScheme>}`;
     const nt = fs.readFileSync(file_path, 'utf8')
-    const reasoner = RoxiReasoner.new();
-    reasoner.add_abox(nt);
-    for (const row of reasoner.query(query)) {
-        for (const binding of row) {
-            schemas.push(binding.getValue().replace('<', '').replace('>', ''))
-        }
+    const store = new Store(new Parser().parse(nt));
+    for (const schema of store.getSubjects(
+        DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+        DataFactory.namedNode('http://www.w3.org/2004/02/skos/core#ConceptScheme'),
+        null)) {
+        schemas.push(schema.value)
     }
     if (!schemas[0]) {
         throw new Error('No Conceptscheme found');

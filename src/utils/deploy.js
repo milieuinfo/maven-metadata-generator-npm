@@ -5,7 +5,7 @@ import path from "path";
 import AdmZip from "adm-zip";
 import {sortLines, select_latest_jar} from './functions.js';
 import { glob } from 'glob';
-import {RoxiReasoner} from "roxi-js";
+import {Parser, Writer} from "n3";
 import fetch, { fileFromSync } from 'node-fetch';
 
 const graph = 'https://' + groupId.split('.id')[0].split('.').reverse().join('.') + '/id/graph/' + artifactId
@@ -91,15 +91,15 @@ async function unzip(fileUrl, omgeving) {
 
 async function merge(dir, omgeving) {
     console.log('Merge turtle files to one n-triple file')
-    const reasoner = RoxiReasoner.new();
+    const quads = [];
     const nt_file = path.join(dir, artifactId + '.nt')
     const ttl_files = await glob('**/*.ttl', {
         cwd: dir
     })
     ttl_files.forEach(file => {
-        reasoner.add_abox(fs.readFileSync(path.join(dir, file), 'utf8').toString());
+        quads.push(...new Parser().parse(fs.readFileSync(path.join(dir, file), 'utf8').toString()));
     })
-    fs.writeFileSync(nt_file,sortLines(reasoner.get_abox_dump()), 'utf8');
+    fs.writeFileSync(nt_file,sortLines(new Writer({ format: 'N-Triples' }).quadsToString(quads)), 'utf8');
     put(nt_file, omgeving)
 }
 

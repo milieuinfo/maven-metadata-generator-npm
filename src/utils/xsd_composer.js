@@ -3,9 +3,8 @@ import jp from "jsonpath";
 import XMLWriter from "xml-writer";
 import XmlBeautify from "xml-beautify";
 import {DOMParser} from "@xmldom/xmldom";
-import {RoxiReasoner} from "roxi-js";
 import rdf from '@rdfjs/dataset';
-import { Parser } from 'n3';
+import { Parser, Store, DataFactory } from 'n3';
 
 
 
@@ -91,14 +90,16 @@ function has_correct_urn_pattern(urn) {
  * @throws {Error} - If no valid identifier is found or validation fails.
  */
 async function identifier_present(json_ld) {
-    var query = `SELECT ?identifier where {?s a <http://www.w3.org/2004/02/skos/core#ConceptScheme> ; <http://purl.org/dc/elements/1.1/identifier> ?identifier}  `;
     const nt = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
-    const reasoner = RoxiReasoner.new();
-    reasoner.add_abox(nt);
+    const store = new Store(new Parser({ format: 'N-Quads' }).parse(nt));
     let id = false
-    for (const row of reasoner.query(query)) {
-        for (const binding of row) {
-            id = binding.getValue()
+    for (const scheme of store.getSubjects(
+        DataFactory.namedNode('http://www.w3.org/1999/02/22-rdf-syntax-ns#type'),
+        DataFactory.namedNode('http://www.w3.org/2004/02/skos/core#ConceptScheme'),
+        null)) {
+        for (const identifier of store.getObjects(scheme, DataFactory.namedNode('http://purl.org/dc/elements/1.1/identifier'), null)) {
+            // Quoted like the N-Triples literal the former SPARQL binding returned.
+            id = '"' + identifier.value + '"'
         }
     }
     if (!id) {

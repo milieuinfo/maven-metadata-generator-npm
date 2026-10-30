@@ -2,7 +2,8 @@
 
 import jp from "jsonpath";
 import jsonld from "jsonld";
-import {RoxiReasoner} from "roxi-js";
+import eyeling from "eyeling";
+import {Writer} from "n3";
 import fs from "fs";
 import path from "path";
 
@@ -42,13 +43,16 @@ function cleanUpDir(dir) {
 async function n3_reasoning(json_ld, rules) {
     //console.log("n3 reasoning ");
     let rdf = await jsonld.toRDF(json_ld, { format: "application/n-quads" })
-    const reasoner = RoxiReasoner.new();
-    reasoner.add_abox(rdf);
+    // Only the rules of the rule files are used, not the facts they describe themselves with.
+    const frules = [];
+    const brules = [];
     for (let rule in rules) {
-        reasoner.add_rules(fs.readFileSync(process.cwd() + rules[rule], 'utf8'));
+        const parsed = eyeling.parseN3Text(fs.readFileSync(process.cwd() + rules[rule], 'utf8'));
+        frules.push(...parsed.frules);
+        brules.push(...parsed.brules);
     }
-    reasoner.materialize();
-    return sortLines(reasoner.get_abox_dump());
+    const result = eyeling.reasonStream({ n3: rdf, frules, brules }, { rdfjs: true });
+    return sortLines(new Writer({ format: 'N-Triples' }).quadsToString(result.closureQuads));
 }
 
 /**

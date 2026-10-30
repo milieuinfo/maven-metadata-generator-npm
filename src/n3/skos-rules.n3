@@ -72,17 +72,17 @@
 
 
 
-    { ?x a skos:ConceptScheme, skos:Concept } => @false.
-    { ?x a skos:Collection, skos:Concept } => @false.
-    { ?x a skos:Collection, skos:ConceptScheme } => @false.
-    { ?x skos:related ?y. ?x skos:broaderTransitive ?y } => @false.
-    { ?x skos:exactMatch ?y. ?x skos:broadMatch ?y } => @false.
-    { ?x skos:exactMatch ?y. ?x skos:relatedMatch ?y } => @false.
-    { ?c skos:memberList ?L1, ?L2. ?L1 log:notEqualTo ?L2 } => @false.
-    { ?c skos:prefLabel ?l; skos:altLabel ?l } => @false.
-    { ?c skos:prefLabel ?l; skos:hiddenLabel ?l } => @false.
-    { ?c skos:altLabel ?l; skos:hiddenLabel ?l } => @false.
-    { ?c skos:prefLabel ?x, ?y. ?x log:notEqualTo ?y. (?x) func:lang-from-PlainLiteral ?lang. (?y) func:lang-from-PlainLiteral ?lang } => @false.
+    { ?x a skos:ConceptScheme, skos:Concept } => false.
+    { ?x a skos:Collection, skos:Concept } => false.
+    { ?x a skos:Collection, skos:ConceptScheme } => false.
+    { ?x skos:related ?y. ?x skos:broaderTransitive ?y } => false.
+    { ?x skos:exactMatch ?y. ?x skos:broadMatch ?y } => false.
+    { ?x skos:exactMatch ?y. ?x skos:relatedMatch ?y } => false.
+    { ?c skos:memberList ?L1, ?L2. ?L1 log:notEqualTo ?L2 } => false.
+    { ?c skos:prefLabel ?l; skos:altLabel ?l } => false.
+    { ?c skos:prefLabel ?l; skos:hiddenLabel ?l } => false.
+    { ?c skos:altLabel ?l; skos:hiddenLabel ?l } => false.
+    { ?c skos:prefLabel ?x, ?y. ?x log:notEqualTo ?y. (?x) func:lang-from-PlainLiteral ?lang. (?y) func:lang-from-PlainLiteral ?lang } => false.
 
      <http://eulersharp.sourceforge.net/2003/03swap/skos-rules>
          dce:title "SKOS rules"@en;
