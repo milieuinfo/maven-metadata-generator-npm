@@ -72,18 +72,19 @@ pipeline {
 				stage("Trivy scan") {
 					steps {
 						script {
-							trivy.scanFilesystem([targetPath: 'package-lock.json'])
+							trivy.scanFilesystem([targetPath: 'pnpm-lock.yaml'])
 						}
 					}
 				}
-				stage("npm build") {
+				stage("pnpm build") {
 					steps {
 						container('node') {
 							sh '''
+								npm install -g pnpm@9.15.9
 								rm -rf build
-								npm ci
-								npm test
-								npx rollup -c rollup.config.mjs
+								pnpm install --frozen-lockfile
+								pnpm test
+								pnpm exec rollup -c rollup.config.mjs
 							'''
 						}
 					}
@@ -100,13 +101,14 @@ pipeline {
 				}
 			}
 			stages {
-				stage("npm publish prerelease") {
+				stage("pnpm publish prerelease") {
 					steps {
 						container('node') {
 							sh '''
 								PRERELEASE_ID=$(echo "${BRANCH_NAME}" | tr -c 'a-zA-Z0-9\\n' '-')
 								npm version prerelease --preid "${PRERELEASE_ID}.${BUILD_NUMBER}" --no-git-tag-version --ignore-scripts
-								npm publish --tag "${PRERELEASE_ID}"
+								npm install -g pnpm@9.15.9
+								pnpm publish --tag "${PRERELEASE_ID}" --no-git-checks
 							'''
 						}
 					}
@@ -130,10 +132,13 @@ pipeline {
 						}
 					}
 				}
-				stage("npm publish") {
+				stage("pnpm publish") {
 					steps {
 						container('node') {
-							sh 'npm publish'
+							sh '''
+								npm install -g pnpm@9.15.9
+								pnpm publish --no-git-checks
+							'''
 						}
 					}
 				}
@@ -145,7 +150,7 @@ pipeline {
 									sh '''
 										git config user.email "$GIT_USER_EMAIL"
 										git config user.name "$GIT_USER_NAME"
-										git add package.json package-lock.json
+										git add package.json
 										git commit -m "${VERSION} [skip ci]"
 										git tag "v${VERSION}"
 										git push origin "HEAD:${BRANCH_NAME}" "v${VERSION}"
