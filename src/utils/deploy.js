@@ -56,7 +56,11 @@ async function get_latest_jar(omgeving) {
             throw new Error(`Response status: ${response.status}`);
         }
         const body = await response.json();
-        unzip(select_latest_jar(body), omgeving)
+        const latest_jar = select_latest_jar(body)
+        if (!latest_jar) {
+            throw new Error(`No released jar found for ${groupId}:${artifactId} in Artifactory (repos=release)`);
+        }
+        await unzip(latest_jar, omgeving)
     } catch (error) {
         console.error(error.message);
     }
