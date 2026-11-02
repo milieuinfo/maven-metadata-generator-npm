@@ -3,7 +3,10 @@ import {
     parquetSourcesFromJsonArray,
     inferSchema,
     typeArray,
-    parquetWriter
+    parquetWriter,
+    toListSchema,
+    toListRow,
+    fromListRow
 } from '../../utils/parquet_writer.js';
 import { succes_frame_parquet, fail_frame_2, json_ld_parquet } from './variables.js' ;
 import {test, describe} from 'node:test' ;
@@ -428,7 +431,14 @@ describe("Writing a parquet file from jsonld.", () => {
         await reader.close();
 
         // 8. Assert that read rows match the typed array
-        assert.deepStrictEqual(readRows, typedArray);
+        //    (parquetjs-lite returns the raw LIST structure: unwrap it first).
+        //    Missing values in repeated fields are written as empty lists.
+        const repeatedKeys = Object.keys(parquetSchema.schema).filter(k => parquetSchema.schema[k].repeated);
+        const expected = typedArray.map(r => ({
+            ...Object.fromEntries(repeatedKeys.map(k => [k, []])),
+            ...r
+        }));
+        assert.deepStrictEqual(readRows.map(r => fromListRow(r, parquetSchema.schema)), expected);
 
         console.log("Round-trip Parquet verification successful!");
     });
@@ -456,7 +466,7 @@ describe("Writing a parquet file from jsonld.", () => {
         const readRows = [];
         let row = null;
         while ((row = await cursor.next())) {
-            readRows.push(row);
+            readRows.push(fromListRow(row));
         }
         await reader.close();
 
@@ -537,7 +547,61 @@ describe("Writing a parquet file from jsonld.", () => {
     //     console.log("Nested round-trip Parquet verification successful!");
     // });
 
+    test('Repeated fields are written as standard Parquet LIST columns', async () => {
+        const data = [
+            { id: 'a', tags: ['x'] },
+            { id: 'b', tags: ['y', 'z'] },
+            { id: 'c', tags: [] },
+            { id: 'd' }
+        ];
+        const typedArray = typeArray(data);
+        const parquetSchema = inferSchema(typedArray);
+        const parquetPath = "src/test/result/list_columns.parquet";
+        await parquetWriter({ parquetSchema, typedArray }, parquetPath);
 
+        const reader = await parquet.ParquetReader.openFile(parquetPath);
+        // the LIST annotation is in the file metadata (parquetjs-lite's schema object does not expose it for groups)
+        const tagsElement = reader.metadata.schema.find(e => e.name === 'tags');
+        assert.strictEqual(tagsElement.converted_type, 3); // ConvertedType.LIST
+        const tags = reader.getSchema().fields.tags;
+        assert.strictEqual(tags.repetitionType, 'OPTIONAL');
+        assert.strictEqual(tags.fields.list.repetitionType, 'REPEATED');
+        assert.strictEqual(tags.fields.list.fields.element.primitiveType, 'BYTE_ARRAY');
 
+        const cursor = reader.getCursor();
+        const readRows = [];
+        let row = null;
+        while ((row = await cursor.next())) {
+            readRows.push(fromListRow(row, parquetSchema.schema));
+        }
+        await reader.close();
 
+        assert.deepStrictEqual(readRows[0].tags, ['x']);       // one element stays a list
+        assert.deepStrictEqual(readRows[1].tags, ['y', 'z']);
+        assert.deepStrictEqual(readRows[2].tags, []);
+        // missing value in a repeated field is written as an empty list, not null
+        assert.deepStrictEqual(readRows[3].tags, []);
+    });
+
+    test('toListSchema / toListRow: nested objects in arrays', () => {
+        const schemaDefinition = {
+            id: { type: 'UTF8' },
+            path: { repeated: true, fields: { label: { type: 'UTF8' } } }
+        };
+        const listSchema = toListSchema(schemaDefinition);
+        assert.strictEqual(listSchema.path.type, 'LIST');
+        assert.deepStrictEqual(listSchema.path.fields.list.fields.element.fields, { label: { type: 'UTF8' } });
+        assert.deepStrictEqual(listSchema.id, { type: 'UTF8' });
+
+        const row = { id: 'a', path: [{ label: 'x' }, { label: 'y' }] };
+        const listRow = toListRow(row, schemaDefinition);
+        assert.deepStrictEqual(listRow.path, { list: [{ element: { label: 'x' } }, { element: { label: 'y' } }] });
+        assert.deepStrictEqual(fromListRow(listRow), row);
+        // a scalar in a repeated field becomes a one-element list
+        assert.deepStrictEqual(toListRow({ path: { label: 'z' } }, schemaDefinition).path,
+            { list: [{ element: { label: 'z' } }] });
+        // missing or null value in a repeated field becomes an empty list
+        assert.deepStrictEqual(toListRow({ id: 'b' }, schemaDefinition), { id: 'b', path: { list: [] } });
+        assert.deepStrictEqual(toListRow({ id: 'c', path: null }, schemaDefinition), { id: 'c', path: { list: [] } });
+    });
 });

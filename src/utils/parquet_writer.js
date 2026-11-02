@@ -266,7 +266,118 @@ function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
 }
 
 /**
+ * Convert a schema definition (as produced by inferSchema) to one where every
+ * repeated field is written as a standard Parquet LIST (3-level structure):
+ *
+ *   optional group <name> (LIST) {
+ *     repeated group list {
+ *       optional <type> element;
+ *     }
+ *   }
+ *
+ * Bare `repeated` fields (the legacy 1-level encoding) are read as a list by
+ * spec-compliant readers (pyarrow, Spark, DuckDB), but several viewers show a
+ * one-element list as a scalar. The LIST annotation removes that ambiguity.
+ *
+ * @param {Object} schemaDefinition - Field definitions, e.g. `parquetSchema.schema`.
+ * @returns {Object} - New field definitions with LIST groups.
+ */
+function toListSchema(schemaDefinition) {
+    const result = {};
+    for (const [key, def] of Object.entries(schemaDefinition)) {
+        const { repeated, optional, ...rest } = def;
+        if (repeated) {
+            const element = rest.fields
+                ? { optional: true, fields: toListSchema(rest.fields) }
+                : { optional: true, type: rest.type || 'UTF8' };
+            result[key] = {
+                type: 'LIST',
+                optional: true,
+                fields: { list: { repeated: true, fields: { element } } }
+            };
+        } else if (rest.fields) {
+            result[key] = { ...(optional ? { optional } : {}), fields: toListSchema(rest.fields) };
+        } else {
+            result[key] = { ...def };
+        }
+    }
+    return result;
+}
+
+/**
+ * Reshape a row to match a schema produced by toListSchema:
+ * arrays become `{ list: [{ element: value }, ...] }`.
+ * A scalar value in a repeated field is wrapped as a one-element list.
+ * A missing or null value in a repeated field becomes an empty list: in RDF an
+ * absent property and an empty set of values mean the same, and an empty list
+ * is easier for consumers (no null checks, len() = 0).
+ *
+ * @param {Object} row - A typed row.
+ * @param {Object} schemaDefinition - The ORIGINAL field definitions (from inferSchema).
+ * @returns {Object} - Row in LIST layout.
+ */
+function toListRow(row, schemaDefinition) {
+    const result = {};
+    const keys = new Set([...Object.keys(row), ...Object.keys(schemaDefinition)]);
+    for (const key of keys) {
+        const def = schemaDefinition[key];
+        const value = row[key];
+        if (def?.repeated) {
+            const values = (value === null || value === undefined) ? []
+                : Array.isArray(value) ? value : [value];
+            const convert = v => (def.fields && v !== null && typeof v === 'object')
+                ? toListRow(v, def.fields)
+                : v;
+            result[key] = { list: values.map(v => ({ element: convert(v) })) };
+        } else if (value === null || value === undefined) {
+            if (key in row) result[key] = value;
+        } else if (def?.fields && typeof value === 'object') {
+            result[key] = toListRow(value, def.fields);
+        } else {
+            result[key] = value;
+        }
+    }
+    return result;
+}
+
+/**
+ * Inverse of toListRow: turn `{ list: [{ element }] }` back into plain arrays.
+ * Useful when reading back a file with parquetjs-lite, which returns the raw
+ * LIST structure.
+ *
+ * parquetjs-lite returns an empty LIST as `{}`. Pass the original schema
+ * definition (from inferSchema) to turn those into `[]`; without it an empty
+ * LIST cannot be told apart from an empty struct and is left as `{}`.
+ *
+ * @param {*} value - A row (or value) as returned by a ParquetReader cursor.
+ * @param {Object} [schemaDefinition] - The ORIGINAL field definitions (from inferSchema).
+ * @returns {*} - The same data with LIST groups replaced by arrays.
+ */
+function fromListRow(value, schemaDefinition) {
+    if (Array.isArray(value)) return value.map(v => fromListRow(v, schemaDefinition));
+    if (value === null || typeof value !== 'object' || Buffer.isBuffer(value) || value instanceof Date) {
+        return value;
+    }
+    const keys = Object.keys(value);
+    if (keys.length === 1 && keys[0] === 'list' && Array.isArray(value.list)) {
+        return value.list.map(item => fromListRow(item.element, schemaDefinition));
+    }
+    const result = {};
+    for (const k of keys) {
+        const def = schemaDefinition?.[k];
+        const v = value[k];
+        if (def?.repeated && v !== null && typeof v === 'object' && Object.keys(v).length === 0) {
+            result[k] = [];
+        } else {
+            result[k] = fromListRow(v, def?.fields);
+        }
+    }
+    return result;
+}
+
+/**
  * Write a Parquet file from inferred schema + typed rows.
+ * Repeated fields are written as standard Parquet LIST columns (see toListSchema).
  *
  * @param {{ typedArray: Array<Object>, parquetSchema: parquet.ParquetSchema }} parquetSources
  *        Object with schema + rows (from parquetSourcesFromJsonArray/Jsonld).
@@ -282,9 +393,11 @@ function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
  * await parquetWriter(sources, "./output.parquet");
  */
 async function parquetWriter(parquetSources, parquetFilePath) {
-    const writer = await parquet.ParquetWriter.openFile(parquetSources.parquetSchema, parquetFilePath);
+    const schemaDefinition = parquetSources.parquetSchema.schema;
+    const listSchema = new parquet.ParquetSchema(toListSchema(schemaDefinition));
+    const writer = await parquet.ParquetWriter.openFile(listSchema, parquetFilePath);
     for (const row of parquetSources.typedArray) {
-        await writer.appendRow(row);
+        await writer.appendRow(toListRow(row, schemaDefinition));
     }
     await writer.close();
     console.log(`Parquet file written to ${parquetFilePath}`);
@@ -295,5 +408,8 @@ export {
     parquetSourcesFromJsonArray,
     inferSchema,
     typeArray,
-    parquetWriter
+    parquetWriter,
+    toListSchema,
+    toListRow,
+    fromListRow
 };
