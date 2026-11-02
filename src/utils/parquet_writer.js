@@ -42,7 +42,12 @@ function inferSchema(array) {
         }
     }
 
-    // Walk through values and update schema definition
+    // Walk through values and update schema definition.
+    // Nested objects of one column are collected over ALL rows and their schema is inferred
+    // in one go, so a nested field that is missing in some rows becomes optional instead of
+    // the schema of the last row winning.
+    const nestedObjects = {};
+    const collectNested = (key, value) => (nestedObjects[key] ??= []).push(value);
     for (const row of array) {
         for (const key of Object.keys(schemaDefinition)) {
             const value = row[key];
@@ -52,18 +57,15 @@ function inferSchema(array) {
                     schemaDefinition[key].optional = true;
                     break;
 
-                case "object": {
-                    const s = inferSchema([value]);
-                    schemaDefinition[key].fields = s.schema;
+                case "object":
+                    collectNested(key, value);
                     break;
-                }
 
                 case "array": {
                     schemaDefinition[key].repeated = true;
                     for (const element of value) {
                         if (_getValueKind(element) === "object") {
-                            const s = inferSchema([element]);
-                            schemaDefinition[key].fields = s.schema;
+                            collectNested(key, element);
                         } else {
                             _evaluate_value(element, key, schemaDefinition);
                         }
@@ -75,6 +77,9 @@ function inferSchema(array) {
                     _evaluate_value(value, key, schemaDefinition);
             }
         }
+    }
+    for (const [key, objects] of Object.entries(nestedObjects)) {
+        schemaDefinition[key].fields = inferSchema(objects).schema;
     }
 
     return new parquet.ParquetSchema(schemaDefinition);
@@ -91,8 +96,7 @@ function inferSchema(array) {
             schemaDefinition[key].repeated = true;
             for (const element of val) {
                 if (_getValueKind(element) === "object") {
-                    const s = inferSchema([element]);
-                    schemaDefinition[key].fields = s.schema;
+                    collectNested(key, element);
                 } else {
                     _evaluate_value(element, key, schemaDefinition);
                 }
@@ -134,6 +138,51 @@ function inferSchema(array) {
         const incomingIdx = typeOrder.indexOf(incoming);
         return typeOrder[Math.max(existingIdx, incomingIdx)];
     }
+}
+
+/**
+ * Make every column either "all objects" or "all scalars".
+ *
+ * JSON-LD framing can produce a column that holds an IRI string in one row and an object
+ * in another (e.g. sh:value or sh:sourceShape in a SHACL validation report). Parquet needs
+ * one type per column, so in such a mixed column every object is replaced by a scalar:
+ * its `@id` or `@value` when that is all it holds, otherwise its JSON serialization.
+ * Columns that only hold objects are harmonized recursively.
+ *
+ * @param {Array<Object>} array - Rows (plain objects).
+ * @returns {Array<Object>} - New rows; the input is not modified.
+ */
+function harmonizeColumns(array) {
+    const rows = array.map(row => ({ ...row }));
+    const isObject = v => v !== null && typeof v === 'object' && !Array.isArray(v);
+    const valuesOf = v => (v === null || v === undefined) ? [] : Array.isArray(v) ? v : [v];
+    const toScalar = v => {
+        if (!isObject(v)) return v;
+        const keys = Object.keys(v);
+        if (keys.length === 1 && keys[0] === '@id') return v['@id'];
+        if ('@value' in v && keys.every(k => ['@value', '@type', '_type', '@language'].includes(k))) return v['@value'];
+        return JSON.stringify(v);
+    };
+    const keys = new Set(rows.flatMap(row => Object.keys(row)));
+    for (const key of keys) {
+        const values = rows.flatMap(row => valuesOf(row[key]));
+        const hasObject = values.some(isObject);
+        const hasScalar = values.some(v => !isObject(v) && !Array.isArray(v));
+        if (hasObject && hasScalar) {
+            for (const row of rows) {
+                if (row[key] === null || row[key] === undefined) continue;
+                row[key] = Array.isArray(row[key]) ? row[key].map(toScalar) : toScalar(row[key]);
+            }
+        } else if (hasObject) {
+            const nested = harmonizeColumns(values);
+            let i = 0;
+            for (const row of rows) {
+                if (row[key] === null || row[key] === undefined) continue;
+                row[key] = Array.isArray(row[key]) ? row[key].map(() => nested[i++]) : nested[i++];
+            }
+        }
+    }
+    return rows;
 }
 
 /**
@@ -212,7 +261,7 @@ function parquetSourcesFromJsonArray(array) {
     if (array.length === 0) {
         throw new Error('Array is empty.');
     }
-    const typedArray = typeArray(array);
+    const typedArray = typeArray(harmonizeColumns(array));
     const parquetSchema = inferSchema(typedArray);
     return { typedArray, parquetSchema };
 }
@@ -260,7 +309,7 @@ function parquetSourcesFromJsonld(json_ld, jsonPath = '$.graph[*]') {
         throw new Error('Extracted array is empty.');
     }
 
-    const typedArray = typeArray(array);
+    const typedArray = typeArray(harmonizeColumns(array));
     const parquetSchema = inferSchema(typedArray);
     return { typedArray, parquetSchema };
 }
@@ -404,6 +453,7 @@ async function parquetWriter(parquetSources, parquetFilePath) {
 }
 
 export {
+    harmonizeColumns,
     parquetSourcesFromJsonld,
     parquetSourcesFromJsonArray,
     inferSchema,

@@ -104,5 +104,21 @@ async function validate(shapesDataset,
 }
 
 
+/**
+ * Throws when a SHACL validation report does not conform, so that a script producing
+ * non-conforming RDF fails (exit code 1) instead of ending silently.
+ *
+ * @param {SHACLValidator.ValidationReport} report - Report returned by validate().
+ * @param {string} [reportFile] - Where the validation report was written (for the message).
+ * @throws {Error} If report.conforms is false.
+ */
+function ensureConforms(report, reportFile = '../validation/validation_result.json') {
+    if (!report.conforms) {
+        throw new Error('SHACL validation failed: the RDF does not conform to the shapes; nothing was written. ' +
+            `See ${reportFile} for the validation report.`);
+    }
+}
+
+export { ensureConforms };
 export default validate;
 

@@ -314,7 +314,7 @@ describe("Writing a parquet file from jsonld.", () => {
         assert(schema.schema.id.type === 'INT64');
         assert(schema.schema.tags.type === 'UTF8');
         assert(schema.schema.tags.repeated === true);
-        assert(schema.schema.tags.fields.label.type === 'INT64'); //TODO: this schould be 'UTF-8'
+        assert(schema.schema.tags.fields.label.type === 'UTF8'); // label is "nested" in one element and 1 in the other
     });
 
 

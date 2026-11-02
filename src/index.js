@@ -2,7 +2,7 @@
 
 import N3 from 'n3';
 import rdfDataset from "@rdfjs/dataset";
-import validate from './utils/shacl_validation.js';
+import validate, { ensureConforms } from './utils/shacl_validation.js';
 import csv from 'csvtojson';
 import {construct_dcat} from './utils/metadata.js';
 import {separateString, to_be_metadated, version_from_uri, n3_reasoning, cleanUpDir} from './utils/functions.js';
@@ -221,8 +221,8 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
     // Clean up temp directory if it exists
     cleanUpDir('../temp/')
 
-    output(metadataSource, latest_version_nt, {"turtlePath": datasetOptions.turtlePath, "jsonldOptions": {"file": datasetOptions.jsonldOptions.file, "frame": datasetOptions.jsonldOptions.frame}});
-    output(metadataSource, all_versions_nt, {"turtlePath": catalogOptions.turtlePath, "jsonldOptions": {"file": catalogOptions.jsonldOptions.file, "frame": catalogOptions.jsonldOptions.frame}});
+    await output(metadataSource, latest_version_nt, {"turtlePath": datasetOptions.turtlePath, "jsonldOptions": {"file": datasetOptions.jsonldOptions.file, "frame": datasetOptions.jsonldOptions.frame}});
+    await output(metadataSource, all_versions_nt, {"turtlePath": catalogOptions.turtlePath, "jsonldOptions": {"file": catalogOptions.jsonldOptions.file, "frame": catalogOptions.jsonldOptions.frame}});
 }
 
 
@@ -250,6 +250,7 @@ async function get_versions(uris, metadataSource, metadataOptions, datasetOption
  * @param {string} rdf - RDF input as string
  * @param {OutputOptions} options
  * @throws {Error} If options object contains no specified output.
+ * @throws {Error} If the RDF does not conform to source.shapesDataset (nothing is written).
  * @throws {TypeError} If OutputOptions is not an object.
  * @throws {TypeError} If source.shapesDataset is not a rdfDataset.
  * @throws {TypeError} If rdf is not a string.
@@ -298,9 +299,11 @@ async function output(
             }
         });
     });
-    // Validate the dataset with provided SHACL shapes
+    // Validate the dataset with provided SHACL shapes.
+    // A non-conforming dataset is not written and makes the calling script fail (exit code 1),
+    // so that a build running create_skos / create_metadata stops instead of passing silently.
     const report = await validate(source.shapesDataset, dataset)
-    if (!(report.conforms)){ return}
+    ensureConforms(report)
 
     try {
         // Write Turtle serialization to file, if requested
