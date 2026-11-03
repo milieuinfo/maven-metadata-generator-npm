@@ -6,6 +6,7 @@ import {
     config
 } from './variables.js';
 import { getSchemas } from './rootresource.js';
+import { odcs_conforms_to } from './odcs.js';
 
 /**
  * Constructs a DCAT (Data Catalog Vocabulary) catalog object
@@ -57,6 +58,12 @@ function construct_dcat(versions) {
                             extension +
                             '.html'
                     };
+
+                    // link to the ODCS data contract written by create_odcs (parquet only)
+                    const contract = odcs_conforms_to(config, artifactId, version, extension);
+                    if (contract) {
+                        dist['http://purl.org/dc/terms/conformsTo'] = contract;
+                    }
 
                     if (!distribution_metadata.description) {
                         dist.description =

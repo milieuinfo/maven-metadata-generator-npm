@@ -125,7 +125,7 @@ ons:distribution a                sh:NodeShape ;
                       omg_ps:dcat_theme, omg_ps:owl_versionInfo, omg_ps:rdf_type,omg_ps:dcat_accessURL,
                       omg_ps:dcat_compressFormat,omg_ps:dcat_downloadURL,omg_ps:dcat_mediaType,omg_ps:dc_identifier,omg_ps:dcterms_accessRights,
                       omg_ps:dcterms_description, omg_ps:dcterms_format,omg_ps:dcterms_identifier,omg_ps:dcterms_issued,omg_ps:dcterms_rightsHolder,omg_ps:dcterms_title,
-                      omg_ps:foaf_page,omg_ps:rdfs_label ;
+                      omg_ps:foaf_page,omg_ps:rdfs_label,omg_ps:dcterms_conformsTo ;
     sh:targetSubjectsOf dcat:mediaType .
 
 
@@ -784,6 +784,16 @@ omg_ps:dcat_keyword
     sh:languageIn    ( "nl" "en" ) ;
     sh:nodeKind      sh:Literal ;
     sh:path  dcat:keyword .
+
+omg_ps:dcterms_conformsTo
+    a sh:PropertyShape ;
+    rdfs:label  "voldoet aan"@nl ;
+    sh:name "voldoet aan"@nl ;
+    sh:description "Het data contract (ODCS) of de standaard waaraan de distributie voldoet."@nl ;
+    rdfs:isDefinedBy omg_ont:dcat-ap-constraints, omg_voc:dcat-ap-constraints ;
+    sh:nodeKind  sh:IRI ;
+    sh:class dcterms:Standard ;
+    sh:path  dcterms:conformsTo .
 
 omg_ps:dcterms_title
     a sh:PropertyShape ;

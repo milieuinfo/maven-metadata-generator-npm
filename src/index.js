@@ -8,6 +8,7 @@ import {construct_dcat} from './utils/metadata.js';
 import {separateString, to_be_metadated, version_from_uri, n3_reasoning, cleanUpDir} from './utils/functions.js';
 import {json_writer, jsonld_writer, table_writer, parquet_writer, xsd_writer, n3_writer } from './utils/writers.js';
 import {deploy_latest} from './utils/deploy.js';
+import {create_odcs} from './utils/odcs.js';
 
 
 /**
@@ -341,7 +342,7 @@ async function output(
 
 }
 
-export { generate_skos, create_metadata, deploy_latest, output };
+export { generate_skos, create_metadata, create_odcs, deploy_latest, output };
 
 
 

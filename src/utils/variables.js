@@ -19,7 +19,9 @@ const groupId = jp.query(pom, '$.project.groupId._text').toString();
 
 const artifactId = jp.query(pom, '$.project.artifactId._text').toString();
 
-const next_release_version = jp.query(pom, '$.project.version._text').toString().split('-')[0];
+const version = jp.query(pom, '$.project.version._text').toString();
+
+const next_release_version = version.split('-')[0];
 
 const skos_rules = config.skos.rules ;
 
@@ -57,6 +59,7 @@ const metadataOptions = {
     "artifactId": artifactId,
     "groupId": groupId,
     "next_release_version": next_release_version,
+    "version": version,
     "startVersion": config.metadata.start_version
 }
 
