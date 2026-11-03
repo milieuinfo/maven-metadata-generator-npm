@@ -357,9 +357,12 @@ function toListSchema(schemaDefinition) {
  * Reshape a row to match a schema produced by toListSchema:
  * arrays become `{ list: [{ element: value }, ...] }`.
  * A scalar value in a repeated field is wrapped as a one-element list.
- * A missing or null value in a repeated field becomes an empty list: in RDF an
- * absent property and an empty set of values mean the same, and an empty list
- * is easier for consumers (no null checks, len() = 0).
+ * A missing, null or empty value in a repeated field is written as a null LIST
+ * (definition level 0), never as an empty LIST. In RDF an absent property and an
+ * empty set of values mean the same. Some readers cannot handle empty LISTs:
+ * the Parquet viewer of IntelliJ (Big Data Tools) reads an empty LIST as a value,
+ * which shifts all following values of that column or fails with
+ * "Can't read value in column [..., list, element]".
  *
  * @param {Object} row - A typed row.
  * @param {Object} schemaDefinition - The ORIGINAL field definitions (from inferSchema).
@@ -374,6 +377,7 @@ function toListRow(row, schemaDefinition) {
         if (def?.repeated) {
             const values = (value === null || value === undefined) ? []
                 : Array.isArray(value) ? value : [value];
+            if (values.length === 0) continue; // null LIST, see above
             const convert = v => (def.fields && v !== null && typeof v === 'object')
                 ? toListRow(v, def.fields)
                 : v;
@@ -394,9 +398,11 @@ function toListRow(row, schemaDefinition) {
  * Useful when reading back a file with parquetjs-lite, which returns the raw
  * LIST structure.
  *
- * parquetjs-lite returns an empty LIST as `{}`. Pass the original schema
- * definition (from inferSchema) to turn those into `[]`; without it an empty
- * LIST cannot be told apart from an empty struct and is left as `{}`.
+ * Pass the original schema definition (from inferSchema) to get `[]` for every
+ * repeated field without values: a null LIST (as written by toListRow, absent
+ * from the row returned by parquetjs-lite) and an empty LIST (returned as `{}`,
+ * found in files written by older versions). Without the schema those fields
+ * stay absent or `{}`.
  *
  * @param {*} value - A row (or value) as returned by a ParquetReader cursor.
  * @param {Object} [schemaDefinition] - The ORIGINAL field definitions (from inferSchema).
@@ -412,10 +418,12 @@ function fromListRow(value, schemaDefinition) {
         return value.list.map(item => fromListRow(item.element, schemaDefinition));
     }
     const result = {};
-    for (const k of keys) {
+    const repeatedKeys = Object.keys(schemaDefinition ?? {}).filter(k => schemaDefinition[k]?.repeated);
+    for (const k of new Set([...keys, ...repeatedKeys])) {
         const def = schemaDefinition?.[k];
         const v = value[k];
-        if (def?.repeated && v !== null && typeof v === 'object' && Object.keys(v).length === 0) {
+        if (def?.repeated && (v === null || v === undefined
+            || (typeof v === 'object' && Object.keys(v).length === 0))) {
             result[k] = [];
         } else {
             result[k] = fromListRow(v, def?.fields);

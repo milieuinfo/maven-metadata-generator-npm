@@ -432,7 +432,8 @@ describe("Writing a parquet file from jsonld.", () => {
 
         // 8. Assert that read rows match the typed array
         //    (parquetjs-lite returns the raw LIST structure: unwrap it first).
-        //    Missing values in repeated fields are written as empty lists.
+        //    Repeated fields without values are written as null LISTs; fromListRow
+        //    (with the schema) returns them as empty arrays.
         const repeatedKeys = Object.keys(parquetSchema.schema).filter(k => parquetSchema.schema[k].repeated);
         const expected = typedArray.map(r => ({
             ...Object.fromEntries(repeatedKeys.map(k => [k, []])),
@@ -569,17 +570,22 @@ describe("Writing a parquet file from jsonld.", () => {
         assert.strictEqual(tags.fields.list.fields.element.primitiveType, 'BYTE_ARRAY');
 
         const cursor = reader.getCursor();
-        const readRows = [];
+        const rawRows = [];
         let row = null;
         while ((row = await cursor.next())) {
-            readRows.push(fromListRow(row, parquetSchema.schema));
+            rawRows.push(row);
         }
         await reader.close();
+        const readRows = rawRows.map(r => fromListRow(r, parquetSchema.schema));
 
         assert.deepStrictEqual(readRows[0].tags, ['x']);       // one element stays a list
         assert.deepStrictEqual(readRows[1].tags, ['y', 'z']);
+        // an empty or missing value in a repeated field is written as a null LIST,
+        // not as an empty LIST (IntelliJ's Parquet viewer cannot read empty LISTs)
+        assert.ok(!('tags' in rawRows[2]), 'empty list is stored as null');
+        assert.ok(!('tags' in rawRows[3]), 'missing value is stored as null');
+        // fromListRow with the schema returns an empty array for both
         assert.deepStrictEqual(readRows[2].tags, []);
-        // missing value in a repeated field is written as an empty list, not null
         assert.deepStrictEqual(readRows[3].tags, []);
     });
 
@@ -600,8 +606,12 @@ describe("Writing a parquet file from jsonld.", () => {
         // a scalar in a repeated field becomes a one-element list
         assert.deepStrictEqual(toListRow({ path: { label: 'z' } }, schemaDefinition).path,
             { list: [{ element: { label: 'z' } }] });
-        // missing or null value in a repeated field becomes an empty list
-        assert.deepStrictEqual(toListRow({ id: 'b' }, schemaDefinition), { id: 'b', path: { list: [] } });
-        assert.deepStrictEqual(toListRow({ id: 'c', path: null }, schemaDefinition), { id: 'c', path: { list: [] } });
+        // missing, null or empty value in a repeated field is left out (null LIST)
+        assert.deepStrictEqual(toListRow({ id: 'b' }, schemaDefinition), { id: 'b' });
+        assert.deepStrictEqual(toListRow({ id: 'c', path: null }, schemaDefinition), { id: 'c' });
+        assert.deepStrictEqual(toListRow({ id: 'd', path: [] }, schemaDefinition), { id: 'd' });
+        // fromListRow with the schema turns a null LIST and an old-style empty LIST ({}) into []
+        assert.deepStrictEqual(fromListRow({ id: 'b' }, schemaDefinition), { id: 'b', path: [] });
+        assert.deepStrictEqual(fromListRow({ id: 'e', path: {} }, schemaDefinition), { id: 'e', path: [] });
     });
 });
