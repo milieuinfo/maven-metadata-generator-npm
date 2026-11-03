@@ -17,7 +17,6 @@
         { ?y dcterms:replaces ?x . } => { ?x dcterms:isReplacedBy ?y . } .
         { ?x dcterms:isRequiredBy ?y . } => { ?y dcterms:requires ?x . } .
         { ?y dcterms:requires ?x . } => { ?x dcterms:isRequiredBy ?y . } .
-        { ?x dcterms:creator ?y . } => { ?x foaf:maker ?y . } .
         { ?x dcterms:publisher ?y . } => { ?y a dcterms:Agent . } .
         { ?x dcterms:contributor ?y . } => { ?y a dcterms:Agent . } .
 
@@ -64,10 +63,6 @@
         { ?x dcterms:isReferencedBy ?y . } => { ?x dcterms:relation ?y . }  .
 
 
-
-# dit laatste is geen onderdeel van het dcterms vocabularium
-
-#{ ?x dcterms:type ?y . } => { ?y a rdfs:Class . } .
 
 
 
